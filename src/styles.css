@@ -1,0 +1,22 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+.setside {
+  display: flex;
+  justify-content: space-between;
+  
+}
+
+.right {
+  width: 100%; /* Adjust width as needed */
+  text-align: right;
+}
+.left {
+  width: 100%; 
+  text-align: left;
+
+}
+.contact-info {
+  height: 495px;
+}
