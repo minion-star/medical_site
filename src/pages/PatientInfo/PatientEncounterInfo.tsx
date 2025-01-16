@@ -30,6 +30,7 @@ import {
   Toolbar,
   Container,
   Badge,
+  Modal
 } from "@mui/material";
 import { ExpandLess, ExpandMore} from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -38,6 +39,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import PrintIcon from "@mui/icons-material/Print";
+import BarChartIcon from '@mui/icons-material/BarChart';
 import Appbar from "../../components/Appbar";
 import { Link, useParams } from "react-router-dom";
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
@@ -60,6 +64,12 @@ import CheckboxSkin from "../../components/Encounter/Checkbox/CheckboxSkin";
 import Appbar_Patient from "../../components/Appbar_Patientlist";
 import { flexibleCompare } from "@fullcalendar/core/internal";
 import ClickableAvatar from "../../components/ClickableAvatar";
+import CalculateIcon from '@mui/icons-material/Calculate';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import { link } from "fs";
+import { Calendar } from "@fullcalendar/core";
+import VitalSignsModal from "../../components/Encounter/VitalSignsModal";
+import { string } from "yargs";
 
 
 
@@ -214,71 +224,86 @@ const psychiatric_4:string = 'No mood disorders, calm affect'
 
 
 // selected options and check box component  
-
 interface NameProps {
-  names?: string[]|string[][]; // Accepts either a 1D or 2D array
+  names?: string[] | string[][]; // Accepts either a 1D or 2D array
   checked1?: boolean;
-  subname?:string;
-  label?:string;
+  subname?: string;
+  label?: string;
 }
 
 function Select_Checkbox({
-  names = name1,
+  names = [["Option 1", "Option 2"], ["Option 3", "Option 4"]],
   checked1 = true,
 }: NameProps) {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [textFieldValue, setTextFieldValue] = useState<string>("");
+  const [dropdownValue, setDropdownValue] = useState<string[]>([]);
 
   const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedOptions(typeof value === "string" ? value.split(",") : value);
+    const selectedValues = event.target.value as string[];
+    const latestSelection = selectedValues[selectedValues.length - 1]; // Get the latest selected item
+    if (latestSelection.trim() !== "") {
+      setTextFieldValue((prev) =>
+        prev.trim() === "" ? latestSelection : `${prev} | ${latestSelection}`
+      );
+    }
+    setDropdownValue([]); // Reset dropdown value to prevent display of selected items
+  };
+
+  const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTextFieldValue(event.target.value);
   };
 
   // Normalize names into a 2D array
   const normalizedNames: string[][] =
     Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
 
+  // Flatten names for dropdown processing
+  const processedNames = normalizedNames.flat();
+
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
-      {/* Select Component */}
-      <Grid item xs={12}>
-        <FormControl variant="standard" fullWidth >
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="select-checkbox"
-            multiple
-            disabled={!checked1}
-            value={selectedOptions}
-            onChange={handleSelectChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => {
-                  // Determine chip color based on the array it belongs to
-                  const isInFirstArray = normalizedNames[0].includes(value);
-                  const chipColor = isInFirstArray ? "success" : "error";
+      <Grid container item xs={11} alignItems={"end"}>
+        {/* TextField */}
+        <Grid item xs={11} sx={{ }}>
+          <TextField
+            fullWidth
+            variant="standard"
+            multiline
+            value={textFieldValue}
+            onChange={handleTextFieldChange}
+            disabled={!checked1} // Disable when unchecked
+          />
+        </Grid>
 
-                  return (
-                    <Chip
-                      key={value}
-                      label={value}
-                      color={chipColor}
-                    />
-                  );
-                })}
-              </Box>
-            )}
-          >
-            {normalizedNames.map((array, arrayIndex) =>
-              array.map((name) => (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={selectedOptions.includes(name)} />
-                  <ListItemText primary={name} />
-                </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+        {/* Select Dropdown */}
+        <Grid item xs={1} sx={{ }}>
+          <FormControl variant="standard">
+            <Select
+              labelId="select-quality-label"
+              id="multi-select"
+              multiple
+              value={dropdownValue} // Dropdown value must be an array
+              onChange={handleSelectChange}
+              renderValue={() => null} // Prevent displaying values in the dropdown
+              disabled={!checked1} // Disable when unchecked
+              displayEmpty
+            >
+              {processedNames.map((name, index) =>
+                name === "" ? (
+                  <MenuItem key={`separator-${index}`} disabled>
+                    <Typography variant="body2" sx={{ color: "gray" }}>
+                      <>&nbsp;</>
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                )
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
     </Box>
   );
@@ -297,13 +322,8 @@ function New_Select_Checkbox ({names=name1, checked1=true, subname=constitutiona
     <Box sx={{display:'flex', gap:1}}>
       <Grid item xs={1}><Checkbox color="success" disabled={!checked1} checked={check&&checked1} onChange={handleCheckboxChange}/></Grid>
       <Grid item xs={10} >
-        {check?<Select_Checkbox names={names} checked1={checked1}/>:<FormControl variant="standard" fullWidth><Select multiple value={subname} renderValue={(selected) => (
-          <Box sx={{ display: "flex", gap: 0.5 }}>
-              <Chip label={subname} color="success" />
-          </Box>
-          )}
-          />
-        </FormControl>}
+        {check?<Select_Checkbox names={names} checked1={checked1}/>:<Box sx={{ display: "flex", gap: 2 }}>
+        <Grid container item xs={11} alignItems={"end"}><Grid item xs={11}><TextField variant="standard" fullWidth disabled defaultValue={subname} multiline/></Grid><Grid item xs={1}><FormControl variant="standard"><Select disabled /></FormControl></Grid></Grid></Box>}
       </Grid>
     </Box>
   );
@@ -776,6 +796,170 @@ function SelectRefills() {
     </div>
   );
 }
+
+// Select E/M Code:
+
+function Select_Code () {
+
+  const [code, setCode] = useState<string>('');
+  const handleChange = (event: SelectChangeEvent) => {
+      setCode(event.target.value);
+    };
+  return (
+    <>
+      <FormControl fullWidth variant="standard">
+        <InputLabel id="demo-simple-select-standard-label">E/M Code:</InputLabel>
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={code}
+          onChange={handleChange}
+          label="Code"
+        >
+          <MenuItem value={10}>90791 - Psychiatric diagnostic eval, no medical services</MenuItem>
+          <MenuItem value={20}>90792 - Psychiatric diagnostic eval, w/medical services</MenuItem>
+          <MenuItem value={30}>90832 - Psychotherapy, 30 min(actual time 16-37min)</MenuItem>
+          <MenuItem value={40}>90834 - Psychotherapy, 45 min(actual time 38-52min)</MenuItem>
+        </Select>
+      </FormControl>
+    </>
+  );
+
+}
+
+// Select Code Basis
+
+function Select_Code_Basis () {
+
+  const [code, setCode] = useState<string>('');
+  const handleChange = (event: SelectChangeEvent) => {
+      setCode(event.target.value);
+    };
+  return (
+    <>
+      <FormControl fullWidth variant="standard">
+        <InputLabel id="demo-simple-select-standard-label">Code Basis:</InputLabel>
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={code}
+          onChange={handleChange}
+          label="Code Basis"
+        >
+          <MenuItem value={10}>Service</MenuItem>
+          <MenuItem value={20}>Time</MenuItem>
+        </Select>
+      </FormControl>
+    </>
+  );
+
+
+}
+
+// Select Period
+
+function Select_Period () {
+
+  const [period, setPeriod] = useState<string>('');
+  const handleChange = (event: SelectChangeEvent) => {
+      setPeriod(event.target.value);
+    };
+  return (
+    <>
+      <FormControl fullWidth variant="standard">
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={period}
+          onChange={handleChange}
+          label="Follow-up Visit"
+        >
+          <MenuItem value={10}>PRN</MenuItem>
+          <MenuItem value={20}>48 to 72 hours</MenuItem>
+          <MenuItem value={30}>Tomorrow</MenuItem>
+          <MenuItem value={40}>in 2 days</MenuItem>
+          <MenuItem value={50}>after 2 days</MenuItem>
+          <MenuItem value={60}>after 3 days</MenuItem>
+          <MenuItem value={70}>after 4 days</MenuItem>
+          <MenuItem value={80}>after 5 days</MenuItem>
+          <MenuItem value={90}>after 6 days</MenuItem>
+          <MenuItem value={100}>after 8 days</MenuItem>
+          <MenuItem value={110}>after 10 days</MenuItem>
+          <MenuItem value={120}>after 1 week</MenuItem>
+          <MenuItem value={130}>after 2 weeks</MenuItem>
+          <MenuItem value={140}>after 3 weeks</MenuItem>
+          <MenuItem value={150}>after 6 weeks</MenuItem>
+          <MenuItem value={160}>after 10 weeks</MenuItem>
+          <MenuItem value={170}>after 1 month</MenuItem>
+          <MenuItem value={180}>after 2 months</MenuItem>
+          <MenuItem value={190}>after 3 months</MenuItem>
+          <MenuItem value={200}>after 4 months</MenuItem>
+          <MenuItem value={210}>after 6 months</MenuItem>
+          <MenuItem value={220}>after 1 year</MenuItem>
+          <MenuItem value={230}>if not improved</MenuItem>
+          <MenuItem value={240}>if symptoms do not improve</MenuItem>
+          <MenuItem value={250}>after testing</MenuItem>
+          <MenuItem value={260}>after lab / xray</MenuItem>
+          <MenuItem value={270}>by telephone</MenuItem>
+          <MenuItem value={280}>call if not better</MenuItem>
+          <MenuItem value={290}>no further followup needed</MenuItem>
+          <MenuItem value={300}>as scheduled earlier</MenuItem>
+        </Select>
+      </FormControl>
+    </>
+  );
+
+
+}
+
+// Select Time
+function Select_Time () {
+
+  const [time, setTime] = useState<string>('');
+  const handleChange = (event: SelectChangeEvent) => {
+      setTime(event.target.value);
+    };
+  return (
+    <>
+      <FormControl fullWidth variant="standard">
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={time}
+          onChange={handleChange}
+          label="Join Work-School"
+        >
+          <MenuItem value={10}>after 2 days</MenuItem>
+          <MenuItem value={20}>after 3 days</MenuItem>
+          <MenuItem value={30}>after 4 days</MenuItem>
+          <MenuItem value={40}>after 5 days</MenuItem>
+          <MenuItem value={50}>after 6 days</MenuItem>
+          <MenuItem value={60}>after 10 days</MenuItem>
+          <MenuItem value={70}>after 1 week</MenuItem>
+          <MenuItem value={80}>after 2 weeks</MenuItem>
+          <MenuItem value={90}>after 3 weeks</MenuItem>
+          <MenuItem value={100}>after 1 month</MenuItem>
+          <MenuItem value={110}>after 2 months</MenuItem>
+          <MenuItem value={120}>after 3 months</MenuItem>
+        </Select>
+      </FormControl>
+    </>
+  );
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 const PatientInfoSchema = Yup.object().shape({
   firstName: Yup.string().required("Required"),
   lastName: Yup.string().required("Required"),
@@ -820,6 +1004,73 @@ const PatientEncounterInfo = ({ patients }: any) => {
     console.log(values);
     //resetForm();
   };
+
+  interface VitalSigns {
+    systolic: string,
+    diastolic: string,
+    temperature: string,
+    weight: string,
+    height: string,
+    respiration: string,
+    pulse: string,
+    waist: string,
+    spO2: string,
+
+  }
+
+
+  const [vitalSigns, setVitalSigns] = useState<VitalSigns>({systolic:'', diastolic:'', temperature:'', weight:'', height:'', respiration:'', pulse:'',waist:'', spO2:''});
+
+  const handleVitalSigns = (e: React.ChangeEvent<HTMLInputElement |  HTMLTextAreaElement> | SelectChangeEvent) => {
+    const { name, value } = e.target;
+    if (name === "systolic") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        systolic: value as string,
+      }));
+    } else if (name === "diastolic") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        diastolic: value as string,
+      }));
+    } else if (name === "temperature") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        temperature: value as string,
+      }));
+    } else if (name === "weight") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        weight: value as string,
+      }));
+    } else if (name === "height") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        height: value as string,
+      }));
+    } else if (name === "respiration") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        respiration: value as string,
+      }));
+    } else if (name === "pulse") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        pulse: value as string,
+      }));
+    } else if (name === "spO2") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        spO2: value as string,
+      }));
+    } else if (name === "waist") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        waist: value as string,
+      }))
+    }
+  };
+
   const bp1 = Array.from({ length: 221  }, (_, index) => index + 30);
   const bp2 = Array.from({ length: 131  }, (_, index) => index + 10);
 
@@ -1033,9 +1284,12 @@ const PatientEncounterInfo = ({ patients }: any) => {
                           </div>                         
                           <div style={styles.container}>
                             <Grid container spacing={1} sx={{display:"flex", alignItems:'end'}}>
-                              <Grid item xs={12}>
+                              <Grid item xs={11}>
                                 <h2>Vital Signs</h2> 
-                              </Grid>                           
+                              </Grid>                
+                              <Grid item xs={1} sx={{mb:2}}>
+                                <VitalSignsModal />
+                              </Grid>           
                               <Grid item container  xs={3}  sx={{display:"flex", alignItems:'end'}}>
                                 <Grid item xs={5} >
                                   <FormControl variant="standard" fullWidth>
@@ -1044,6 +1298,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                         variant="standard"
                                         id="vital-signs-bp-2"
                                         IconComponent={() => null} 
+                                        name="systolic"
+                                        value={vitalSigns.systolic}
+                                        onChange={handleVitalSigns}
                                       >
                                     
                                       {bp1.map((name) => (
@@ -1062,6 +1319,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                     <Select                                  
                                         id="vital-signs-bp-4"
                                         IconComponent={() => null} 
+                                        name="diastolic"
+                                        value={vitalSigns.diastolic}
+                                        onChange={handleVitalSigns}
                                     >
                                         {bp2.map((name) => (
                                           <MenuItem key={name} value={name}>                                        
@@ -1078,6 +1338,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   <Select
                                     id = 'vital-signs-tp-2'
                                     IconComponent={() => null} 
+                                    value={vitalSigns.temperature}
+                                    name="temperature"
+                                    onChange={handleVitalSigns}
                                   >
                                     {tp.map((name) => (
                                       <MenuItem key={name} value={name}>                                        
@@ -1093,6 +1356,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   <Select
                                       id="vital-signs-pr-2"
                                       IconComponent={() => null} 
+                                      value={vitalSigns.pulse}
+                                      name="pulse"
+                                      onChange={handleVitalSigns}
                                     >
                                       {pr.map((name) => (
                                         <MenuItem key={name} value={name}>                                        
@@ -1108,6 +1374,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   <Select
                                       id="vital-signs-rr-2"
                                       IconComponent={() => null} 
+                                      value={vitalSigns.respiration}
+                                      name="respiration"
+                                      onChange={handleVitalSigns}
                                     >
                                       {rr.map((name) => (
                                         <MenuItem key={name} value={name}>                                        
@@ -1123,6 +1392,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   <Select
                                       id="vital-signs-ht-2"
                                       IconComponent={() => null} 
+                                      value={vitalSigns.height}
+                                      name="height"
+                                      onChange={handleVitalSigns}
                                     >
                                       {ht.map((name) => (
                                         <MenuItem key={name} value={name}>                                        
@@ -1138,6 +1410,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   <Select
                                       id="vital-signs-wt-2"
                                       IconComponent={() => null} 
+                                      value={vitalSigns.weight}
+                                      name="weight"
+                                      onChange={handleVitalSigns}
                                     >
                                       {wt.map((name) => (
                                         <MenuItem key={name} value={name}>                                        
@@ -1153,6 +1428,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   <Select
                                       id="vital-signs-waist-2"
                                       IconComponent={() => null} 
+                                      value={vitalSigns.waist}
+                                      onChange={handleVitalSigns}
+                                      name="waist"
                                     >
                                       {waist.map((name) => (
                                         <MenuItem key={name} value={name}>                                        
@@ -1168,6 +1446,9 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   <Select
                                       id="vital-signs-spo2-2"
                                       IconComponent={() => null} 
+                                      value={vitalSigns.spO2}
+                                      name="spO2"
+                                      onChange={handleVitalSigns}
                                     >
                                       {sp02.map((name) => (
                                         <MenuItem key={name} value={name}>                                        
@@ -1247,12 +1528,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
                               </Grid>
                             </Grid>
                           </div> 
-                          <div style={styles.container}>
-                            <h2>Procedures / Services</h2>
-                            <Grid container spacing={2}>                                                        
-                              <Procedures_Services />                                                      
-                            </Grid>
-                          </div>                                               
+                                                                         
                         </Grid>                          
                         <Grid item xs={6} sm={6}>
                           <div style={styles.container}>
@@ -1474,7 +1750,75 @@ const PatientEncounterInfo = ({ patients }: any) => {
                           <div style={styles.container}>
                             <h2>Medications / Rx</h2>
                             <Medications_Rx />                                          
-                          </div>                      
+                          </div> 
+                          <div style={styles.container}>
+                            <Grid container spacing={1} >
+                              <Grid container item xs={4} alignItems={'end'}>
+                                <Grid item xs={9}>
+                                  <Select_Code/>
+                                </Grid>
+                                <Grid item xs={3}>
+                                  <TextField
+                                    id="outlined-multiline-static"
+                                    variant="standard"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                              <Grid item xs={4} container alignItems={"end"}>
+                                <Grid item xs={9}>
+                                  <Select_Code_Basis/>
+                                </Grid>
+                                <Grid item xs={3}>
+                                  <TextField
+                                    id="outlined-multiline-static"
+                                    variant="standard"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                              <Grid item xs={4} container alignItems={"end"}>
+                                <Grid item xs={9}>
+                                  <TextField
+                                    id="outlined-multiline-static"
+                                    variant="standard"
+                                    fullWidth
+                                  />
+                                </Grid>
+                                <Grid item xs={3}>
+                                  <IconButton color="success">
+                                    <CalculateIcon/>
+                                  </IconButton>
+                                </Grid>
+                              </Grid>
+                              <Grid item container xs={4} alignItems={'center'}>
+                                <Grid item xs={3}>
+                                  <IconButton color="success" component={Link} to="/calender" >
+                                    <ScheduleIcon/>
+                                  </IconButton>
+                                </Grid>
+                                <Grid item xs={9}>
+                                  <label>Follow-up Visit:</label>
+                                </Grid>
+                              </Grid>
+                              <Grid item xs={8}>
+                                <Select_Period/>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <label>Join Work-School:</label>
+                              </Grid>
+                              <Grid item xs={8}>
+                                <Select_Time/>
+                              </Grid>
+                            </Grid>
+                          </div>
+                          <div style={styles.container}>
+                            <h2>Procedures / Services</h2>
+                            <Grid container spacing={2}>                                                        
+                              <Procedures_Services />                                                      
+                            </Grid>
+                          </div>
+                          {/* Refer patient */}                    
                         </Grid>                      
                       </Grid>                     
                       <br />
@@ -1502,7 +1846,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
                            >
                             History
                           </Button>                          
-                        </Grid>s
+                        </Grid>
                       </Grid>
                     </Form>
                   )}

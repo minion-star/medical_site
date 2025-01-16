@@ -20,6 +20,8 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import SickIcon from "@mui/icons-material/Sick";
 import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+
 
 const primarynavList = [
   {
@@ -33,10 +35,16 @@ const primarynavList = [
     icon: <AccountCircleIcon />,
   },
   {
+    link: "/administrator",
+    label: "administrator",
+    icon: <AdminPanelSettingsIcon/>,
+  },
+/*  {
     link: "/doctor-list",
     label: "Doctor List",
     icon: <PeopleIcon />,
   },
+*/
   {
     link: "/patient-list",
     label: "Patient List",

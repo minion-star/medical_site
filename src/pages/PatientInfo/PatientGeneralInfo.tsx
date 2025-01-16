@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 import { useState } from "react";
 import { Formik, Form, Field } from "formik";
+import { debounce } from 'lodash';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import '../../styles.css'
 import {
@@ -33,129 +34,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { blueGrey, grey, red } from "@mui/material/colors";
 import Appbar_Patient from "../../components/Appbar_Patientlist";
+import dayjs from "dayjs";
 
-// select gender
 
-export function Gender () {
-  // set marriage
-  const [gender, setGender] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-      setGender(event.target.value);
-    };
-  return (
-    <>
-      <FormControl fullWidth variant="standard">
-        <InputLabel id="demo-simple-select-standard-label">Gender</InputLabel>
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={gender}
-          onChange={handleChange}
-          label="Gender"
-        >
-          <MenuItem value={10}>Male</MenuItem>
-          <MenuItem value={20}>Female</MenuItem>
-          <MenuItem value={30}>Transgender</MenuItem>
-          <MenuItem value={40}>Unknown</MenuItem>
-        </Select>
-      </FormControl>
-    </>
-  );
-}
 
-// select marriage
-
-export function Marriage () {
-  // set marriage
-  const [marriage, setMarriage] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-      setMarriage(event.target.value);
-    };
-  return (
-    <>
-      <FormControl fullWidth variant="standard">
-        <InputLabel id="demo-simple-select-standard-label">Marriage</InputLabel>
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={marriage}
-          onChange={handleChange}
-          label="Marriage"
-        >
-          <MenuItem value={10}>Married</MenuItem>
-          <MenuItem value={20}>Divorced</MenuItem>
-          <MenuItem value={30}>Separated</MenuItem>
-          <MenuItem value={40}>Widowed</MenuItem>
-          <MenuItem value={50}>Single</MenuItem>
-          <MenuItem value={60}>Cohabiting</MenuItem>
-          <MenuItem value={70}>Polygamous</MenuItem>
-          <MenuItem value={80}>Other</MenuItem>
-        </Select>
-      </FormControl>
-    </>
-  );
-}
-
-// select race
-export function Race () {
-  // set marriage
-  const [race, setRace] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-      setRace(event.target.value);
-    };
-  return (
-    <>
-      <FormControl variant="standard" fullWidth>
-        <InputLabel id="demo-simple-select-standard-label">Race</InputLabel>
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={race}
-          onChange={handleChange}
-          label="Race"
-        >
-          <MenuItem value={10}>White</MenuItem>
-          <MenuItem value={20}>Black</MenuItem>
-          <MenuItem value={30}>Hispanic</MenuItem>
-          <MenuItem value={40}>Asian</MenuItem>
-          <MenuItem value={50}>Other</MenuItem>
-        </Select>
-      </FormControl>
-    </>
-  );
-}
-
-// work information status
-
-export function SelectStatus() {
-  const [status, setStatus] = useState<string>('');
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setStatus(event.target.value);
-  };
-
-  return (
-    <div>
-      <FormControl variant="standard" fullWidth>
-        <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={status}
-          onChange={handleChange}
-          label="Status"
-        >
-          <MenuItem value={10}>Employed</MenuItem>
-          <MenuItem value={20}>Un-Employed</MenuItem>
-          <MenuItem value={30}>Retired</MenuItem>
-          <MenuItem value={40}>Full-time Student</MenuItem>
-          <MenuItem value={50}>Part-time Student</MenuItem>
-        </Select>
-      </FormControl>
-      
-    </div>
-  );
-}
 
 const PatientInfoSchema = Yup.object().shape({
   firstName: Yup.string().required("Required"),
@@ -199,9 +81,122 @@ const PatientInfo = ({ patients }: any) => {
     diseases: patient.diseases,
     patientHistory: patient.patientHistory,
   };
-  const handleSubmit = (values: any, { resetForm }: any) => {
-    console.log(values);
-    //resetForm();
+  
+  interface PersonalInformation {
+    id: string,
+    mrn: string,
+    dob: string,
+    gender: string,
+    marriage: string,
+    siblings: string,
+    race: string,
+    pharamacy: string,
+    other: string
+  }
+
+  interface ContactInformation {
+    address: string,
+    city: string,
+    postcode: string,
+    country: string,
+    state: string,
+    homeph: string,
+    cellph: string,
+    email: string,
+    emergency: string
+  }
+
+  interface WorkInformation {
+    status: string,
+    workph: string,
+    emloyer: string
+  }
+
+  interface Insurance {
+    carrier: string,
+    address: string,
+    city: string,
+    postcode: string,
+    country: string,
+    state: string,
+    phone: string,
+    facsimile: string,
+    plan: string,
+    expiry: string,
+    idno: string,
+    groupno: string,
+    copay: string,
+    authno: string,
+    remarks: string,
+    relation: string,
+    homeph: string,
+    lastname: string,
+    firstname: string,
+    mi: string,
+    dob: string,
+    gender: string
+  }
+  const [personalInformation, setPersonalInformation] = useState<PersonalInformation>({id:'',mrn:'',dob:'',gender:'',marriage:'',siblings:'',race:'',pharamacy:'',other:'' });
+  const [contactInformation, setContactInformation] = useState<ContactInformation>({address:'', city:'', postcode:'', country:'', state:'', homeph:'', cellph:'', email:'', emergency:''});
+  const [insurance, setInsurance] = useState<Insurance>({carrier:'', address:'', city:'', postcode:'', country:'', state:'', phone:'', facsimile:'', plan:'', expiry:'', idno:'', groupno:'', copay:'', authno:'', remarks:'', relation:'', homeph:'', lastname:'', firstname:'',mi:'', dob:'', gender:''});
+  const [workInformation, setWorkInformation] = useState<WorkInformation>({status:'', workph:'', emloyer:''});
+
+  const handlePersonalInformationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+    const { name, value } = e.target;
+    if (name === 'gender') {
+      setPersonalInformation((prev) => ({
+        ...prev,
+        gender: value as string,
+      }));
+    } else if (name === 'marriage') {
+      setPersonalInformation((prev) => ({
+        ...prev,
+        marriage: value as string,
+      }));
+    } else if (name === 'race') {
+      setPersonalInformation((prev) => ({
+        ...prev,
+        race: value as string,
+      }))
+    } else if (name === 'id' || name === 'mrn' || name === 'dob' || name === 'siblings' || name === 'pharmacy' || name === 'other') {
+        setPersonalInformation((prev) => ({
+        ...prev,
+        [name]: value as string,
+      }));
+    }
+  };
+
+  const handleContactInformationChange = (e: React.ChangeEvent<HTMLInputElement |  HTMLTextAreaElement> ) => {
+    const { name, value } = e.target;
+    setContactInformation((prev) => ({
+      ...prev,
+      [name as keyof ContactInformation]: value as string,
+    }));
+  };
+
+  const handleInsuranceChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+    const { name, value } = e.target;
+    setInsurance((prev) => ({
+      ...prev,
+      [name as keyof Insurance]: value as string, gender:e.target.value,
+    }));
+  };
+
+  const handleWorkInformationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+    const { name, value } = e.target;
+    setWorkInformation((prev) => ({
+      ...prev,
+      [name as keyof WorkInformation]: value as string, status:e.target.value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    console.log(
+      'Personal Information:', personalInformation,
+      'Contact Information', contactInformation,
+      'Insurance', insurance,
+      'Work Information', workInformation
+    );
   };
 
   return (
@@ -310,52 +305,120 @@ const PatientInfo = ({ patients }: any) => {
                             <Grid container rowSpacing={1} columnSpacing={1}>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="personal-informatin-id"
                                   label="ID"
                                   multiline
+                                  value={personalInformation.id}
                                   variant="standard"
                                   fullWidth
+                                  name="id"
+                                  onChange={handlePersonalInformationChange}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="personal-information-mrn"
                                   label="MRN"
                                   multiline
+                                  name="mrn"
                                   variant="standard"
+                                  value={personalInformation.mrn}
                                   fullWidth
+                                  onChange={handlePersonalInformationChange}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DatePicker label="DOB"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                  <DatePicker label="DOB" value={personalInformation.dob ? dayjs(personalInformation.dob) : null} // Convert string to Dayjs object
+                                      onChange={(newValue) => {
+                                        setPersonalInformation((prev) => ({
+                                          ...prev,
+                                          dob: newValue ? newValue.format('YYYY-MM-DD') : '', // Format date as string
+                                        }));
+                                      }} slotProps={{ textField: { variant: 'standard', fullWidth: true, name:'dob' } }}  />
                                 </LocalizationProvider>
                               </Grid>
                               <Grid item xs={6}>
-                                <Gender/>
+                                <FormControl fullWidth variant="standard">
+                                  <InputLabel id="personal-information-gender">Gender</InputLabel>
+                                  <Select
+                                    labelId="personal-information-gender"
+                                    id="personal-information-gender"
+                                    value={personalInformation.gender}
+                                    onChange={handlePersonalInformationChange}
+                                    label="Gender"
+                                    name="gender"
+                                  >
+                                    <MenuItem value="Male">Male</MenuItem>
+                                    <MenuItem value="Female">Female</MenuItem>
+                                    <MenuItem value="Transgender">Transgender</MenuItem>
+                                    <MenuItem value="Unknown">Unknown</MenuItem>
+                                  </Select>
+                                </FormControl>
                               </Grid>
                               <Grid item xs={6}>
-                                <Marriage/>
+                                <FormControl fullWidth variant="standard">
+                                  <InputLabel id="personal-information-marriage">Marriage</InputLabel>
+                                  <Select
+                                    labelId="personal-information-marriage"
+                                    id="personal-information-marriage"
+                                    value={personalInformation.marriage}
+                                    onChange={handlePersonalInformationChange}
+                                    label="Marriage"
+                                    name="marriage"
+                                  >
+                                    <MenuItem value="Married">Married</MenuItem>
+                                    <MenuItem value="Divorced">Divorced</MenuItem>
+                                    <MenuItem value="Separated">Separated</MenuItem>
+                                    <MenuItem value="Widowed">Widowed</MenuItem>
+                                    <MenuItem value="Single">Single</MenuItem>
+                                    <MenuItem value="Cohabiting">Cohabiting</MenuItem>
+                                    <MenuItem value="Polygamous">Polygamous</MenuItem>
+                                    <MenuItem value="Other">Other</MenuItem>
+                                  </Select>
+                                </FormControl>
                               </Grid>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="personal-marriage-siblings"
                                   label="Siblings"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="siblings"
+                                  onChange={handlePersonalInformationChange}
+                                  value={personalInformation.siblings}
                                 />
                               </Grid>
                               <Grid item xs={12}>
-                                <Race/>
+                                <FormControl variant="standard" fullWidth>
+                                  <InputLabel id="personal-information-race">Race</InputLabel>
+                                  <Select
+                                    labelId="personal-information-race"
+                                    id="personal-information-race"
+                                    value={personalInformation.race}
+                                    onChange={handlePersonalInformationChange}
+                                    label="Race"
+                                    name="race"
+                                  >
+                                    <MenuItem value="White">White</MenuItem>
+                                    <MenuItem value="Black">Black</MenuItem>
+                                    <MenuItem value="Hispanic">Hispanic</MenuItem>
+                                    <MenuItem value="Asian">Asian</MenuItem>
+                                    <MenuItem value="Other">Other</MenuItem>
+                                  </Select>
+                                </FormControl>
                               </Grid>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="personal-information-pharamacy"
                                   label="Pharamacy"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="pharamacy"
+                                  onChange={handlePersonalInformationChange}
+                                  value={personalInformation.pharamacy}
                                 />
                               </Grid>
                               <Grid item xs={12}>
@@ -365,6 +428,9 @@ const PatientInfo = ({ patients }: any) => {
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="other"
+                                  onChange={handlePersonalInformationChange}
+                                  value={personalInformation.other}
                                 />
                               </Grid>
                             </Grid>                       
@@ -374,101 +440,129 @@ const PatientInfo = ({ patients }: any) => {
                             <Grid container rowSpacing={1} columnSpacing={1}>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-address"
                                   label="Address"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="address"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.address}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-city"
                                   label="City"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="city"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.city}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-postcode"
                                   label="Post Code"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="postcode"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.postcode}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-country"
                                   label="Country"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="country"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.country}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-state"
                                   label="State"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="state"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.state}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-homeph"
                                   label="Home Ph"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="homeph"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.homeph}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-cellph"
                                   label="Cell Ph"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="cellph"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.cellph}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-email"
                                   label="Email"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="email"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.email}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="contact-information-emergency"
                                   label="Emergency"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="emergency"
+                                  onChange={handleContactInformationChange}
+                                  value={contactInformation.emergency}
                                 />
                               </Grid>
-                              
-                              
                             </Grid>                       
                           </div>                                      
                         </Grid>  
                         <Grid item xs={12} sm={6} md={6}>
-                          <div style={styles.container}>
+                          <div className="insurance" style={styles.container}>
                             <h2>Insurance 1</h2>
                             <Grid container spacing={1}>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-carrier"
                                   label="Carrier"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="carrier"
+                                  onChange={handleInsuranceChange}
+                                  value={insurance.carrier}
                                 />
                               </Grid>
                               <Grid item xs={12}>
@@ -478,204 +572,305 @@ const PatientInfo = ({ patients }: any) => {
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="address"
+                                  onChange={handleInsuranceChange}
+                                  value={insurance.address}
                                 />
                               </Grid>
                               
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-city"
                                   label="City"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="city"
+                                  onChange={handleInsuranceChange}
+                                  value={insurance.city}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-postcode"
                                   label="Postcode"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="postcode"
+                                  onChange={handleInsuranceChange}
+                                  value={insurance.postcode}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-country"
                                   label="Country"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="country"
+                                  onChange={handleInsuranceChange}
+                                  value={insurance.country}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-state"
                                   label="State"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  value={insurance.state}
+                                  name="state"
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-phone"
                                   label="Phone"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  value={insurance.phone}
+                                  name="phone"
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-facsimile"
                                   label="Facsimile"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="facsimile"
+                                  value={insurance.facsimile}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-plan"
                                   label="Plan"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="plan"
+                                  value={insurance.plan}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-expiry"
                                   label="Expiry"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="expiry"
+                                  value={insurance.expiry}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-id-no"
                                   label="ID No"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="idno"
+                                  onChange={handleInsuranceChange}
+                                  value={insurance.idno}
+
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-group-no"
                                   label="Group No"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="groupno"
+                                  value={insurance.groupno}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-copay"
                                   label="Copay"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="copay"
+                                  value={insurance.copay}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-auth-no"
                                   label="Auth No"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="authno"
+                                  value={insurance.authno}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               
                               <Grid item xs={12} paddingBottom={2} borderBottom={1} borderColor={"green"}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-remarks"
                                   label="Remarks"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="remarks"
+                                  value={insurance.remarks}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-relation"
                                   label="Relation"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="relation"
+                                  value={insurance.relation}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-home-ph"
                                   label="Home Ph"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="homeph"
+                                  value={insurance.homeph}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid> 
                               <Grid item xs={5}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-last-name"
                                   label="Last Name"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="lastname"
+                                  value={insurance.lastname}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={5}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-first-name"
                                   label="First Name"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="firstname"
+                                  value={insurance.firstname}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={2}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="insurance-mi"
                                   label="MI"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="mi"
+                                  value={insurance.mi}
+                                  onChange={handleInsuranceChange}
                                 />
                               </Grid>
                               <Grid item xs={6}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DatePicker label="DOB"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                  <DatePicker label="DOB" value={insurance.dob ? dayjs(insurance.dob) : null} // Convert string to Dayjs object
+                                      onChange={(newValue) => {
+                                        setInsurance((prev) => ({
+                                          ...prev,
+                                          dob: newValue ? newValue.format('YYYY-MM-DD') : '', // Format date as string
+                                        }));
+                                      }} slotProps={{ textField: { variant: 'standard', fullWidth: true, name:'dob' } }}  />
                                 </LocalizationProvider>
                               </Grid>
                               <Grid item xs={6}>
-                                <Gender/>
+                                <FormControl fullWidth variant="standard">
+                                  <InputLabel id="personal-information-gender">Gender</InputLabel>
+                                  <Select
+                                    labelId="personal-information-gender"
+                                    id="personal-information-gender"
+                                    value={insurance.gender}
+                                    onChange={handleInsuranceChange}
+                                    label="Gender"
+                                  >
+                                    <MenuItem value="Male">Male</MenuItem>
+                                    <MenuItem value="Female">Female</MenuItem>
+                                    <MenuItem value="Transgender">Transgender</MenuItem>
+                                    <MenuItem value="Unknown">Unknown</MenuItem>
+                                  </Select>
+                                </FormControl>
                               </Grid>
                             </Grid>                                                                               
                           </div>  
-                          <div style={styles.container}>
+                          <div className="work-information" style={styles.container}>
                             <h2>Work Information</h2>
                             <Grid container spacing={1}>
                               <Grid item xs={6}>
-                                <SelectStatus/>
+                                <FormControl variant="standard" fullWidth>
+                                  <InputLabel id="work-information-status">Status</InputLabel>
+                                  <Select
+                                    labelId="work-information-status"
+                                    id="work-information-status"
+                                    value={workInformation.status}
+                                    onChange={handleWorkInformationChange}
+                                    label="Status"
+                                  >
+                                    <MenuItem value="Employed">Employed</MenuItem>
+                                    <MenuItem value="Un-Employed">Un-Employed</MenuItem>
+                                    <MenuItem value="Retired">Retired</MenuItem>
+                                    <MenuItem value="Full-time Student">Full-time Student</MenuItem>
+                                    <MenuItem value="Part-time Student">Part-time Student</MenuItem>
+                                  </Select>
+                                </FormControl>
                               </Grid>
                               <Grid item xs={6}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="work-information-work-ph"
                                   label="Work Ph:"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="workph"
+                                  value={workInformation.workph}
+                                  onChange={handleWorkInformationChange}
+
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <TextField
-                                  id="outlined-multiline-static"
+                                  id="work-information-employer"
                                   label="Employer:"
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  name="employer"
+                                  value={workInformation.emloyer}
+                                  onChange={handleWorkInformationChange}
+
                                 />
                               </Grid>
                             </Grid>                                                                                       
@@ -695,7 +890,7 @@ const PatientInfo = ({ patients }: any) => {
                           </Button>
                         </Grid>
                         <Grid item xs={2} sm={1}>
-                          <Button type="submit" variant="contained">
+                          <Button type="submit" variant="contained" onClick={handleSubmit} >
                             Save
                           </Button>                          
                         </Grid>

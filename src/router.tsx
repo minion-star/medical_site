@@ -20,6 +20,7 @@ import Settings from "./pages/Settings/Settings";
 import { mockPatientData } from "./mockData";
 import PdfViewer from "./components/Pdf";
 import Search from "./pages/Search/Search";
+import Administrator from "./pages/Administrator/Administrator";
 
 
 const USER_TYPES = {
@@ -111,7 +112,15 @@ export const router = createBrowserRouter([
       </AdminElement>
     )
   },
-  
+  {
+    path: "/administrator",
+    element: (
+      <AdminElement>
+        <Administrator/>
+      </AdminElement>
+    )
+  },
+/*  
   {
     path: "/doctor-list",
     element: (
@@ -120,6 +129,7 @@ export const router = createBrowserRouter([
       </AdminElement>
     )
   },
+*/
   {
     path: "/appointments",
     element: (

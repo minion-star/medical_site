@@ -34,7 +34,7 @@ import Appbar from "../../components/Appbar";
 import { Link, useParams } from "react-router-dom";
 import { DisplaySettings } from "@mui/icons-material";
 import { experimentalStyled as styled } from '@mui/material/styles';
-
+import { MenuProps } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -312,98 +312,108 @@ export function Mfr () {
 
 
 // set history
-
 interface HistoryProps {
   label?: string; // Optional prop to customize the label
   names?: string[] | string[][]; // Accepts either a 1D or 2D array
 }
 
 export function History({
-  label = 'Diabetes',
-  names = name1,
+  label = "Diabetes",
+  names = [],
 }: HistoryProps) {
   const [checked, setChecked] = useState<boolean>(false);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [textFieldValue, setTextFieldValue] = useState<string>("");
+  const [dropdownValue, setDropdownValue] = useState<string[]>([]); // Dropdown value must be an array for `multiple`
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
   };
-
+  
   const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedOptions(typeof value === 'string' ? value.split(',') : value);
+    const selectedValues = event.target.value as string[];
+    const latestSelection = selectedValues[selectedValues.length - 1]; // Get the latest selected item
+    if (latestSelection.trim() !== "") {
+      setTextFieldValue((prev) =>
+        prev.trim() === "" ? latestSelection : `${prev} | ${latestSelection}`
+      );
+    }
+    setDropdownValue([]); // Reset dropdown value to prevent display of selected items
+  };
+
+  const handleTextFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setTextFieldValue(event.target.value);
   };
 
   // Ensure names is always a 2D array for consistent processing
-  const processedNames = Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+  const processedNames = Array.isArray(names[0])
+    ? (names as string[][])
+    : [names as string[]];
 
   return (
-    <Box sx={{ display: 'flex', gap: 2 }}>
-      {/* Label */}
-      <Grid item xs={3} sx={{ mt: 1 }}>
-        <label>{label}:</label>
-      </Grid>
+    <Box sx={{ display: "flex", gap: 2 }}>
+      <Grid container>
+        {/* Label */}
+        <Grid item xs={3} sx={{ mt: 2 }}>
+          <label>{label}:</label>
+        </Grid>
 
-      {/* Checkbox */}
-      <Grid item xs={1}>
-        <Checkbox
-          checked={checked}
-          onChange={handleCheckboxChange}
-          inputProps={{ 'aria-label': 'controlled' }}
-          color="success"
-        />
-      </Grid>
+        {/* Checkbox */}
+        <Grid item xs={1} sx={{ mt: 1 }}>
+          <Checkbox
+            checked={checked}
+            onChange={handleCheckboxChange}
+            inputProps={{ "aria-label": "controlled" }}
+            color="success"
+          />
+        </Grid>
+        <Grid container item xs={8} alignItems={"end"}>
+          <Grid item xs={11} sx={{ mb: 1 }}>
+            <TextField
+              fullWidth
+              variant="standard"
+              multiline
+              value={textFieldValue}
+              onChange={handleTextFieldChange}
+              disabled={!checked} // Disable when unchecked
+            />
+          </Grid>
 
-      {/* Select Component */}
-      <Grid item xs={8}>
-        <FormControl variant="standard" fullWidth>
-          <Select
-            labelId="select-quality-label"
-            id="multiple-checkbox-select"
-            multiple
-            disabled={!checked} // Disable when unchecked
-            value={selectedOptions}
-            onChange={handleSelectChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => {
-                  const isSecondArray =
-                    processedNames.length > 1 && processedNames[1].includes(value);
-                  return (
-                    <Chip
-                      key={value}
-                      label={value}
-                      color={isSecondArray ? 'error' : 'success'}
-                    />
-                  );
-                })}
-              </Box>
-            )}
-          >
-            {processedNames.flat().map((name, index) =>
-              name === '' ? (
-                // Render blank space as a non-selectable separator
-                <MenuItem key={`separator-${index}`} disabled>
-                  <Typography variant="body2" sx={{ color: 'gray' }}>
-                    <>&nbsp;</>
-                  </Typography>
-                </MenuItem>
-              ) : (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={selectedOptions.includes(name)} />
-                  <ListItemText primary={name} />
-                </MenuItem>
-              )
-            )}
-          </Select>
-        </FormControl>
+          {/* Select Dropdown */}
+          <Grid item xs={1} sx={{ mb: 1 }}>
+            <FormControl variant="standard">
+              <Select
+                labelId="select-quality-label"
+                id="multi-select"
+                multiple
+                value={dropdownValue} // Dropdown value must be an array
+                onChange={handleSelectChange}
+                renderValue={() => null} // Prevent displaying values in the dropdown
+                disabled={!checked} // Disable when unchecked
+                displayEmpty
+              >
+                {processedNames.flat().map((name, index) =>
+                  name === "" ? (
+                    <MenuItem key={`separator-${index}`} disabled>
+                      <Typography variant="body2" sx={{ color: "gray" }}>
+                        <>&nbsp;</>
+                      </Typography>
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key={name} value={name}>
+                      {name}
+                    </MenuItem>
+                  )
+                )}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </Grid>
     </Box>
   );
 }
-
 // set master problem status
 
 export function Master_Problem_List () {

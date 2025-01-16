@@ -61,26 +61,28 @@ const SearchPage: React.FC = () => {
 
   const getSearchFieldValue = (doctor: any): string | undefined => {
     switch (searchBy) {
-      case 'Chart ID':
-        return doctor.chartId;
-      case 'MRN':
-        return doctor.mrn;
-      case 'Phone':
-        return doctor.phone;
-      case 'Last Name':
-        return doctor.lastName;
-      case 'First Name':
-        return doctor.firstName;
-      case 'Birth Date':
-        return doctor.dob;
-      case 'Visit Date':
-        return doctor.visitDate;
-      case 'Age/Gender':
-        return `${doctor.age} ${doctor.gender}`;
-      case 'Other':
-        return doctor.other;
-      default:
-        return undefined;
+        case 'Chart ID':
+            return doctor.chartId;
+        case 'MRN':
+            return doctor.diagnosis;
+        case 'MRN':
+            return doctor.medication;
+        case 'Phone':
+            return doctor.phone;
+        case 'Last Name':
+            return doctor.lastName;
+        case 'First Name':
+            return doctor.firstName;
+        case 'Birth Date':
+            return doctor.dob;
+        case 'Visit Date':
+            return doctor.visitDate;
+        case 'Age/Gender':
+            return `${doctor.age} ${doctor.gender}`;
+        case 'Other':
+            return doctor.other;
+        default:
+            return undefined;
     }
   };
 
@@ -195,7 +197,8 @@ const SearchPage: React.FC = () => {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell>CHART ID</TableCell>
-                        <TableCell>MRN</TableCell>
+                        <TableCell>DIAGNOSIS</TableCell>
+                        <TableCell>MEDICATION</TableCell>
                         <TableCell>LAST NAME</TableCell>
                         <TableCell>FIRST NAME</TableCell>
                         <TableCell>MI</TableCell>
@@ -210,7 +213,8 @@ const SearchPage: React.FC = () => {
                           <TableRow key={index}>
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{doctor.chartId}</TableCell>
-                            <TableCell>{doctor.mrn}</TableCell>
+                            <TableCell>{doctor.diagnosis}</TableCell>
+                            <TableCell>{doctor.medication}</TableCell>
                             <TableCell>{doctor.lastName}</TableCell>
                             <TableCell>{doctor.firstName}</TableCell>
                             <TableCell>{doctor.mi}</TableCell>
