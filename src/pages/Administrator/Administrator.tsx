@@ -34,6 +34,14 @@ import {
   } from "@mui/material";
 import Appbar from "../../components/Appbar";
 import { GridOff } from "@mui/icons-material";
+import { Form } from "react-router-dom";
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from "@mui/icons-material/Add";
+import ClinicModal from "./ClinicModal";
+import StaffModal from "./StaffModal";
+
+
+
 
 const ID:string[] = ['NPI', 'EIN', 'PIN', 'PVN', 'SSN', 'TIN', 'DEA', 'DPS', 'NSC', 'UPIN', 'OSCAR', 'BCID', 'BSID', 'NCPDP', 'NPI;NCPDP', 'Champus', 'Medicare', 'Medicaid', 'License', 'Group', 'Other', '&nbsp', 'OB', '1A', '1B', '1C', '1D', '1G', '1H',  'EI', '1J', 'B3', 'BQ', 'FH', 'G2', 'G5', 'LU', 'N5', 'SY', 'U3', 'X5', 'ZZ']
 const ALL_TIMES = [
@@ -56,7 +64,103 @@ const ALL_TIMES = [
     "11:00 PM",
   ];
 
+
   
+// Adding Staff Member
+
+{/* Addable Component props */}
+interface AddableComponentProps {
+    id: number;
+    place: number; // Add an order prop
+    onDelete: (id: number) => void;
+    disableDelete: boolean;
+  }
+  
+function Addable_Staff_Member({
+    id,
+    place,
+    onDelete,
+    disableDelete,
+  }: AddableComponentProps) {
+    return (
+      <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
+            {/* Display the order number */}
+        <div style={{ fontWeight: 'bold'}}>{place}</div>
+        <Grid container spacing={1} alignItems="center">
+          
+          <Grid item xs={3}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-code-${id}`}
+                startAdornment={<InputAdornment position="start">ID:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-desc-${id}`}
+                startAdornment={<InputAdornment position="start">Name:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={1}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-note-${id}`}
+                multiline
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={1}>
+            <IconButton
+              color="inherit"
+              onClick={() => onDelete(id)}
+              disabled={disableDelete}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Grid>
+          
+        </Grid>
+      </Paper>
+    );
+  }
+  
+  function Staff_Members () {
+    const [components, setComponents] = useState<{ id: number }[]>([{ id: 1 }]);
+  
+    const handleAdd = () => {
+      const nextId = components.length ? Math.max(...components.map((c) => c.id)) + 1 : 1;
+      setComponents([...components, { id: nextId }]);
+    };
+  
+    const handleDelete = (id: number) => {
+      if (components.length > 1) {
+        setComponents(components.filter((component) => component.id !== id));
+      }
+    };
+  
+    return (
+      <Grid>
+        {components.map((component, index) => (
+          <Addable_Staff_Member
+            key={component.id}
+            id={component.id}
+            place={index + 1} // Pass the order number (index + 1)
+            onDelete={handleDelete}
+            disableDelete={components.length === 1} // Disable delete if only one item remains
+          />
+        ))}
+        <IconButton onClick={handleAdd} color="success">
+          <AddIcon />
+        </IconButton>
+      </Grid>
+    );
+  }
+  
+
+
   
 const Administrator = () => {
 
@@ -138,6 +242,7 @@ const Administrator = () => {
 
     
     return (
+
         <Box sx={{display:"flex"}}>
             <Appbar appBarTitle="Clinic/Staff" />
             <Box
@@ -159,12 +264,13 @@ const Administrator = () => {
                             container
                             spacing={2}
                             sx={{ marginleft: "10px", padding: "20px" }}
+
                         >
+                            
                             <Grid item xs={12} sm={6} md={6}>
                                 <div className="clinic" style={styles.container}>
                                     <h2>Clinic</h2>
                                     <div className="clinc-name" style={styles.container}>
-                                        <Checkbox/>
                                         <label>Clinic Name:</label>
                                         <Grid item xs={12}>
                                             <TextField 
@@ -177,7 +283,6 @@ const Administrator = () => {
                                         </Grid>   
                                     </div>
                                     <div className="Other Information" style={styles.container}>
-                                        <Checkbox />
                                         <label>Other Information</label>
                                         <Grid container spacing={1}>
                                             <Grid item xs={12}>
@@ -350,7 +455,6 @@ const Administrator = () => {
                                         </Grid>
                                     </div>
                                     <div className="appointment-book" style={styles.container}>
-                                        <Checkbox/>
                                         <label>Appointment Book</label>
                                         <Grid container spacing={1}>
                                             <Grid item xs={12}>
@@ -407,11 +511,19 @@ const Administrator = () => {
                                             </Grid>
                                         </Grid>
                                     </div>
+                                    <Grid item xs={12} sx={{mt:2, display:'flex', justifyContent:'right'}}>
+                                        <ClinicModal/>
+                                    </Grid>
                                     
                                 </div>
                             </Grid>
                             <Grid item xs={12} sm={6} md={6}>
-
+                                {/* Add Staff Members */}
+                                <div className="staff-members" style={styles.container}>
+                                    <h2>Staff Members</h2>
+                                    <StaffModal/>
+                                </div>
+                                {/* References */}
                             </Grid>
                         </Grid>
                     </Paper>     
