@@ -93,21 +93,18 @@ interface ClinicModalProps {
 
 
   
-const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
+const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }:ClinicModalProps) => {
 
     
     
 
     const [clinic, setClinic] = useState<Clinic>(clinic1);
-    const setAndUpdateClinic = (updatedClinic: Clinic): void => {
-        setClinic(updatedClinic); // Update local state
-        updateClinic(updatedClinic); // Pass the updated state to the parent
-      };
+
     
     const handleClinicChange = (e: React.ChangeEvent<HTMLInputElement |  HTMLTextAreaElement> | SelectChangeEvent) => {
         const { name, value } = e.target;
         const updatedClinic = { ...clinic, [name]: value };
-        setAndUpdateClinic(updatedClinic);
+        setClinic(updatedClinic);
     
     }
 
@@ -141,7 +138,7 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
         bookingStartTime: '',
         bookingEndTime: '',
       };
-      setAndUpdateClinic(updatedClinic);
+      setClinic(updatedClinic);
     const startTimes = generateTimeSlots("07:00 AM", "11:00 PM", duration);
     setFilteredBookingStartTimes(startTimes);
     setFilteredBookingEndTimes([]);
@@ -169,14 +166,19 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
         bookingEndTime: '',
       };
     setFilteredBookingEndTimes(filteredEndTimes);
-    updateClinic(updatedClinic);
+
 
   };
 
   const handleBookingEndTimeChange = (event: SelectChangeEvent<string>) => {
     const updatedClinic = { ...clinic, bookingEndTime: event.target.value };
-    setAndUpdateClinic(updatedClinic);
+    setClinic(updatedClinic);
   };
+    const handleSaveChange = ():void => {
+        updateClinic(clinic);
+        setOpen(false);
+        console.log("Clinic Data", clinic);
+    }
       
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -229,7 +231,6 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
                                     <div className="clinic" style={styles.container}>
                                         <h2>Clinic</h2>
                                         <div className="clinc-name" style={styles.container}>
-                                            <Checkbox/>
                                             <label>Clinic Name:</label>
                                             <Grid item xs={12}>
                                                 <TextField 
@@ -244,7 +245,6 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
                                             </Grid>   
                                         </div>
                                         <div className="Other Information" style={styles.container}>
-                                            <Checkbox />
                                             <label>Other Information</label>
                                             <Grid container spacing={1}>
                                                 <Grid item xs={12}>
@@ -337,7 +337,7 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
                                                         label="Telephone-1"
                                                         fullWidth
                                                         variant="standard"
-                                                        name="telephone1"
+                                                        name="telephoneNumber1"
                                                         value={clinic.telephoneNumber1}
                                                         onChange={handleClinicChange}
                                                          
@@ -349,7 +349,7 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
                                                         label="Telephone-2"
                                                         fullWidth
                                                         variant="standard"
-                                                        name="telephone2"
+                                                        name="telephoneNumber2"
                                                         value={clinic.telephoneNumber2}
                                                         onChange={handleClinicChange}
                                                          
@@ -455,7 +455,6 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
                                             </Grid>
                                         </div>
                                         <div className="appointment-book" style={styles.container}>
-                                            <Checkbox/>
                                             <label>Appointment Book</label>
                                             <Grid container spacing={1}>
                                                 <Grid item xs={12}>
@@ -513,7 +512,7 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }) => {
                                             </Grid>
                                         </div>
                                         <Grid item xs={12} sx={{ mt:2, display:'flex', justifyContent:'right'}}>
-                                            <Button variant="contained" color="success" sx={{mr:3}}>
+                                            <Button variant="contained" color="success" sx={{mr:3}} onClick={handleSaveChange}>
                                                 Save
                                             </Button>
                                             <Button variant="outlined" color="success" onClick={handleClose}>
