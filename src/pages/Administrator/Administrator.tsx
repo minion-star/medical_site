@@ -34,110 +34,110 @@ import {
   } from "@mui/material";
 import Appbar from "../../components/Appbar";
 import { GridOff } from "@mui/icons-material";
+import { Form } from "react-router-dom";
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from "@mui/icons-material/Add";
+import ClinicModal from "./ClinicModal";
+import StaffModal from "./StaffModal";
+
+
+
 
 const ID:string[] = ['NPI', 'EIN', 'PIN', 'PVN', 'SSN', 'TIN', 'DEA', 'DPS', 'NSC', 'UPIN', 'OSCAR', 'BCID', 'BSID', 'NCPDP', 'NPI;NCPDP', 'Champus', 'Medicare', 'Medicaid', 'License', 'Group', 'Other', '&nbsp', 'OB', '1A', '1B', '1C', '1D', '1G', '1H',  'EI', '1J', 'B3', 'BQ', 'FH', 'G2', 'G5', 'LU', 'N5', 'SY', 'U3', 'X5', 'ZZ']
-const ALL_TIMES = [
-    "07:00 AM", "07:15 AM", "07:30 AM", "07:45 AM",
-    "08:00 AM", "08:15 AM", "08:30 AM", "08:45 AM",
-    "09:00 AM", "09:15 AM", "09:30 AM", "09:45 AM",
-    "10:00 AM", "10:15 AM", "10:30 AM", "10:45 AM",
-    "11:00 AM", "11:15 AM", "11:30 AM", "11:45 AM",
-    "12:00 PM", "12:15 PM", "12:30 PM", "12:45 PM",
-    "01:00 PM", "01:15 PM", "01:30 PM", "01:45 PM",
-    "02:00 PM", "02:15 PM", "02:30 PM", "02:45 PM",
-    "03:00 PM", "03:15 PM", "03:30 PM", "03:45 PM",
-    "04:00 PM", "04:15 PM", "04:30 PM", "04:45 PM",
-    "05:00 PM", "05:15 PM", "05:30 PM", "05:45 PM",
-    "06:00 PM", "06:15 PM", "06:30 PM", "06:45 PM",
-    "07:00 PM", "07:15 PM", "07:30 PM", "07:45 PM",
-    "08:00 PM", "08:15 PM", "08:30 PM", "08:45 PM",
-    "09:00 PM", "09:15 PM", "09:30 PM", "09:45 PM",
-    "10:00 PM", "10:15 PM", "10:30 PM", "10:45 PM",
-    "11:00 PM",
-  ];
-
+const generateTimeIntervals = (startTime: string, endTime: string, interval: number) => {
+    const times: string[] = [];
+    const formatTime = (hours: number, minutes: number): string => {
+      const period = hours >= 12 ? "PM" : "AM";
+      const adjustedHours = hours % 12 === 0 ? 12 : hours % 12;
+      return `${adjustedHours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")} ${period}`;
+    };
   
+    let [startHours, startMinutes] = startTime
+      .split(":")
+      .map((time) => parseInt(time));
+    const [endHours, endMinutes] = endTime
+      .split(":")
+      .map((time) => parseInt(time));
+    let currentMinutes = startMinutes;
+  
+    while (
+      startHours < endHours ||
+      (startHours === endHours && currentMinutes <= endMinutes)
+    ) {
+      times.push(formatTime(startHours, currentMinutes));
+      currentMinutes += interval;
+  
+      if (currentMinutes >= 60) {
+        currentMinutes -= 60;
+        startHours++;
+      }
+    }
+  
+    return times;
+  };
+  
+  const ALL_TIMES = generateTimeIntervals("07:00", "23:00", 5);
+
+
+
+
   
 const Administrator = () => {
 
-    const [id1, setId1] = useState<string>('');
-    const handleId1Change = (event: SelectChangeEvent) => {
-      setId1(event.target.value);
+    interface Clinic {
+        clinicName: string,
+        subTitle: string,
+        address1: string,
+        address2: string,
+        city: string,
+        postCode: string,
+        country: string,
+        state: string,
+        telephoneNumber1: string,
+        telephoneNumber2: string,
+        fax: string,
+        email: string,
+        id1: string,
+        id2: string,
+        type1: string,
+        type2: string,
+        specialization: string,
+        slotDuration: number,
+        bookingStartTime: string,
+        bookingEndTime: string,
+    }
+
+    const [clinicData, setClinicData] = useState<Clinic>({
+        clinicName: '',
+        subTitle: '',
+        address1: '',
+        address2: '',
+        city: '',
+        postCode: '',
+        country: '',
+        state: '',
+        telephoneNumber1: '',
+        telephoneNumber2: '',
+        fax: '',
+        email: '',
+        id1: '',
+        id2: '',
+        type1: '',
+        type2: '',
+        specialization: '',
+        slotDuration: 5,
+        bookingStartTime: '',
+        bookingEndTime: '',
+      });
+
+    const updateClinic = (updatedClinic:Clinic):void => {
+        setClinicData(updatedClinic); // Update the parent state
     };
 
-    const [id2, setId2] = useState<string>('');
-    const handleId2Change = (event: SelectChangeEvent) => {
-      setId2(event.target.value);
-    };
-
-    const [slotDuration, setSlotDuration] = useState<number>(15); // Default slot duration in minutes
-    const [bookingStartTime, setBookingStartTime] = useState<string>("");
-    const [bookingEndTime, setBookingEndTime] = useState<string>("");
-    const [filteredBookingStartTimes, setFilteredBookingStartTimes] = useState<string[]>([]);
-    const [filteredBookingEndTimes, setFilteredBookingEndTimes] = useState<string[]>([]);
-
-    const generateTimeSlots = (start: string, end: string, duration: number) => {
-        const startTime = new Date(`1970-01-01T${start.replace(" AM", "").replace(" PM", "")}:00`);
-        const endTime = new Date(`1970-01-01T${end.replace(" AM", "").replace(" PM", "")}:00`);
-        const slots: string[] = [];
-      
-        while (startTime < endTime) {
-          const hours = startTime.getHours();
-          const minutes = startTime.getMinutes();
-          const ampm = hours >= 12 ? "PM" : "AM";
-          const formattedTime = `${(hours % 12 || 12).toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${ampm}`;
-          slots.push(formattedTime);
-      
-          startTime.setMinutes(startTime.getMinutes() + duration);
-        }
-      
-        return slots;
-      };
-      
-      // Update available start times when slot duration changes
-      const handleSlotDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const duration = parseInt(event.target.value, 10);
-        setSlotDuration(duration);
-        const startTimes = generateTimeSlots("07:00 AM", "11:00 PM", duration);
-        setFilteredBookingStartTimes(startTimes);
-        setFilteredBookingEndTimes([]); // Reset end times
-        setBookingStartTime(""); // Reset start time
-        setBookingEndTime(""); // Reset end time
-      };
-      
-      // Update end times when start time changes
-      const handleBookingStartTimeChange = (event: SelectChangeEvent) => {
-        const selectedStartTime = event.target.value;
-        setBookingStartTime(selectedStartTime);
-        
-        // Convert start time to timestamp
-        const selectedStartTimestamp = new Date(`1970-01-01T${selectedStartTime.replace(' AM', '').replace(' PM', '')}:00`).getTime();
-      
-        // Filter potential end times from the ALL_TIMES array (or any array of times you're using)
-        const filteredEndTimes = ALL_TIMES.filter((time) => {
-          // Convert end time to timestamp
-          const endTimestamp = new Date(`1970-01-01T${time.replace(' AM', '').replace(' PM', '')}:00`).getTime();
-          
-          // Ensure the end time is after the start time and the time difference is a multiple of slot duration
-          return endTimestamp > selectedStartTimestamp && (endTimestamp - selectedStartTimestamp) % (slotDuration * 60 * 1000) === 0;
-        });
-      
-        // Update filtered end times based on start time selection
-        setFilteredBookingEndTimes(filteredEndTimes);
-        setBookingEndTime(""); // Reset end time if start time changes
-      };
-      
-      
-      // Update selected end time
-      const handleBookingEndTimeChange = (event: SelectChangeEvent) => {
-        setBookingEndTime(event.target.value);
-      };
-      
-
-
-
-    
     return (
+
         <Box sx={{display:"flex"}}>
             <Appbar appBarTitle="Clinic/Staff" />
             <Box
@@ -159,12 +159,13 @@ const Administrator = () => {
                             container
                             spacing={2}
                             sx={{ marginleft: "10px", padding: "20px" }}
+
                         >
+                            
                             <Grid item xs={12} sm={6} md={6}>
                                 <div className="clinic" style={styles.container}>
                                     <h2>Clinic</h2>
                                     <div className="clinc-name" style={styles.container}>
-                                        <Checkbox/>
                                         <label>Clinic Name:</label>
                                         <Grid item xs={12}>
                                             <TextField 
@@ -172,12 +173,11 @@ const Administrator = () => {
                                                 fullWidth
                                                 multiline 
                                                 variant="standard"
-                                                value="Clinique Sante Pour Tous"
-                                                inputProps={{readOnly:true}} />
+                                                value={clinicData.clinicName}
+                                                 />
                                         </Grid>   
                                     </div>
                                     <div className="Other Information" style={styles.container}>
-                                        <Checkbox />
                                         <label>Other Information</label>
                                         <Grid container spacing={1}>
                                             <Grid item xs={12}>
@@ -187,25 +187,26 @@ const Administrator = () => {
                                                     fullWidth
                                                     multiline
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}} 
+        
+                                                    value={clinicData.subTitle}
                                                 />
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <TextField
-                                                    id="other-information-address"
+                                                    id="other-information-address-1"
                                                     label="Address(line1)"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.address1}
                                                 />
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <TextField
-                                                    id="other-information-address"
+                                                    id="other-information-address-2"
                                                     label="Address(line2)"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.address2}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -214,7 +215,7 @@ const Administrator = () => {
                                                     label="City"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.city}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -223,7 +224,7 @@ const Administrator = () => {
                                                     label="Post Code"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.postCode}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -232,7 +233,7 @@ const Administrator = () => {
                                                     label="Country"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.country}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -241,7 +242,7 @@ const Administrator = () => {
                                                     label="State"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.state}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -250,7 +251,7 @@ const Administrator = () => {
                                                     label="Telephone-1"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.telephoneNumber1}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -259,7 +260,7 @@ const Administrator = () => {
                                                     label="Telephone-2"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.telephoneNumber2}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -268,7 +269,7 @@ const Administrator = () => {
                                                     label="Fax"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.fax}
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
@@ -277,27 +278,25 @@ const Administrator = () => {
                                                     label="Email"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.email}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} container columnSpacing={1}>
-                                                <Grid item xs={2} sx={{mt:3}}><label>ID #1:</label></Grid>
-                                                <Grid item xs={5} sx={{mt:2}}>
+                                            <Grid item xs={12} container columnSpacing={1} alignItems={"end"}>
+                                                <Grid item xs={2} sx={{mt:2}}><label>ID #1:</label></Grid>
+                                                <Grid item xs={5} sx={{mt:1}}>
                                                     <TextField
                                                         id="other-information-id-1"
                                                         fullWidth
                                                         multiline
                                                         variant="standard"
-                                                        inputProps={{readOnly:true}}
+                                                        value={clinicData.type1}
                                                     />
                                                 </Grid>
-                                                <Grid item xs={5} sx={{mt:2}}>
+                                                <Grid item xs={5} sx={{mt:1}}>
                                                      <FormControl variant="standard" fullWidth>
                                                         <Select
                                                             id="other-information-id-1"
-                                                            disabled
-                                                            value={id2}
-                                                            onChange={handleId2Change}
+                                                            value={clinicData.id1}
                                                         >
                                                             {ID.map((name) => (
                                                             <MenuItem key={name} value={name}>                                        
@@ -309,24 +308,22 @@ const Administrator = () => {
                                                      </FormControl>
                                                 </Grid>
                                             </Grid>
-                                            <Grid container item xs={12} columnSpacing={1}>
-                                                <Grid item xs={2} sx={{mt:3}}><label>ID #2:</label></Grid>
-                                                <Grid item xs={5} sx={{mt:2}}>
+                                            <Grid container item xs={12} columnSpacing={1} alignItems={"end"}>
+                                                <Grid item xs={2} sx={{mt:2}}><label>ID #2:</label></Grid>
+                                                <Grid item xs={5} sx={{mt:1}}>
                                                     <TextField
                                                         id="other-information-id-2"
                                                         fullWidth
                                                         multiline
                                                         variant="standard"
-                                                        inputProps={{readOnly:true}}
+                                                        value={clinicData.type2}
                                                     />
                                                 </Grid>
-                                                <Grid item xs={5} sx={{mt:2}}>
+                                                <Grid item xs={5} sx={{mt:1}}>
                                                      <FormControl variant="standard" fullWidth>
                                                         <Select
                                                             id="other-information-id-2"
-                                                            disabled
-                                                            value={id1}
-                                                            onChange={handleId1Change}
+                                                            value={clinicData.id2}
                                                         >
                                                             {ID.map((name) => (
                                                             <MenuItem key={name} value={name}>                                        
@@ -344,13 +341,12 @@ const Administrator = () => {
                                                     label="Specialization"
                                                     fullWidth
                                                     variant="standard"
-                                                    inputProps={{readOnly:true}}
+                                                    value={clinicData.specialization}
                                                 />
                                             </Grid>
                                         </Grid>
                                     </div>
                                     <div className="appointment-book" style={styles.container}>
-                                        <Checkbox/>
                                         <label>Appointment Book</label>
                                         <Grid container spacing={1}>
                                             <Grid item xs={12}>
@@ -360,8 +356,8 @@ const Administrator = () => {
                                                         row
                                                         aria-labelledby="appointment-book-slot-duration"
                                                         name="appointment-book-slot-duration"
-                                                        value={slotDuration}
-                                                        onChange={handleSlotDurationChange}
+                                                        value={clinicData.slotDuration}
+
                                                     >
                                                         <FormControlLabel value={5} control={<Radio />} label="5 Minutes" />
                                                         <FormControlLabel value={10} control={<Radio />} label="10 Minutes" />
@@ -374,16 +370,13 @@ const Administrator = () => {
                                                     <InputLabel id="appointment-book-bookings-start-at">Bookings start at</InputLabel>
                                                     <Select
                                                         id="appointment-book-bookings-start-at"
-                                                        
-                                                        value={bookingStartTime}
-                                                        onChange={handleBookingStartTimeChange}
+                                                        value={clinicData.bookingStartTime}
                                                         >
-                                                            {filteredBookingStartTimes.map((time) => (
+                                                            {ALL_TIMES.map((time) => (
                                                                 <MenuItem key={time} value={time}>
-                                                                {time}
+                                                                    {time}
                                                                 </MenuItem>
                                                             ))}
-                                                            
                                                     </Select>
                                                 </FormControl>
                                             </Grid>
@@ -392,26 +385,32 @@ const Administrator = () => {
                                                     <InputLabel id="appointment-book-bookings-end-at">Bookings end at</InputLabel>
                                                     <Select
                                                         id="appointment-book-bookings-end-at"
-                                                        disabled={!bookingStartTime}
-                                                        value={bookingEndTime}
-                                                        onChange={handleBookingEndTimeChange}
-                                                        >
-                                                            {filteredBookingEndTimes.map((time) => (
+                                                        disabled={!clinicData.bookingStartTime}
+                                                        value={clinicData.bookingEndTime}
+                                                        >      
+                                                            {ALL_TIMES.map((time) => (
                                                                 <MenuItem key={time} value={time}>
-                                                                {time}
+                                                                    {time}
                                                                 </MenuItem>
-                                                            ))} 
-                                                            
+                                                            ))}
                                                     </Select>
                                                 </FormControl>
                                             </Grid>
                                         </Grid>
                                     </div>
+                                    <Grid item xs={12} sx={{mt:2, display:'flex', justifyContent:'right'}}>
+                                        <ClinicModal clinic1={clinicData} updateClinic={updateClinic} />
+                                    </Grid>
                                     
                                 </div>
                             </Grid>
                             <Grid item xs={12} sm={6} md={6}>
-
+                                {/* Add Staff Members */}
+                                <div className="staff-members" style={styles.container}>
+                                    <h2>Staff Members</h2>
+                                    <StaffModal/>
+                                </div>
+                                {/* References */}
                             </Grid>
                         </Grid>
                     </Paper>     

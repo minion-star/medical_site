@@ -731,7 +731,7 @@ const PatientInfo = ({ patients }: any) => {
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item container xs={4} alignItems='end'>
-                                  <Grid xs={8}>
+                                  <Grid item xs={8}>
                                     <TextField
                                       id="outlined-multiline-static"
                                       label="Dose"
@@ -740,7 +740,7 @@ const PatientInfo = ({ patients }: any) => {
                                       fullWidth
                                     />
                                   </Grid>
-                                  <Grid xs={4}>
+                                  <Grid item xs={4}>
                                     <Unit/>
                                   </Grid>
                                 </Grid>
@@ -795,7 +795,7 @@ const PatientInfo = ({ patients }: any) => {
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item container xs={4} alignItems='end'>
-                                  <Grid xs={8}>
+                                  <Grid item xs={8}>
                                     <TextField
                                       id="outlined-multiline-static"
                                       label="Dose"
@@ -804,7 +804,7 @@ const PatientInfo = ({ patients }: any) => {
                                       fullWidth
                                     />
                                   </Grid>
-                                  <Grid xs={4}>
+                                  <Grid item xs={4}>
                                     <Unit/>
                                   </Grid>
                                 </Grid>

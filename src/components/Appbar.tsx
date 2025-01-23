@@ -19,7 +19,7 @@ import { settings } from "../constant";
 import { AppBar, Drawer } from "../styles";
 
 export default function Appbar(props: { appBarTitle: string }) {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );

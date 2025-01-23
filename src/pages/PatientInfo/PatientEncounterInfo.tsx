@@ -30,7 +30,12 @@ import {
   Toolbar,
   Container,
   Badge,
-  Modal
+  Modal,
+  SpeedDialAction,
+  SpeedDialIcon,
+  SpeedDial,
+  AppBar,
+  Drawer,
 } from "@mui/material";
 import { ExpandLess, ExpandMore} from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -66,10 +71,13 @@ import { flexibleCompare } from "@fullcalendar/core/internal";
 import ClickableAvatar from "../../components/ClickableAvatar";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import LockIcon from '@mui/icons-material/Lock';
 import { link } from "fs";
 import { Calendar } from "@fullcalendar/core";
-import VitalSignsModal from "../../components/Encounter/VitalSignsModal";
+import VitalSignsModal from "./VitalSignsModal";
+import StickySpeedDial from "./StickySpeedDial"
 import { string } from "yargs";
+import TypedRegistry from "chart.js/dist/core/core.typedRegistry";
 
 
 
@@ -221,6 +229,7 @@ const psychiatric_1:string = 'Judgment intact, insight present'
 const psychiatric_2:string = 'Oriented to time, place & person'
 const psychiatric_3:string = 'No memory impairment noted'
 const psychiatric_4:string = 'No mood disorders, calm affect'
+
 
 
 // selected options and check box component  
@@ -957,9 +966,6 @@ function Select_Time () {
 
 
 
-
-
-
 const PatientInfoSchema = Yup.object().shape({
   firstName: Yup.string().required("Required"),
   lastName: Yup.string().required("Required"),
@@ -1098,6 +1104,10 @@ const PatientEncounterInfo = ({ patients }: any) => {
   }
 
   const general: string = "General";
+  // Add print 
+  const [openPrint, setOpenPrint] = useState(false);
+      const handleOpenPrint = () => setOpenPrint(true);
+      const handleClosePrint = () => setOpenPrint(false);
 
   // nest list handle
 
@@ -1240,7 +1250,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
                             <h2>Chief Complaint / Encounter Reason</h2>
                               <Select_Checkbox />
                           </div>  
-                          <div style={styles.container}>
+                          <div className="history-of-present-illness" style={styles.container}>
                             <h2>History of Present Illness</h2>
                             <Grid container rowSpacing={2}>
                               <Grid item xs={12} sm={12}>
@@ -1282,7 +1292,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
                               </Grid>
                             </Grid>                            
                           </div>                         
-                          <div style={styles.container}>
+                          <div className="vital-signs" style={styles.container}>
                             <Grid container spacing={1} sx={{display:"flex", alignItems:'end'}}>
                               <Grid item xs={11}>
                                 <h2>Vital Signs</h2> 
@@ -1460,7 +1470,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
                               </Grid>                 
                             </Grid>
                           </div> 
-                          <div style={styles.container}>
+                          <div className="review-of-systems" style={styles.container}>
                             <h2>Review of Systems</h2>
                             <Grid item xs={12} sm={12}>
                               <CheckboxComGen nameCheckbox="General" /> 
@@ -1531,7 +1541,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                                                          
                         </Grid>                          
                         <Grid item xs={6} sm={6}>
-                          <div style={styles.container}>
+                          <div className="physical-examination" style={styles.container}>
                             <h2>Physical Examination</h2>
                             <Grid item xs={12} sm={12}>
                               <ListItemButton onClick={()=>{handleListClick("constitutional")}}>
@@ -1743,11 +1753,11 @@ const PatientEncounterInfo = ({ patients }: any) => {
                               <TextField fullWidth sx={{ m: 1 }} id="standard-basic"  variant="standard" />
                             </Grid>                   
                           </div> 
-                          <div style={styles.container}>
+                          <div className="order-requistion" style={styles.container}>
                             <h2>Order / Requistion</h2>
                             <Orders_Requisitions />                                          
                           </div>  
-                          <div style={styles.container}>
+                          <div className="medications-rx" style={styles.container}>
                             <h2>Medications / Rx</h2>
                             <Medications_Rx />                                          
                           </div> 
@@ -1855,13 +1865,38 @@ const PatientEncounterInfo = ({ patients }: any) => {
             </Grid>
           </Paper>
         </Container>
+        <StickySpeedDial/>
+        
       </Box>
+      
     </Box>
   );
 };
 
 
 const styles = {
+  modal: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    backgroundColor: "white",
+    boxShadow: "24px",
+    width: "1200px",
+    height: "600px",
+    borderRadius: "8px",
+    padding: "0px",
+},
+bar: {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  backgroundColor: "green",
+  color: "white",
+  padding: "8px 8px",
+  borderTopLeftRadius: "8px",
+  borderTopRightRadius: "8px",
+},
   container: {
     border: '1px solid lightgray',
     borderRadius: '5px',

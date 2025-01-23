@@ -23,7 +23,7 @@ import { mainListItems, secondaryListItems } from "./listItems";
 export default function Appbar_Patient(props: { appBarTitle: string; id: Number }) {
   const location = useLocation(); // Get current route
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   // Define tab paths
   const tabs = [

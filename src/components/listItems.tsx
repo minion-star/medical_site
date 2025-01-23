@@ -36,7 +36,7 @@ const primarynavList = [
   },
   {
     link: "/administrator",
-    label: "administrator",
+    label: "Administrator",
     icon: <AdminPanelSettingsIcon/>,
   },
 /*  {

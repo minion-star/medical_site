@@ -393,7 +393,7 @@ const VitalSignsModal: React.FC = () => {
       
       
 
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
   const handleOpen = () => setOpen(true);

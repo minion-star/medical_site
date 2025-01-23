@@ -233,14 +233,14 @@ const PatientInfo = ({ patients }: any) => {
                     
                     <Form>
                       <Grid item xs={12} sm={12}>
-                      <div className="setside">
-                        <div className="left">
-                          <IconButton component={Link} to="/patient-list" color="inherit">
-                            <ArrowBackIcon />
-                          </IconButton>
-                        </div>                        
-                      </div>
-                        </Grid>  
+                        <div className="setside">
+                          <div className="left">
+                            <IconButton component={Link} to="/patient-list" color="inherit">
+                              <ArrowBackIcon />
+                            </IconButton>
+                          </div>                        
+                        </div>
+                      </Grid>  
                       
                      <Grid container spacing={2} sx={{justifyContent: "space-between",alignItems: "center",}}>
                         <Grid item xs={12} sm={2}>
@@ -282,7 +282,7 @@ const PatientInfo = ({ patients }: any) => {
                             helperText={touched.age && errors.age}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={1} style={{textAlign:'right'}}>
+                        <Grid item xs={12} sm={1} style={{justifyContent:"flex-end"}}>
                           <IconButton component={Link} to="/pdf-viewer" color="inherit">
                             <DocumentScannerIcon                              
                               style={{
@@ -880,7 +880,7 @@ const PatientInfo = ({ patients }: any) => {
                       <br />
                         
                       <Grid container justifyContent="flex-end">
-                        <Grid item xs={2} sm={1}>
+                        <Grid item xs={4} sm={3} md={2} lg={1}>
                           <Button
                             component={Link}
                             to="/patient-list"
@@ -889,12 +889,12 @@ const PatientInfo = ({ patients }: any) => {
                             Cancel
                           </Button>
                         </Grid>
-                        <Grid item xs={2} sm={1}>
+                        <Grid item xs={4} sm={3} md={2} lg={1}>
                           <Button type="submit" variant="contained" onClick={handleSubmit} >
                             Save
                           </Button>                          
                         </Grid>
-                        <Grid item xs={2} sm={1}>
+                        <Grid item xs={4} sm={3} md={2} lg={1}>
                           <Button 
                            component={Link}
                            to={`/patient-info-history/${patient.id}`}

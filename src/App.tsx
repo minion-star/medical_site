@@ -8,7 +8,7 @@ import { router } from "./router";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { useThemeStore } from "./store/themeStore";
-
+import PatientListProvider from "./contexts/PatientListContext";
 //const Theme = createTheme(themeOptions);
 
 export default function App() {
@@ -17,16 +17,20 @@ export default function App() {
   return (
     <ThemeProvider theme={createTheme(theme)}>
       <CssBaseline />
-      <React.Suspense
-        fallback={
-          <Box sx={{ display: "flex" }}>
-            <CircularProgress />
-          </Box>
-        }
-      >
-        <RouterProvider router={router} />
-        {/* <StickyFooter /> */}
-      </React.Suspense>
+      <PatientListProvider>
+
+        
+        <React.Suspense
+          fallback={
+            <Box sx={{ display: "flex" }}>
+              <CircularProgress />
+            </Box>
+          }
+        >
+          <RouterProvider router={router} />
+          {/* <StickyFooter /> */}
+        </React.Suspense>
+      </PatientListProvider>
     </ThemeProvider>
   );
 }

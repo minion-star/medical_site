@@ -21,7 +21,7 @@ import { mockPatientData } from "./mockData";
 import PdfViewer from "./components/Pdf";
 import Search from "./pages/Search/Search";
 import Administrator from "./pages/Administrator/Administrator";
-
+import Forms from "./pages/Forms/Form";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -185,5 +185,13 @@ export const router = createBrowserRouter([
         <Search />
       </AdminElement>
     )
-  }
+  },
+  {
+    path:"/forms",
+    element: (
+      <AdminElement>
+        <Forms/>
+      </AdminElement>
+    )
+  },
 ]);
