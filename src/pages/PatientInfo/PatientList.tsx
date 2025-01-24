@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,31 +9,35 @@ import {
   Paper,
   Grid,
   Box,
-  TablePagination
+  TablePagination,
+  Toolbar,
+  Container,
+  CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import Chip from "@mui/material/Chip";
-import Toolbar from "@mui/material/Toolbar";
-import Container from "@mui/material/Container";
 import Appbar from "../../components/Appbar";
+import { PatientListContext } from "../../contexts/PatientListContext";
 import AddPatientDialog from "./AddPatientDialog";
-import { mockPatientData } from "../../mockData";
+import { useNavigate } from "react-router-dom";
 
-function PatientList({ data }: any) {
-  const [patients, setPatients] = React.useState(mockPatientData);
-  const [searchedPatients, setSearchedPatients] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  const handleChange = (e: any) => {
-    const data: any = patients.filter((item: any) =>
-      item.fullName.toLowerCase().match(e.target.value)
+
+const PatientList: React.FC = () => {
+  // Access patient data from the context
+  const patientList = useContext(PatientListContext);
+  const Navigate = useNavigate();
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  if (!patientList) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress color="success" />
+      </Box>
     );
-    setSearchedPatients(data);
-    setPage(0); // Reset page to the first page when searching
-  };
-
-  const patientList = searchedPatients.length > 0 ? searchedPatients : patients;
+  }
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -65,34 +69,26 @@ function PatientList({ data }: any) {
               : theme.palette.grey[900],
           flexGrow: 1,
           height: "100vh",
-          overflow: "auto"
+          overflow: "auto",
         }}
       >
         <Toolbar />
 
         <Container sx={{ mt: 4, mb: 4 }}>
-          <AddPatientDialog
-            patients={patients}
-            setPatients={setPatients}
-            handleChange={handleChange}
-          />
-          <Grid
-            container
-            spacing={2}
-            sx={{ marginleft: "10px", marginTop: "40px" }}
-          >
+          <AddPatientDialog/>
+          <Grid container spacing={2} sx={{ marginLeft: "10px", marginTop: "40px" }}>
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="patient table">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">#</TableCell>
+                    <TableCell align="center">CSN</TableCell>
                     <TableCell>FULL NAME</TableCell>
                     <TableCell>AGE</TableCell>
                     <TableCell>GENDER</TableCell>
-                    <TableCell>ADDRESS</TableCell>
-                    <TableCell>REFERRED BY DR.</TableCell>
-                    <TableCell>ENTRY DATE</TableCell>
-                    <TableCell>STATUS</TableCell>
+                    <TableCell>CREATED DATE</TableCell>
+                    <TableCell>CREATED BY</TableCell>
+                    <TableCell>LAST SAVED DATE</TableCell>
+                    <TableCell>LAST SAVED BY</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -102,31 +98,23 @@ function PatientList({ data }: any) {
                         page * rowsPerPage + rowsPerPage
                       )
                     : patientList
-                  ).map((patient: any, index: any) => (
+                  ).map((patient, index) => (
                     <TableRow
                       key={index}
-                      component={Link}
-                      to={`/patient-info/${patient.id}`}
-                      style={{ textDecoration: "none", color: "inherit" }}
+                      hover
+                      onClick={() => Navigate(`/patient-info/${patient.CSN}`)}
+                      style={{ cursor: "pointer" }}
                     >
-                      <TableCell align="center">{patient.id}</TableCell>
-                      <TableCell>{patient.fullName}</TableCell>
-                      <TableCell>{patient.age}</TableCell>
-                      <TableCell>{patient.gender}</TableCell>
-                      <TableCell>{patient.address}</TableCell>
-                      <TableCell>{patient.referredByDoctor}</TableCell>
-                      <TableCell>{patient.dateOfEntry}</TableCell>
+                      <TableCell align="center">{patient.CSN}</TableCell>
                       <TableCell>
-                        <Chip
-                          label={patient.status}
-                          color={
-                            patient.status === "In Treatment"
-                              ? "success"
-                              : "error"
-                          }
-                          sx={{ textTransform: "uppercase" }}
-                        />
+                        {patient.FIRST_NAME} {patient.LAST_NAME}
                       </TableCell>
+                      <TableCell>{patient.AGE}</TableCell>
+                      <TableCell>{patient.INFORMATION.personalInformation.gender}</TableCell>
+                      <TableCell>{patient.CREATED_DATE}</TableCell>
+                      <TableCell>{patient.CREATED_BY}</TableCell>
+                      <TableCell>{patient.LAST_SAVED_DATE}</TableCell>
+                      <TableCell>{patient.LAST_SAVED_BY}</TableCell>
                     </TableRow>
                   ))}
                   {emptyRows > 0 && (
@@ -152,6 +140,6 @@ function PatientList({ data }: any) {
       </Box>
     </Box>
   );
-}
+};
 
 export default PatientList;

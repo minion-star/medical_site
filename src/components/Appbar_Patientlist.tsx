@@ -20,7 +20,7 @@ import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import { mainListItems, secondaryListItems } from "./listItems";
 
-export default function Appbar_Patient(props: { appBarTitle: string; id: Number }) {
+export default function Appbar_Patient(props: { appBarTitle: string; id: string }) {
   const location = useLocation(); // Get current route
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [open, setOpen] = React.useState(false);

@@ -565,7 +565,7 @@ const PatientInfoSchema = Yup.object().shape({
 });
 
 
-const PatientInfo = ({ patients }: any) => {
+const PatientHistoryInfo = ({ patients }: any) => {
   const { id } = useParams<{ id: string }>();
   const patient = patients?.find(
     (patient: any) => patient.id === parseInt(id || "", 10)
@@ -1187,4 +1187,4 @@ const styles = {
  
 };
 
-export default PatientInfo;
+export default PatientHistoryInfo;

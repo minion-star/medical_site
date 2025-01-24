@@ -1,6 +1,6 @@
 import * as Yup from "yup";
-import { useState } from "react";
-import { Formik, Form, Field } from "formik";
+import axios from "axios";
+import { useState, useContext, useEffect } from "react";
 import { debounce } from 'lodash';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import '../../styles.css'
@@ -22,7 +22,7 @@ import {
   SelectChangeEvent,
   Hidden
 } from "@mui/material";
-import ImageUploadCard from "../../components/ClickableAvatar";
+
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
@@ -34,7 +34,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { blueGrey, grey, red } from "@mui/material/colors";
 import Appbar_Patient from "../../components/Appbar_Patientlist";
+import { PatientListContext } from "../../contexts/PatientListContext";
 import dayjs from "dayjs";
+import { init } from "echarts";
 
 
 
@@ -61,27 +63,51 @@ const PatientInfoSchema = Yup.object().shape({
 
 
 
-const PatientInfo = ({ patients }: any) => {
+const PatientInfo : React.FC = () => {
+
+  const patientList = useContext(PatientListContext);
+  if (!patientList) {
+    return (
+      <Typography variant="h6" color="error">
+        Patient list not available.
+      </Typography>
+    );
+  }
   const { id } = useParams<{ id: string }>();
-  const patient = patients?.find(
-    (patient: any) => patient.id === parseInt(id || "", 10)
-  );
+  const patient = patientList.find((p) => p.CSN === id);
+  if (!patient) {
+    return (
+      <Typography variant="h6" color="error">
+        Patient not found.
+      </Typography>
+    );
+  }
   const initialValues = {
-    id: patient.id,
-    firstName: patient.firstName,
-    lastName: patient.lastName,
-    address: patient.address,
-    phoneNumber: patient.phoneNumber,
-    email: patient.email,
-    age: patient.age,
-    bloodGroup: patient.bloodGroup,
-    referredByDoctor: patient.referredByDoctor,
-    referredByDoctorEmail: patient.referredByDoctorEmail,
-    referredByDoctorPhoneNumber: patient.referredByDoctorPhoneNumber,
-    diseases: patient.diseases,
-    patientHistory: patient.patientHistory,
+    id: patient.CSN || "",
+    firstName: patient.FIRST_NAME || "",
+    lastName: patient.LAST_NAME || "",
+    age: patient.AGE || "",
+    photo: patient.PHOTO || "",
+    personalInformation: patient.INFORMATION.personalInformation || {},
+    workInformation: patient.INFORMATION.workInformation || {},
+    contactInformation: patient.INFORMATION.contactInformation || {},
+    insurance: patient.INFORMATION.insurance || {},
   };
-  
+
+  interface Patient {
+    CSN: string;
+    FIRST_NAME: string;
+    LAST_NAME: string;
+    PHOTO: string;
+    AGE: string;
+    INFORMATION: {
+      personalInformation: PersonalInformation;
+      contactInformation: ContactInformation;
+      workInformation: WorkInformation;
+      insurance: Insurance;
+    };
+  }
+
   interface PersonalInformation {
     id: string,
     mrn: string,
@@ -109,7 +135,7 @@ const PatientInfo = ({ patients }: any) => {
   interface WorkInformation {
     status: string,
     workph: string,
-    emloyer: string
+    employer: string
   }
 
   interface Insurance {
@@ -136,10 +162,39 @@ const PatientInfo = ({ patients }: any) => {
     dob: string,
     gender: string
   }
-  const [personalInformation, setPersonalInformation] = useState<PersonalInformation>({id:'',mrn:'',dob:'',gender:'',marriage:'',siblings:'',race:'',pharamacy:'',other:'' });
-  const [contactInformation, setContactInformation] = useState<ContactInformation>({address:'', city:'', postcode:'', country:'', state:'', homeph:'', cellph:'', email:'', emergency:''});
-  const [insurance, setInsurance] = useState<Insurance>({carrier:'', address:'', city:'', postcode:'', country:'', state:'', phone:'', facsimile:'', plan:'', expiry:'', idno:'', groupno:'', copay:'', authno:'', remarks:'', relation:'', homeph:'', lastname:'', firstname:'',mi:'', dob:'', gender:''});
-  const [workInformation, setWorkInformation] = useState<WorkInformation>({status:'', workph:'', emloyer:''});
+
+  const [personalInformation, setPersonalInformation] = useState<PersonalInformation>(initialValues.personalInformation);
+  const [contactInformation, setContactInformation] = useState<ContactInformation>(initialValues.contactInformation);
+  const [insurance, setInsurance] = useState<Insurance>(initialValues.insurance);
+  const [workInformation, setWorkInformation] = useState<WorkInformation>(initialValues.workInformation);
+  const [firstName, setFirstName] = useState<string>(initialValues.firstName);
+  const [lastName, setLastName] = useState<string>(initialValues.lastName);
+  const [age, setAge] = useState<string>(initialValues.age);
+  const [avatarSrc, setAvatarSrc] = useState<string>(initialValues.photo||""); // Initial state
+  const [isUploaded, setIsUploaded] = useState<boolean>(false);
+
+  const handleFirstNameChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFirstName(e.target.value as string);
+  }
+
+  const handleLastNameChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setLastName(e.target.value as string);
+  }
+
+  const handleAgeChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setAge(e.target.value as string);
+  }
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setAvatarSrc(reader.result as string);
+          setIsUploaded(true);
+        };
+        reader.readAsDataURL(file);
+      }
+  };
 
   const handlePersonalInformationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
     const { name, value } = e.target;
@@ -178,7 +233,7 @@ const PatientInfo = ({ patients }: any) => {
     const { name, value } = e.target;
     setInsurance((prev) => ({
       ...prev,
-      [name as keyof Insurance]: value as string, gender:e.target.value,
+      [name as keyof Insurance]: value as string
     }));
   };
 
@@ -186,22 +241,35 @@ const PatientInfo = ({ patients }: any) => {
     const { name, value } = e.target;
     setWorkInformation((prev) => ({
       ...prev,
-      [name as keyof WorkInformation]: value as string, status:e.target.value,
+      [name as keyof WorkInformation]: value as string
     }));
   };
 
-  const handleSubmit = () => {
-    console.log(
-      'Personal Information:', personalInformation,
-      'Contact Information', contactInformation,
-      'Insurance', insurance,
-      'Work Information', workInformation
-    );
+  const handleSubmit = async () => {
+    const updatedPatient = {
+      CSN: patient.CSN,
+      FIRST_NAME: firstName || "",
+      LAST_NAME: lastName ||"",
+      PHOTO: avatarSrc || "",
+      AGE: age || "",
+      personalInformation:personalInformation,
+      contactInformation:contactInformation,
+      workInformation:workInformation,
+      insurance:insurance,
+    };
+        try {
+              await axios.post("http://localhost:5000/api/general", updatedPatient);
+              alert("Patient saved successfully!");
+            
+        } catch (err) {
+          console.error("Error saving patient:", err);
+          alert("Error saving patient!");
+        }
   };
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar_Patient appBarTitle="GENERAL" id={patient.id}/>
+      <Appbar_Patient appBarTitle="GENERAL" id={patient.CSN}/>
       <Box
         component="main"
         sx={{
@@ -223,15 +291,7 @@ const PatientInfo = ({ patients }: any) => {
               spacing={2}
               sx={{ marginleft: "10px", padding: "20px" }}
             >           
-              <Grid item xs={12}>
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={PatientInfoSchema}
-                  onSubmit={handleSubmit}
-                >
-                  {({ errors, touched }) => (
-                    
-                    <Form>
+              <Grid item container xs={12}>
                       <Grid item xs={12} sm={12}>
                         <div className="setside">
                           <div className="left">
@@ -244,42 +304,51 @@ const PatientInfo = ({ patients }: any) => {
                       
                      <Grid container spacing={2} sx={{justifyContent: "space-between",alignItems: "center",}}>
                         <Grid item xs={12} sm={2}>
-                          <Field
-                            as={TextField}
-                            name="id"
+                          <TextField
+                            id="chart"
                             label="Chart"
+                            multiline
+                            value={initialValues.id}
+                            variant="standard"
                             fullWidth
+                            name="chart"
                           />
                           
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                          <Field
-                            as={TextField}
-                            name="firstName"
+                          <TextField
+                            id="first-name"
                             label="First Name"
+                            multiline
+                            value={firstName}
+                            variant="standard"
                             fullWidth
-                            error={errors.firstName && touched.firstName}
-                            helperText={touched.firstName && errors.firstName}
+                            name="firstName"
+                            onChange={handleFirstNameChange}
                           />
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                          <Field
-                            as={TextField}
-                            name="lastName"
+                          <TextField
+                            id="last-name"
                             label="Last Name"
+                            multiline
+                            value={lastName}
+                            variant="standard"
                             fullWidth
-                            error={errors.lastName && touched.lastName}
-                            helperText={touched.lastName && errors.lastName}
+                            name="lastName"
+                            onChange={handleLastNameChange}
                           />
                         </Grid>                     
                         <Grid item xs={12} sm={1}>
-                          <Field
-                            as={TextField}
-                            name="age"
+                          <TextField
+                            id="age"
                             label="Age"
+                            multiline
+                            value={age}
+                            variant="standard"
                             fullWidth
-                            error={touched.age && Boolean(errors.age)}
-                            helperText={touched.age && errors.age}
+                            name="age"
+                            onChange={handleAgeChange}
                           />
                         </Grid>
                         <Grid item xs={12} sm={1} style={{justifyContent:"flex-end"}}>
@@ -294,7 +363,32 @@ const PatientInfo = ({ patients }: any) => {
                         </Grid>
                       
                         <Grid item xs={12} sm={2} style={{textAlign:'right', paddingRight:'0'}}>
-                          <ImageUploadCard/>
+                          <div>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              id="avatar-upload"
+                              onChange={handleFileChange}
+                            />
+                            <label htmlFor="avatar-upload">
+                              <IconButton style={{ padding: "0" }} component="span">
+                                    {isUploaded ? (
+                                      <Avatar
+                                        variant="square"
+                                        src={avatarSrc}
+                                        alt="Avatar"
+                                        style={{ width: "100px", height: "100px" }}
+                                      />
+                                    ) : (
+                                      <Avatar
+                                        variant="square"
+                                        style={{ width: "100px", height: "100px" }}
+                                      />
+                                    )}
+                              </IconButton>
+                            </label>
+                          </div>
                         </Grid>
                       
                       </Grid>                     
@@ -344,7 +438,7 @@ const PatientInfo = ({ patients }: any) => {
                                   <Select
                                     labelId="personal-information-gender"
                                     id="personal-information-gender"
-                                    value={personalInformation.gender}
+                                    value={personalInformation.gender || ""}
                                     onChange={handlePersonalInformationChange}
                                     label="Gender"
                                     name="gender"
@@ -362,7 +456,7 @@ const PatientInfo = ({ patients }: any) => {
                                   <Select
                                     labelId="personal-information-marriage"
                                     id="personal-information-marriage"
-                                    value={personalInformation.marriage}
+                                    value={personalInformation.marriage || ""}
                                     onChange={handlePersonalInformationChange}
                                     label="Marriage"
                                     name="marriage"
@@ -396,7 +490,7 @@ const PatientInfo = ({ patients }: any) => {
                                   <Select
                                     labelId="personal-information-race"
                                     id="personal-information-race"
-                                    value={personalInformation.race}
+                                    value={personalInformation?.race || ""}
                                     onChange={handlePersonalInformationChange}
                                     label="Race"
                                     name="race"
@@ -813,9 +907,10 @@ const PatientInfo = ({ patients }: any) => {
                                   <Select
                                     labelId="personal-information-gender"
                                     id="personal-information-gender"
-                                    value={insurance.gender}
+                                    value={insurance.gender || ""}
                                     onChange={handleInsuranceChange}
                                     label="Gender"
+                                    name="gender"
                                   >
                                     <MenuItem value="Male">Male</MenuItem>
                                     <MenuItem value="Female">Female</MenuItem>
@@ -835,9 +930,10 @@ const PatientInfo = ({ patients }: any) => {
                                   <Select
                                     labelId="work-information-status"
                                     id="work-information-status"
-                                    value={workInformation.status}
+                                    value={workInformation.status || ""}
                                     onChange={handleWorkInformationChange}
                                     label="Status"
+                                    name="status"
                                   >
                                     <MenuItem value="Employed">Employed</MenuItem>
                                     <MenuItem value="Un-Employed">Un-Employed</MenuItem>
@@ -868,7 +964,7 @@ const PatientInfo = ({ patients }: any) => {
                                   variant="standard"
                                   fullWidth
                                   name="employer"
-                                  value={workInformation.emloyer}
+                                  value={workInformation.employer}
                                   onChange={handleWorkInformationChange}
 
                                 />
@@ -879,7 +975,7 @@ const PatientInfo = ({ patients }: any) => {
                       </Grid>                     
                       <br />
                         
-                      <Grid container justifyContent="flex-end">
+                      <Grid container justifyContent="flex-end" sx={{mt:3}}>
                         <Grid item xs={4} sm={3} md={2} lg={1}>
                           <Button
                             component={Link}
@@ -897,7 +993,7 @@ const PatientInfo = ({ patients }: any) => {
                         <Grid item xs={4} sm={3} md={2} lg={1}>
                           <Button 
                            component={Link}
-                           to={`/patient-info-history/${patient.id}`}
+                           to={`/patient-info-history/${patient.CSN}`}
                            color="warning"
                            variant="contained"
                            >
@@ -905,10 +1001,9 @@ const PatientInfo = ({ patients }: any) => {
                           </Button> 
                                                  
                         </Grid>
-                      </Grid>
-                    </Form>
-                  )}
-                </Formik>
+                      </Grid>  
+                  
+               
               </Grid>
             </Grid>
           </Paper>

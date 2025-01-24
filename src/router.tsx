@@ -84,7 +84,7 @@ export const router = createBrowserRouter([
     path: "/patient-info/:id",
     element: (
       <AdminElement>
-        <PatientInfo patients={mockPatientData} />
+        <PatientInfo />
       </AdminElement>
     )
   },
@@ -108,7 +108,7 @@ export const router = createBrowserRouter([
     path: "/patient-list",
     element: (
       <AdminElement>
-        <PatientList data={mockPatientData} />
+        <PatientList />
       </AdminElement>
     )
   },
