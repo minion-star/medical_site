@@ -1,4 +1,3 @@
-import * as Yup from "yup";
 import axios from "axios";
 import { useState, useContext, useEffect } from "react";
 import { debounce } from 'lodash';
@@ -20,158 +19,152 @@ import {
   FormControl,
   Input,
   SelectChangeEvent,
-  Hidden
+  Hidden,
+  Container
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Toolbar from "@mui/material/Toolbar";
-import Container from "@mui/material/Container";
-import Appbar from "../../components/Appbar";
 import { Link, useParams } from "react-router-dom";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { blueGrey, grey, red } from "@mui/material/colors";
 import Appbar_Patient from "../../components/Appbar_Patientlist";
-import { PatientListContext } from "../../contexts/PatientListContext";
 import dayjs from "dayjs";
 import { init } from "echarts";
 
 
+interface Patient {
+  CSN: string;
+  FIRST_NAME: string;
+  LAST_NAME: string;
+  PHOTO: string;
+  AGE: string;
+  INFORMATION: {
+    personalInformation: PersonalInformation;
+    contactInformation: ContactInformation;
+    workInformation: WorkInformation;
+    insurance: Insurance;
+  };
+}
 
+interface PersonalInformation {
+  id: string,
+  mrn: string,
+  dob: string,
+  gender: string,
+  marriage: string,
+  siblings: string,
+  race: string,
+  pharamacy: string,
+  other: string
+}
 
-const PatientInfoSchema = Yup.object().shape({
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
-  address: Yup.string().required("Required"),
-  phoneNumber: Yup.string()
-    .required("Required")
-    .matches(/^\d+$/, "Phone number must contain only digits"),
-  email: Yup.string().email("Invalid email").required("Required"),
-  age: Yup.number().required("Required").positive("Age must be positive"),
-  bloodGroup: Yup.string().required("Required"),
-  referredByDoctor: Yup.string().required("Required"),
-  referredByDoctorEmail: Yup.string().email("Invalid email"),
-  referredByDoctorPhoneNumber: Yup.string().matches(
-    /^\d+$/,
-    "Phone number must contain only digits"
-  ),
-  diseases: Yup.string().required("Required"),
-  patientHistory: Yup.string(),
-});
+interface ContactInformation {
+  address: string,
+  city: string,
+  postcode: string,
+  country: string,
+  state: string,
+  homeph: string,
+  cellph: string,
+  email: string,
+  emergency: string
+}
+
+interface WorkInformation {
+  status: string,
+  workph: string,
+  employer: string
+}
+
+interface Insurance {
+  carrier: string,
+  address: string,
+  city: string,
+  postcode: string,
+  country: string,
+  state: string,
+  phone: string,
+  facsimile: string,
+  plan: string,
+  expiry: string,
+  idno: string,
+  groupno: string,
+  copay: string,
+  authno: string,
+  remarks: string,
+  relation: string,
+  homeph: string,
+  lastname: string,
+  firstname: string,
+  mi: string,
+  dob: string,
+  gender: string
+}
 
 
 
 const PatientInfo : React.FC = () => {
 
-  const patientList = useContext(PatientListContext);
-  if (!patientList) {
-    return (
-      <Typography variant="h6" color="error">
-        Patient list not available.
-      </Typography>
-    );
-  }
+
   const { id } = useParams<{ id: string }>();
-  const patient = patientList.find((p) => p.CSN === id);
-  if (!patient) {
-    return (
-      <Typography variant="h6" color="error">
-        Patient not found.
-      </Typography>
-    );
-  }
-  const initialValues = {
-    id: patient.CSN || "",
-    firstName: patient.FIRST_NAME || "",
-    lastName: patient.LAST_NAME || "",
-    age: patient.AGE || "",
-    photo: patient.PHOTO || "",
-    personalInformation: patient.INFORMATION.personalInformation || {},
-    workInformation: patient.INFORMATION.workInformation || {},
-    contactInformation: patient.INFORMATION.contactInformation || {},
-    insurance: patient.INFORMATION.insurance || {},
-  };
 
-  interface Patient {
-    CSN: string;
-    FIRST_NAME: string;
-    LAST_NAME: string;
-    PHOTO: string;
-    AGE: string;
-    INFORMATION: {
-      personalInformation: PersonalInformation;
-      contactInformation: ContactInformation;
-      workInformation: WorkInformation;
-      insurance: Insurance;
+  // Patient data states
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Individual states for form fields
+  const [personalInformation, setPersonalInformation] = useState<PersonalInformation>({id:"", mrn:"", dob:"", gender:"", marriage:"", siblings:"", race:"", pharamacy:"", other:""});
+  const [contactInformation, setContactInformation] = useState<ContactInformation>({address: "",city: "",postcode: "",country: "",state: "",homeph: "",cellph: "",email: "",emergency: ""});
+  const [insurance, setInsurance] = useState<Insurance>({carrier: "",address: "",city: "",postcode: "", country: "",state: "",phone: "",facsimile: "",plan: "",expiry: "",idno: "",groupno: "",copay: "",authno: "",remarks: "",relation: "",homeph: "",lastname: "",firstname: "",mi: "",dob: "",gender: ""});
+  const [workInformation, setWorkInformation] = useState<WorkInformation>({status:"", workph:"",employer:""});
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [age, setAge] = useState<string>("");
+  const [avatarSrc, setAvatarSrc] = useState<string>("");
+
+
+  // Fetch patient data
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/general/${id}`);
+        const patientData = response.data;
+
+        if (patientData.PHOTO) {
+          setAvatarSrc(`http://localhost:5000/${patientData.PHOTO}`);
+        } 
+
+        // Populate states with fetched data
+        setPatient(patientData);
+        setPersonalInformation(patientData.INFORMATION.personalInformation || {});
+        setContactInformation(patientData.INFORMATION.contactInformation || {});
+        setInsurance(patientData.INFORMATION.insurance || {});
+        setWorkInformation(patientData.INFORMATION.workInformation || {});
+        setFirstName(patientData.FIRST_NAME || "");
+        setLastName(patientData.LAST_NAME || "");
+        setAge(patientData.AGE || "");
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
+        setError("Failed to load patient data.");
+      } finally {
+        setLoading(false);
+      }
     };
-  }
 
-  interface PersonalInformation {
-    id: string,
-    mrn: string,
-    dob: string,
-    gender: string,
-    marriage: string,
-    siblings: string,
-    race: string,
-    pharamacy: string,
-    other: string
-  }
+    fetchPatient();
+  }, [id]);
 
-  interface ContactInformation {
-    address: string,
-    city: string,
-    postcode: string,
-    country: string,
-    state: string,
-    homeph: string,
-    cellph: string,
-    email: string,
-    emergency: string
-  }
+  // Render loading or error states
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+  if (!patient) return <p>No patient data found.</p>;
+  
+  
 
-  interface WorkInformation {
-    status: string,
-    workph: string,
-    employer: string
-  }
-
-  interface Insurance {
-    carrier: string,
-    address: string,
-    city: string,
-    postcode: string,
-    country: string,
-    state: string,
-    phone: string,
-    facsimile: string,
-    plan: string,
-    expiry: string,
-    idno: string,
-    groupno: string,
-    copay: string,
-    authno: string,
-    remarks: string,
-    relation: string,
-    homeph: string,
-    lastname: string,
-    firstname: string,
-    mi: string,
-    dob: string,
-    gender: string
-  }
-
-  const [personalInformation, setPersonalInformation] = useState<PersonalInformation>(initialValues.personalInformation);
-  const [contactInformation, setContactInformation] = useState<ContactInformation>(initialValues.contactInformation);
-  const [insurance, setInsurance] = useState<Insurance>(initialValues.insurance);
-  const [workInformation, setWorkInformation] = useState<WorkInformation>(initialValues.workInformation);
-  const [firstName, setFirstName] = useState<string>(initialValues.firstName);
-  const [lastName, setLastName] = useState<string>(initialValues.lastName);
-  const [age, setAge] = useState<string>(initialValues.age);
-  const [avatarSrc, setAvatarSrc] = useState<string>(initialValues.photo||""); // Initial state
-  const [isUploaded, setIsUploaded] = useState<boolean>(false);
 
   const handleFirstNameChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFirstName(e.target.value as string);
@@ -190,7 +183,6 @@ const PatientInfo : React.FC = () => {
         const reader = new FileReader();
         reader.onloadend = () => {
           setAvatarSrc(reader.result as string);
-          setIsUploaded(true);
         };
         reader.readAsDataURL(file);
       }
@@ -246,19 +238,25 @@ const PatientInfo : React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const updatedPatient = {
-      CSN: patient.CSN,
-      FIRST_NAME: firstName || "",
-      LAST_NAME: lastName ||"",
-      PHOTO: avatarSrc || "",
-      AGE: age || "",
-      personalInformation:personalInformation,
-      contactInformation:contactInformation,
-      workInformation:workInformation,
-      insurance:insurance,
-    };
+    const formData = new FormData;
+    formData.append("CSN", patient.CSN);
+    formData.append("FIRST_NAME", firstName || "");
+    formData.append("LAST_NAME", lastName || "");
+    formData.append("AGE", age || "");
+    formData.append("personalInformation", JSON.stringify(personalInformation));
+    formData.append("contactInformation", JSON.stringify(contactInformation));
+    formData.append("workInformation", JSON.stringify(workInformation));
+    formData.append("insurance", JSON.stringify(insurance));
+
+    const fileInput = document.querySelector<HTMLInputElement>("#avatar-upload");
+      if (fileInput?.files?.[0]) {
+        formData.append("photo", fileInput.files[0]);
+      } else {
+        formData.append("photo", avatarSrc); // Add the photo path if already saved
+      }
+
         try {
-              await axios.post("http://localhost:5000/api/general", updatedPatient);
+              await axios.post("http://localhost:5000/api/general", formData);
               alert("Patient saved successfully!");
             
         } catch (err) {
@@ -308,7 +306,7 @@ const PatientInfo : React.FC = () => {
                             id="chart"
                             label="Chart"
                             multiline
-                            value={initialValues.id}
+                            value={id}
                             variant="standard"
                             fullWidth
                             name="chart"
@@ -373,19 +371,12 @@ const PatientInfo : React.FC = () => {
                             />
                             <label htmlFor="avatar-upload">
                               <IconButton style={{ padding: "0" }} component="span">
-                                    {isUploaded ? (
                                       <Avatar
                                         variant="square"
                                         src={avatarSrc}
                                         alt="Avatar"
                                         style={{ width: "100px", height: "100px" }}
                                       />
-                                    ) : (
-                                      <Avatar
-                                        variant="square"
-                                        style={{ width: "100px", height: "100px" }}
-                                      />
-                                    )}
                               </IconButton>
                             </label>
                           </div>

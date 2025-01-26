@@ -1,6 +1,6 @@
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import dayjs from "dayjs";
 import * as React from 'react';
 import {
   ListItemIcon,
@@ -36,6 +36,7 @@ import {
   SpeedDial,
   AppBar,
   Drawer,
+  FormGroup,
 } from "@mui/material";
 import { ExpandLess, ExpandMore} from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -51,33 +52,13 @@ import Appbar from "../../components/Appbar";
 import { Link, useParams } from "react-router-dom";
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import '../../styles.css'
-import CheckboxComGen from "../../components/Encounter/Checkbox/CheckboxGeneral";
-import CheckboxAllergic from "../../components/Encounter/Checkbox/CheckboxAllergic";
-import CheckboxCardiovascular from "../../components/Encounter/Checkbox/CheckboxCardiovascular";
-import CheckboxENMT from "../../components/Encounter/Checkbox/CheckboxENMT";
-import CheckboxEndocrine from "../../components/Encounter/Checkbox/CheckboxEndocrine";
-import CheckboxEyes from "../../components/Encounter/Checkbox/CheckboxEyes";
-import CheckboxGastrointestinal from "../../components/Encounter/Checkbox/CheckboxGastrointestinal";
-import CheckboxGenitourianryFemale from "../../components/Encounter/Checkbox/CheckboxGenitourianryFemale";
-import CheckboxGenitourinaryMale from "../../components/Encounter/Checkbox/CheckboxGenitourinaryMale";
-import CheckboxHematologic from "../../components/Encounter/Checkbox/CheckboxHematologic";
-import CheckboxMusculoskeletal from "../../components/Encounter/Checkbox/CheckboxMusculoskeletal";
-import CheckboxNeurologic from "../../components/Encounter/Checkbox/CheckboxNeurologic";
-import CheckboxPsychiatric from "../../components/Encounter/Checkbox/CheckboxPsychiatric";
-import CheckboxRespiratory from "../../components/Encounter/Checkbox/CheckboxRespiratory";
-import CheckboxSkin from "../../components/Encounter/Checkbox/CheckboxSkin";
 import Appbar_Patient from "../../components/Appbar_Patientlist";
-import { flexibleCompare } from "@fullcalendar/core/internal";
-import ClickableAvatar from "../../components/ClickableAvatar";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import LockIcon from '@mui/icons-material/Lock';
-import { link } from "fs";
-import { Calendar } from "@fullcalendar/core";
 import VitalSignsModal from "./VitalSignsModal";
 import StickySpeedDial from "./StickySpeedDial"
-import { string } from "yargs";
-import TypedRegistry from "chart.js/dist/core/core.typedRegistry";
+
 
 
 
@@ -230,6 +211,67 @@ const psychiatric_2:string = 'Oriented to time, place & person'
 const psychiatric_3:string = 'No memory impairment noted'
 const psychiatric_4:string = 'No mood disorders, calm affect'
 
+const reviewGeneral:string[] = ["Fevers", "Sweats", "Weight loss", "Chills", "Appetite loss", "Fatigue"]
+const reviewEyes:string[] = ["Vision loss", "Double vision", "Blurred vision", "Eye irritation", "Eye pain", "Light sensitivity"]
+const reviewENMT:string[] = ["Earache", "Ear discharge", "Ringing in the ears", "Decreased hearing", "Frequent colds", "Nasal congestion", "Nosebleeds", "Bleeding gums", "Difficulty swallowing", "Hoarseness", "Sore throat"]
+const reviewCardiovascular:string[] = ["Difficulty breathing at night", "Chest pain or discomfort", "Irregular heart beats", "Fatigue", "Lightheadedness", "Shortness of breath with exertion",
+  "Palpitations", "Swelling of hands or feet", "Difficulty breathing while lying down", "Leg cramps with exertion", "Discoloration of lips or nails ", "Recent weight gain"
+]
+const reviewRespiratory:string[] = ["Sleep disturbances due to breathing", "Cough", "Coughing up blood", "Shortness of breath", "Chest discomfort", "Wheezing", "Excessive sputum", "Excessive snoring"]
+const reviewGastrointestinal:string[] = ["Change in appetite", "Indigestion", "Heartburn", "Nausea", "Vomiting", "Excessive gas", "Abdominal pain", "Abdominal bloating", "Hemorrhoids", "Diarrhea", "Change in bowel habits", "Constipation", "Black or tarry stools", "Bloody stools"]
+const reviewGenitourinaryMale:string[] = ["Frequent urination", "Blood in urine", "Foul urinary discharge", "Kidney pain", "Urinary urgency", "Trouble starting urinary stream", "Inability to empty bladder", "Burning or pain on urination", "Genital rashes or sores","Testicular pain or masses"]
+const reviewGenitourinaryFemale:string[] = ["Inability to control bladder", "Unusual urinary color", "Missed periods", "Excessively heavy periods", "Lumps or sores", "Pelvic pain"]
+const reviewMusculoskeletal:string[] = ["Joint pain ", "Joint stiffness or swelling", "Muscle cramps", "Muscle aches", "Loss of strength", "Back or neck pain", "Muscle weakness"]
+const reviewSkin:string[] =["Suspicious lesions", "Excessive perspiration", "Dryness", "Rash", "Changes in hair or nails", "Night sweats", "Poor wound healing", "Itching", "Flushing", "Changes in color of skin"]
+const reviewNeurologic:string[] = ["Headaches", "Weakness or numbness", "Tingling", "Faints or blackouts", "Tremors", "Memory loss", "Poor balance ", "Difficulty with speaking", "Difficulty with concentration", "Disturbances in coordination", "Brief paralysis", " Visual disturbances", "Seizures", "Sensation of room spinning", "Excessive daytime sleeping"]
+const reviewPsychiatric:string[] = ["Anxiety", "Depression", "Nervousness", "Memory change", "Frightening visions or sounds", "Thoughts of suicide or violence"]
+const reviewEndocrine:string[] = ["Heat or cold intolerance", "Weight change", "Excessive thirst or hunger", "Excessive sweating or urination"]
+const reviewHematologicLymphatic:string[] = ["Skin discoloration", "Enlarged lymph nodes", "Bleeding", "Fevers", "Abnormal bruising"]
+const reviewAllergicImmunologic:string[] = ["Seasonal allergies", "Persistent infections", "Hives or rash", "HIV exposure"]
+
+
+
+interface Head {
+  date:string,
+  type:string,
+  attendBy:string,
+}
+
+interface PresentIllness {
+  text:string,
+  location:string,
+  quality:string,
+  severity:string,
+  duration:string,
+  onsetTiming:string,
+  context:string,
+  modifyingFactors:string,
+  signsSymptoms:string,
+}
+
+
+interface ReviewOfSystems {
+  general : {fevers:boolean, sweats:boolean, weightLoss:boolean, Chills:boolean, appetiteLoss:boolean, fatigue:boolean},
+  eyes:{visionLoss:boolean, doubleVision:boolean, blurredVision:boolean, eyeIrritation:boolean, eyePain:boolean, lightSensitivity:boolean},
+  eNMT:{earache:boolean, earDischarge:boolean, ringingInTheEars:boolean, decreasedHearing:boolean, frequentColds:boolean, nasalCongestion:boolean, nosebleeds:boolean, bleedingGums:boolean, difficultySwallowing:boolean, hoarseness:boolean, soreThroat:boolean},
+  cardiovascular:{difficultyBreathingAtNight:boolean, chestPainOrDiscomfort:boolean, irregularHeartBeats:boolean, fatigue:boolean, lightheadedness:boolean, shortnessOfBreathWithExertion:boolean,
+  palpitations:boolean, swellingOfHandsOrFeet:boolean, difficultyBreathingWhileLyingDown:boolean, legCrampsWithExertion:boolean, discolorationOfLipsOrNails:boolean, recentWeightGain:boolean
+},
+  respiratory:{sleepDisturbancesDueToBreathing:boolean, cough:boolean, coughingUpBlood:boolean, shortnessOfBreath:boolean, chestDiscomfort:boolean, wheezing:boolean, excessiveSputum:boolean, excessiveSnoring:boolean},
+  gastrointestinal:{changeInAppetite:boolean, indigestion:boolean, heartburn:boolean, nausea:boolean, vomiting:boolean, excessiveGas:boolean, abdominalPain:boolean, abdominalBloating:boolean, hemorrhoids:boolean, diarrhea:boolean, changeInBowelHabits:boolean, constipation:boolean, blackOrTarryStools:boolean, bloodyStools:boolean},
+  genitourinaryMale:{frequentUrination:boolean, bloodInUrine:boolean, foulUrinaryDischarge:boolean, kidneyPain:boolean, urinaryUrgency:boolean, troubleStartingUrinaryStream:boolean, inabilityToEmptyBladder:boolean, burningOrPainOnUrination:boolean, genitalRashesOrSores:boolean, testicularPainOrMasses:boolean},
+  genitourinaryFemale:{inabilityToControlBladder:boolean, unusualUrinaryColor:boolean, missedPeriods:boolean, excessivelyHeavyPeriods:boolean, lumpsOrSores:boolean, pelvicPain:boolean},
+  musculoskeletal:{jointPain:boolean, jointStiffnessOrSwelling:boolean, muscleCramps:boolean, muscleAches:boolean, lossOfStrength:boolean, backOrNeckPain:boolean, muscleWeakness:boolean},
+  skin:{suspiciousLesions:boolean, excessivePerspiration:boolean, dryness:boolean, rash:boolean, changesInHairOrNails:boolean, nightSweats:boolean, poorWoundHealing:boolean, itching:boolean, flushing:boolean, changesInColorOfSkin:boolean},
+  neurologic:{headaches:boolean, weaknessOrNumbness:boolean, tingling:boolean, faintsOrBlackouts:boolean, tremors:boolean, memoryLoss:boolean, poorBalance :boolean, difficultyWithSpeaking:boolean, difficultyWithConcentration:boolean, disturbancesInCoordination:boolean, briefParalysis:boolean, visualDisturbances:boolean, seizures:boolean, sensationOfRoomSpinning:boolean, excessiveDaytimeSleeping:boolean},
+  psychiatric:{Anxiety:boolean, Depression:boolean, Nervousness:boolean, memoryChange:boolean, frighteningVisionsOrSounds:boolean, thoughtsOfSuicideOrViolence:boolean},
+  endocrine:{heatOrColdIntolerance:boolean, weightChange:boolean, excessiveThirstOrHunger:boolean, excessiveSweatingOrUrination:boolean},
+  hematologicLymphatic:{skinDiscoloration:boolean, enlargedLymphNodes:boolean, bleeding:boolean, fevers:boolean, abnormalBruising:boolean},
+  allergicImmunologic:{seasonalAllergies:boolean, persistentInfections:boolean, hivesOrRash:boolean, hIVExposure:boolean},
+  checkReview:{checkGeneral:boolean, checkEyes:boolean, checkENMT:boolean, checkCardiovascular:boolean, checkRespiratory:boolean, checkGastrointestinal:boolean, checkGenitourinaryMale:boolean, checkGenitourinaryFemale:boolean, checkMusculoskeletal:boolean, checkSkin:boolean, checkNeurologic:boolean, checkPsychiatric:boolean, checkEndocrine:boolean, checkHematologicLymphatic:boolean, checkAllergicImmunologic:boolean,}, 
+}
+
+
 
 
 // selected options and check box component  
@@ -239,6 +281,103 @@ interface NameProps {
   subname?: string;
   label?: string;
 }
+
+//  Chief Complaint / Encounter Reason
+
+const chiefEncounter = ["Abdominal pain", "Abnormal appearance of eyes", "Allergy symptoms", "Ankle symptoms", "Anxiety / nervousness", "Back symptoms", "Bedwetting", "Bite, animal", "Bite, insect", "Blisters", "Blood pressure test", "Boils", "Burn / scald", "Chest pain", "Common cold / flu", "Constipation", "Cough", "Cough, barking", "Cuts and bruises", "Depression", "Diabetes mellitus", "Discuss Test results", "Earache / ear infection", "Exposure to chemical", "Fever", "Fever and chills", "Fever and cough", "Flu like symptoms", "Followup / Progress visit", "Foot / toe symptoms", "General medical examination, routine", "General well baby examination", "Head cold, upper respiratory infection", "Headache / pain in head", "Hypertension", "Knee symptoms", "Leg symptoms", "Low back symptoms", "Medication / refill", "Memory problems", "Mouth ulcers", "Nasal congestion", "Nausea / vomiting", "Neck symptoms", "Numbness / tingling of hands or feet", "Obtain Referral", "Pap smear", "Physical examination for school / employment", "Physical examination for sport participation", "Prenatal examination, routine", "Prophylactic inoculations", "Runny nose", "Severe tiredness", "Shoulder symptoms", "Sinus symptoms", "Skin rash", "Snoring, nasal voice", "Sore ear", "Sore throat", "Sore tongue", "Spots / acne", "Spots / blotchy rash", "Stomach and abdominal pain, cramps and spasms", "Stuffy nose, scratchy throat", "Throat symptoms", "Tiredness, exhaustion", "Tongue and throat swelling", "Weakness and tingling in lower extremities", "Wheezing", "Wheezing, coughing and breathlessness", "Wound", "Wound / cut", "Wound management"]
+
+interface ChiefProps {
+  value?:string,
+  onValueChange?:(newValue:string)=>void,
+  names?: string[] | string[][]; // Accepts either a 1D or 2D array
+  checked1?: boolean;
+}
+
+function ChiefEncounter({
+  names = [["Option 1", "Option 2"], ["Option 3", "Option 4"]],
+  checked1 = true,
+  value,
+  onValueChange,
+}: ChiefProps) {
+
+  const [dropdownValue, setDropdownValue] = useState<string[]>([]);
+
+  const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    const latestSelection = selectedValues[selectedValues.length - 1]; // Get the latest selected item
+    if (latestSelection.trim() !== "") {
+      if (onValueChange) {  // Check if onValueChange is defined
+        onValueChange(
+          value?.trim() === "" ? latestSelection : `${value} | ${latestSelection}`
+        );
+      }
+    }
+    setDropdownValue([]); // Reset dropdown value to prevent display of selected items
+  };
+
+  const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (onValueChange) {  // Check if onValueChange is defined
+      onValueChange(event.target.value);
+    }
+  };
+
+  // Normalize names into a 2D array
+  const normalizedNames: string[][] =
+    Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+
+  // Flatten names for dropdown processing
+  const processedNames = normalizedNames.flat();
+
+  return (
+    <Box sx={{ display: "flex", m:1 }}>
+        {/* TextField */}
+        <Grid item xs={11}>
+          <TextField
+            fullWidth
+            variant="standard"
+            multiline
+            value={value}
+            onChange={handleTextFieldChange}
+            disabled={!checked1} // Disable when unchecked
+          />
+        </Grid>
+
+        {/* Select Dropdown */}
+        <Grid item xs={1}>
+          <FormControl variant="standard">
+            <Select
+              labelId="select-quality-label"
+              id="multi-select"
+              multiple
+              value={dropdownValue} // Dropdown value must be an array
+              onChange={handleSelectChange}
+              renderValue={() => null} // Prevent displaying values in the dropdown
+              disabled={!checked1} // Disable when unchecked
+              displayEmpty
+            >
+              {processedNames.map((name, index) =>
+                name === "" ? (
+                  <MenuItem key={`separator-${index}`} disabled>
+                    <Typography variant="body2" sx={{ color: "gray" }}>
+                      <>&nbsp;</>
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                )
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
+      
+    </Box>
+  );
+}
+
+
+
 
 function Select_Checkbox({
   names = [["Option 1", "Option 2"], ["Option 3", "Option 4"]],
@@ -270,10 +409,9 @@ function Select_Checkbox({
   const processedNames = normalizedNames.flat();
 
   return (
-    <Box sx={{ display: "flex", gap: 2 }}>
-      <Grid container item xs={11} alignItems={"end"}>
+    <Box sx={{ display: "flex", m:1 }}>
         {/* TextField */}
-        <Grid item xs={11} sx={{ }}>
+        <Grid item xs={11}>
           <TextField
             fullWidth
             variant="standard"
@@ -285,7 +423,7 @@ function Select_Checkbox({
         </Grid>
 
         {/* Select Dropdown */}
-        <Grid item xs={1} sx={{ }}>
+        <Grid item xs={1}>
           <FormControl variant="standard">
             <Select
               labelId="select-quality-label"
@@ -313,7 +451,7 @@ function Select_Checkbox({
             </Select>
           </FormControl>
         </Grid>
-      </Grid>
+      
     </Box>
   );
 }
@@ -958,59 +1096,187 @@ function Select_Time () {
 
 }
 
+// Review of Systems
+interface CheckboxGroupProps {
+  label: string; // Label for the group
+  name: string[]; // Array of checkbox names (child checkboxes)
+  isParentChecked: boolean; // State for parent checkbox
+  childCheckedState: boolean[]; // State for child checkboxes
+  onParentChange: (checked: boolean) => void; // Callback for parent checkbox toggle
+  onChildChange: (index: number, checked: boolean) => void; // Callback for child checkbox toggle
+}
 
+const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
+  label,
+  name,
+  isParentChecked,
+  childCheckedState,
+  onParentChange,
+  onChildChange,
+}) => {
 
-
-
-
-
-
-
-const PatientInfoSchema = Yup.object().shape({
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
-  address: Yup.string().required("Required"),
-  phoneNumber: Yup.string()
-    .required("Required")
-    .matches(/^\d+$/, "Phone number must contain only digits"),
-  email: Yup.string().email("Invalid email").required("Required"),
-  age: Yup.number().required("Required").positive("Age must be positive"),
-  bloodGroup: Yup.string().required("Required"),
-  referredByDoctor: Yup.string().required("Required"),
-  referredByDoctorEmail: Yup.string().email("Invalid email"),
-  referredByDoctorPhoneNumber: Yup.string().matches(
-    /^\d+$/,
-    "Phone number must contain only digits"
-  ),
-  diseases: Yup.string().required("Required"),
-  patientHistory: Yup.string(),
-});
-
-const PatientEncounterInfo = ({ patients }: any) => {
-  const { id } = useParams<{ id: string }>();
-  const patient = patients?.find(
-    (patient: any) => patient.id === parseInt(id || "", 10)
-  );
-
-  const initialValues = {
-    firstName: patient.firstName,
-    lastName: patient.lastName,
-    address: patient.address,
-    phoneNumber: patient.phoneNumber,
-    email: patient.email,
-    age: patient.age,
-    bloodGroup: patient.bloodGroup,
-    referredByDoctor: patient.referredByDoctor,
-    referredByDoctorEmail: patient.referredByDoctorEmail,
-    referredByDoctorPhoneNumber: patient.referredByDoctorPhoneNumber,
-    diseases: patient.diseases,
-    patientHistory: patient.patientHistory,
+  const handleParentChange = (checked: boolean) => {
+    onParentChange(checked);
+    if (!checked) {
+      // Reset all child checkboxes when parent is unchecked
+      name.forEach((_, index) => {
+        onChildChange(index, false);
+      });
+    }
   };
-  const handleSubmit = (values: any, { resetForm }: any) => {
-    console.log(values);
+
+  return (
+    <Box sx={{ mb: 2 }}>
+      <FormGroup>
+        {/* Parent Checkbox */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isParentChecked}
+              onChange={(e) => handleParentChange(e.target.checked)}
+            />
+          }
+          label={<Typography variant="h6">{label}</Typography>}
+        />
+        {/* Conditionally Render Child Checkboxes */}
+        {isParentChecked && (
+          <Box sx={{ pl: 4 }}>
+            <Grid container rowSpacing={2}>
+              {name.map((childLabel, index) => (
+                <Grid item xs={6} key={index}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={childCheckedState[index]}
+                        onChange={(e) => onChildChange(index, e.target.checked)}
+                      />
+                    }
+                    label={childLabel}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+      </FormGroup>
+    </Box>
+  );
+};
+
+
+
+
+const PatientEncounterInfo:React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [age, setAge] = useState<string>("");
+  const [avatarSrc, setAvatarSrc] = useState<string>("");
+
+
+  const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
+  const [reviewOfSystems, setReviewOfSystems] = useState<ReviewOfSystems>({
+    general: {fevers: false, sweats: false, weightLoss: false, Chills: false, appetiteLoss: false, fatigue: false },
+    eyes: {visionLoss: false, doubleVision: false, blurredVision: false, eyeIrritation: false, eyePain: false, lightSensitivity: false },
+    eNMT: {earache: false, earDischarge: false, ringingInTheEars: false, decreasedHearing: false, frequentColds: false, nasalCongestion: false, nosebleeds: false, bleedingGums: false, difficultySwallowing: false, hoarseness: false, soreThroat: false },
+    cardiovascular: {difficultyBreathingAtNight: false, chestPainOrDiscomfort: false, irregularHeartBeats: false, fatigue: false, lightheadedness: false, shortnessOfBreathWithExertion: false, palpitations: false, swellingOfHandsOrFeet: false, difficultyBreathingWhileLyingDown: false, legCrampsWithExertion: false, discolorationOfLipsOrNails: false, recentWeightGain: false },
+    respiratory: {sleepDisturbancesDueToBreathing: false, cough: false, coughingUpBlood: false, shortnessOfBreath: false, chestDiscomfort: false, wheezing: false, excessiveSputum: false, excessiveSnoring: false },
+    gastrointestinal: {changeInAppetite: false, indigestion: false, heartburn: false, nausea: false, vomiting: false, excessiveGas: false, abdominalPain: false, abdominalBloating: false, hemorrhoids: false, diarrhea: false, changeInBowelHabits: false, constipation: false, blackOrTarryStools: false, bloodyStools: false },
+    genitourinaryMale: {frequentUrination: false, bloodInUrine: false, foulUrinaryDischarge: false, kidneyPain: false, urinaryUrgency: false, troubleStartingUrinaryStream: false, inabilityToEmptyBladder: false, burningOrPainOnUrination: false, genitalRashesOrSores: false, testicularPainOrMasses: false },
+    genitourinaryFemale: {inabilityToControlBladder: false, unusualUrinaryColor: false, missedPeriods: false, excessivelyHeavyPeriods: false, lumpsOrSores: false, pelvicPain: false },
+    musculoskeletal: {jointPain: false, jointStiffnessOrSwelling: false, muscleCramps: false, muscleAches: false, lossOfStrength: false, backOrNeckPain: false, muscleWeakness: false },
+    skin: {suspiciousLesions: false, excessivePerspiration: false, dryness: false, rash: false, changesInHairOrNails: false, nightSweats: false, poorWoundHealing: false, itching: false, flushing: false, changesInColorOfSkin: false },
+    neurologic: {headaches: false, weaknessOrNumbness: false, tingling: false, faintsOrBlackouts: false, tremors: false, memoryLoss: false, poorBalance: false, difficultyWithSpeaking: false, difficultyWithConcentration: false, disturbancesInCoordination: false, briefParalysis: false, visualDisturbances: false, seizures: false, sensationOfRoomSpinning: false, excessiveDaytimeSleeping: false },
+    psychiatric: {Anxiety: false, Depression: false, Nervousness: false, memoryChange: false, frighteningVisionsOrSounds: false, thoughtsOfSuicideOrViolence: false },
+    endocrine: {heatOrColdIntolerance: false, weightChange: false, excessiveThirstOrHunger: false, excessiveSweatingOrUrination: false },
+    hematologicLymphatic: {skinDiscoloration: false, enlargedLymphNodes: false, bleeding: false, fevers: false, abnormalBruising: false },
+    allergicImmunologic: {seasonalAllergies: false, persistentInfections: false, hivesOrRash: false, hIVExposure: false },
+    checkReview:{checkGeneral:false, checkEyes:false, checkENMT:false, checkCardiovascular:false, checkRespiratory:false, checkGastrointestinal:false, checkGenitourinaryMale:false, checkGenitourinaryFemale:false, checkMusculoskeletal:false, checkSkin:false, checkNeurologic:false, checkPsychiatric:false, checkEndocrine:false, checkHematologicLymphatic:false, checkAllergicImmunologic:false,},
+  });
+  const [chief, setChief] = useState<string>("");
+
+
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/general/${id}`);
+        const patientData = response.data;
+
+        if (patientData.PHOTO) {
+          setAvatarSrc(`http://localhost:5000/${patientData.PHOTO}`);
+      
+        } 
+
+        // Populate states with fetched data
+        setFirstName(patientData.FIRST_NAME || "");
+        setLastName(patientData.LAST_NAME || "");
+        setAge(patientData.AGE || "");
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
+      } 
+
+    };
+
+    fetchPatient();
+  }, [id]);
+  const handleSubmit = () => {
+    console.log(reviewOfSystems, chief, head);
     //resetForm();
   };
 
+
+  
+// 
+const handleHeadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+  const { name, value } = e.target;
+  setHead((prev) => ({
+    ...prev,
+    [name as keyof Head]: value as string
+  }));
+};
+
+// Chief Complaint / Encounter Reason
+
+const handleChiefChange = (newValue: string) => {
+  setChief(newValue);
+};
+
+
+// Handle parent checkbox toggle
+
+const handleParentChange = (section: keyof ReviewOfSystems['checkReview'], checked: boolean) => {
+  setReviewOfSystems((prev) => ({
+    ...prev,
+    checkReview: {
+      ...prev.checkReview,
+      [section]: checked,
+    },
+  }));
+};
+
+const handleChildChange = <T extends keyof ReviewOfSystems>(
+  section: T,
+  key: keyof ReviewOfSystems[T],
+  checked: boolean
+) => {
+  setReviewOfSystems((prev) => ({
+    ...prev,
+    [section]: {
+      ...prev[section],
+      [key]: checked,
+    },
+  }));
+};
+
+
+
+  
+
+
+
+  
   interface VitalSigns {
     systolic: string,
     diastolic: string,
@@ -1104,10 +1370,6 @@ const PatientEncounterInfo = ({ patients }: any) => {
   }
 
   const general: string = "General";
-  // Add print 
-  const [openPrint, setOpenPrint] = useState(false);
-      const handleOpenPrint = () => setOpenPrint(true);
-      const handleClosePrint = () => setOpenPrint(false);
 
   // nest list handle
 
@@ -1122,7 +1384,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
   }
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar_Patient appBarTitle="ENCOUNTERS" id={patient.id} />
+      <Appbar_Patient appBarTitle="HISTORY" id={id}/>
       <Box
         component="main"
         sx={{
@@ -1136,6 +1398,7 @@ const PatientEncounterInfo = ({ patients }: any) => {
         }}
       >
         <Toolbar />
+        
         <Container sx={{ mt: 4, mb: 4 }}>
           <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
             <Grid
@@ -1143,75 +1406,78 @@ const PatientEncounterInfo = ({ patients }: any) => {
               spacing={2}
               sx={{ marginleft: "10px", padding: "20px" }}
             >           
-              <Grid item xs={12}>
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={PatientInfoSchema}
-                  onSubmit={handleSubmit}
-                >
-                  {({ errors, touched }) => (
-                    
-                    <Form>
+                <Grid container item xs={12}>
                       <Grid item xs={12} sm={12}>
-                      <div className="setside">
-                        <div className="left">
-                          <IconButton component={Link} to="/patient-list" color="inherit">
-                            <ArrowBackIcon />
-                          </IconButton>
-                        </div>                        
-                      </div>
-                        </Grid>  
-                      
-                     <Grid container rowSpacing={2} sx={{justifyContent: "space-between",alignItems: "center",}}>
+                        <div className="setside">
+                          <div className="left">
+                            <IconButton component={Link} to="/patient-list" color="inherit">
+                              <ArrowBackIcon />
+                            </IconButton>
+                          </div>                        
+                        </div>
+                      </Grid>  
+                      <Grid container spacing={2} sx={{justifyContent: "space-between",alignItems: "center",}}>
                         <Grid item xs={12} sm={2}>
-                          <Field
-                            as={TextField}
-                            name="id"
+                          <TextField
+                            id="chart"
                             label="Chart"
+                            multiline
+                            value={id}
+                            variant="standard"
                             fullWidth
+                            name="chart"
                           />
                           
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                          <Field
-                            as={TextField}
-                            name="firstName"
+                          <TextField
+                            id="first-name"
                             label="First Name"
+                            multiline
+                            value={firstName}
+                            variant="standard"
                             fullWidth
-                            error={errors.firstName && touched.firstName}
-                            helperText={touched.firstName && errors.firstName}
+                            name="firstName"
                           />
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                          <Field
-                            as={TextField}
-                            name="lastName"
+                          <TextField
+                            id="last-name"
                             label="Last Name"
+                            multiline
+                            value={lastName}
+                            variant="standard"
                             fullWidth
-                            error={errors.lastName && touched.lastName}
-                            helperText={touched.lastName && errors.lastName}
+                            name="lastName"
                           />
                         </Grid>                     
                         <Grid item xs={12} sm={1}>
-                          <Field
-                            as={TextField}
-                            name="age"
+                          <TextField
+                            id="age"
                             label="Age"
+                            multiline
+                            value={age}
+                            variant="standard"
                             fullWidth
-                            error={touched.age && Boolean(errors.age)}
-                            helperText={touched.age && errors.age}
+                            name="age"
                           />
-                        </Grid>  
-                        <Grid item xs={12} sm={2} style={{textAlign:'right', paddingRight:'0'}}>
-                          <ClickableAvatar/>
                         </Grid>
-                      
-                      </Grid>                     
+                        <Grid item xs={12} sm={2} style={{textAlign:'right', paddingRight:'0'}}>
+                          <IconButton style={{ padding: "0" }} component="span">
+                            <Avatar
+                              variant="square"
+                              src={avatarSrc}
+                              alt="Avatar"
+                              style={{ width: "100px", height: "100px" }}
+                            />
+                          </IconButton>
+                        </Grid>
+                      </Grid>               
                       <Grid container spacing={2}>                        
                         <Grid item xs={6} sm={6}>
                         <div className="contact-information" style={styles.container}>
                             <Grid container rowSpacing={1} columnSpacing={1}>
-                              <Grid item xs={4}>
+                              <Grid item xs={3}>
                                 <TextField
                                   id="outlined-multiline-static"
                                   label="Encounter"
@@ -1221,9 +1487,25 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   fullWidth
                                 />
                               </Grid>
+                              <Grid item xs={1}>
+                                <TextField
+                                  id="outlined-multiline-static"
+                                  label="1"
+                                  multiline
+                                  variant="standard"
+                                  disabled
+                                  fullWidth
+                                />
+                              </Grid>
                               <Grid item xs={4}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DatePicker label="Date"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                  <DatePicker label="DOB" value={head.date ? dayjs(head.date) : null} // Convert string to Dayjs object
+                                    onChange={(newValue) => {
+                                    setHead((prev) => ({
+                                    ...prev,
+                                    date: newValue ? newValue.format('YYYY-MM-DD') : '', // Format date as string
+                                    }));
+                                    }} slotProps={{ textField: { variant: 'standard', fullWidth: true, name:'date' } }}  />
                                 </LocalizationProvider>
                               </Grid>
                               <Grid item xs={4}>
@@ -1233,6 +1515,8 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  onChange={handleHeadChange}
+                                  value={head.type}
                                 />
                               </Grid>
                               <Grid item xs={12}>
@@ -1242,29 +1526,31 @@ const PatientEncounterInfo = ({ patients }: any) => {
                                   multiline
                                   variant="standard"
                                   fullWidth
+                                  onChange={handleHeadChange}
+                                  value={head.attendBy}
                                 /> 
                               </Grid>                            
                             </Grid>                       
                           </div>
-                          <div className="past-medical-history" style={styles.container} >
+                          <div className="chief-complaint-encounter-reason" style={styles.container} >
                             <h2>Chief Complaint / Encounter Reason</h2>
-                              <Select_Checkbox />
+                              <ChiefEncounter names={chiefEncounter} value={chief} onValueChange={handleChiefChange} />
                           </div>  
                           <div className="history-of-present-illness" style={styles.container}>
                             <h2>History of Present Illness</h2>
                             <Grid container rowSpacing={2}>
                               <Grid item xs={12} sm={12}>
                                 <TextField 
-                                    id="past-medical-history"
-                                    fullWidth
-                                    InputProps={{
-                                      style: {
-                                        borderRadius: "0px",
-                                      }
-                                    }}
-                                    multiline 
-                                    rows={2}
-                                    placeholder="Please write the past medical history" />
+                                  id="history-of-present-illness"
+                                  fullWidth
+                                  InputProps={{
+                                    style: {
+                                      borderRadius: "0px",
+                                    }
+                                  }}
+                                  multiline 
+                                  rows={2}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12} sx={{mt:3}}>
                                 <Select_History_Checkbox label="Location" names={location}/>
@@ -1473,55 +1759,188 @@ const PatientEncounterInfo = ({ patients }: any) => {
                           <div className="review-of-systems" style={styles.container}>
                             <h2>Review of Systems</h2>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxComGen nameCheckbox="General" /> 
+                              <CheckboxGroup label="General" name={reviewGeneral} 
+                              isParentChecked={reviewOfSystems.checkReview.checkGeneral}
+                              childCheckedState={Object.keys(reviewOfSystems.general)
+                                .map((key) => reviewOfSystems.general[key as keyof typeof reviewOfSystems.general] as boolean)}
+                              onParentChange={(checked) => handleParentChange("checkGeneral", checked)}
+                              onChildChange={(index, checked) => {
+                                const childKey = Object.keys(reviewOfSystems.general)[index] as keyof typeof reviewOfSystems.general;
+                                handleChildChange("general", childKey, checked);
+                              }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxEyes nameCheckbox="Eyes" /> 
+                              <CheckboxGroup label="Eyes" name={reviewEyes} 
+                                isParentChecked={reviewOfSystems.checkReview.checkEyes}
+                                childCheckedState={Object.keys(reviewOfSystems.eyes)
+                                  .map((key) => reviewOfSystems.eyes[key as keyof typeof reviewOfSystems.eyes] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkEyes", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.eyes)[index] as keyof typeof reviewOfSystems.eyes;
+                                  handleChildChange("eyes", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxENMT nameCheckbox="ENMT" /> 
+                              <CheckboxGroup label="ENMT" name={reviewENMT} 
+                                isParentChecked={reviewOfSystems.checkReview.checkENMT}
+                                childCheckedState={Object.keys(reviewOfSystems.eNMT)
+                                  .map((key) => reviewOfSystems.eNMT[key as keyof typeof reviewOfSystems.eNMT] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkENMT", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.eNMT)[index] as keyof typeof reviewOfSystems.eNMT;
+                                  handleChildChange("eNMT", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxCardiovascular nameCheckbox="Cardiovascular" /> 
+                              <CheckboxGroup label="Cardiovascular" name={reviewCardiovascular}
+                                isParentChecked={reviewOfSystems.checkReview.checkCardiovascular}
+                                childCheckedState={Object.keys(reviewOfSystems.cardiovascular)
+                                  .map((key) => reviewOfSystems.cardiovascular[key as keyof typeof reviewOfSystems.cardiovascular] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkCardiovascular", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.cardiovascular)[index] as keyof typeof reviewOfSystems.cardiovascular;
+                                  handleChildChange("cardiovascular", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxRespiratory nameCheckbox="Respiratory" /> 
+                              <CheckboxGroup label="Respiratory" name={reviewRespiratory}
+                                isParentChecked={reviewOfSystems.checkReview.checkRespiratory}
+                                childCheckedState={Object.keys(reviewOfSystems.respiratory)
+                                  .map((key) => reviewOfSystems.respiratory[key as keyof typeof reviewOfSystems.respiratory] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkRespiratory", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.respiratory)[index] as keyof typeof reviewOfSystems.respiratory;
+                                  handleChildChange("respiratory", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxGastrointestinal nameCheckbox="Gastrointestinal" /> 
+                              <CheckboxGroup label="Gastrointestinal" name={reviewGastrointestinal} 
+                                isParentChecked={reviewOfSystems.checkReview.checkGastrointestinal}
+                                childCheckedState={Object.keys(reviewOfSystems.gastrointestinal)
+                                  .map((key) => reviewOfSystems.gastrointestinal[key as keyof typeof reviewOfSystems.gastrointestinal] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkGastrointestinal", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.gastrointestinal)[index] as keyof typeof reviewOfSystems.gastrointestinal;
+                                  handleChildChange("gastrointestinal", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxGenitourinaryMale nameCheckbox="Genitourinary Male" /> 
+                              <CheckboxGroup label="Genitourinary Male" name={reviewGenitourinaryMale} 
+                                isParentChecked={reviewOfSystems.checkReview.checkGenitourinaryMale}
+                                childCheckedState={Object.keys(reviewOfSystems.genitourinaryMale)
+                                  .map((key) => reviewOfSystems.genitourinaryMale[key as keyof typeof reviewOfSystems.genitourinaryMale] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkGenitourinaryMale", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.genitourinaryMale)[index] as keyof typeof reviewOfSystems.genitourinaryMale;
+                                  handleChildChange("genitourinaryMale", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxGenitourianryFemale nameCheckbox="Genitourinary Female" /> 
+                              <CheckboxGroup label="Genitourinary Female" name={reviewGenitourinaryFemale} 
+                                isParentChecked={reviewOfSystems.checkReview.checkGenitourinaryFemale}
+                                childCheckedState={Object.keys(reviewOfSystems.genitourinaryFemale)
+                                  .map((key) => reviewOfSystems.genitourinaryFemale[key as keyof typeof reviewOfSystems.genitourinaryFemale] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkGenitourinaryFemale", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.genitourinaryFemale)[index] as keyof typeof reviewOfSystems.genitourinaryFemale;
+                                  handleChildChange("genitourinaryFemale", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxMusculoskeletal nameCheckbox="Musculoskeletal" /> 
+                              <CheckboxGroup label="Musculoskeletal" name={reviewMusculoskeletal} 
+                                isParentChecked={reviewOfSystems.checkReview.checkMusculoskeletal}
+                                childCheckedState={Object.keys(reviewOfSystems.musculoskeletal)
+                                  .map((key) => reviewOfSystems.musculoskeletal[key as keyof typeof reviewOfSystems.musculoskeletal] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkMusculoskeletal", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.musculoskeletal)[index] as keyof typeof reviewOfSystems.musculoskeletal;
+                                  handleChildChange("musculoskeletal", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxSkin nameCheckbox="Skin" /> 
+                              <CheckboxGroup label="Skin" name={reviewSkin} 
+                                isParentChecked={reviewOfSystems.checkReview.checkSkin}
+                                childCheckedState={Object.keys(reviewOfSystems.skin)
+                                  .map((key) => reviewOfSystems.skin[key as keyof typeof reviewOfSystems.skin] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkSkin", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.skin)[index] as keyof typeof reviewOfSystems.skin;
+                                  handleChildChange("skin", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxNeurologic nameCheckbox="Neurologic" /> 
+                              <CheckboxGroup label="Neurologic" name={reviewNeurologic} 
+                                isParentChecked={reviewOfSystems.checkReview.checkNeurologic}
+                                childCheckedState={Object.keys(reviewOfSystems.neurologic)
+                                  .map((key) => reviewOfSystems.neurologic[key as keyof typeof reviewOfSystems.neurologic] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkNeurologic", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.neurologic)[index] as keyof typeof reviewOfSystems.neurologic;
+                                  handleChildChange("neurologic", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxPsychiatric nameCheckbox="Psychiatric" /> 
+                              <CheckboxGroup label="Psychiatric" name={reviewPsychiatric} 
+                                isParentChecked={reviewOfSystems.checkReview.checkPsychiatric}
+                                childCheckedState={Object.keys(reviewOfSystems.psychiatric)
+                                  .map((key) => reviewOfSystems.psychiatric[key as keyof typeof reviewOfSystems.psychiatric] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkPsychiatric", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.psychiatric)[index] as keyof typeof reviewOfSystems.psychiatric;
+                                  handleChildChange("psychiatric", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxEndocrine nameCheckbox="Endocrine" /> 
+                              <CheckboxGroup label="Endocrine" name={reviewEndocrine} 
+                                isParentChecked={reviewOfSystems.checkReview.checkEndocrine}
+                                childCheckedState={Object.keys(reviewOfSystems.endocrine)
+                                  .map((key) => reviewOfSystems.endocrine[key as keyof typeof reviewOfSystems.endocrine] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkEndocrine", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.endocrine)[index] as keyof typeof reviewOfSystems.endocrine;
+                                  handleChildChange("endocrine", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxHematologic nameCheckbox="Hematologic-Lymphatic" /> 
+                              <CheckboxGroup label="Hematologic-Lymphatic" name={reviewHematologicLymphatic} 
+                                isParentChecked={reviewOfSystems.checkReview.checkHematologicLymphatic}
+                                childCheckedState={Object.keys(reviewOfSystems.hematologicLymphatic)
+                                  .map((key) => reviewOfSystems.hematologicLymphatic[key as keyof typeof reviewOfSystems.hematologicLymphatic] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkHematologicLymphatic", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.hematologicLymphatic)[index] as keyof typeof reviewOfSystems.hematologicLymphatic;
+                                  handleChildChange("hematologicLymphatic", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
-                              <CheckboxAllergic nameCheckbox="Allergic-Immunologic" /> 
+                              <CheckboxGroup label="Allergic-Immunologic" name={reviewAllergicImmunologic} 
+                                isParentChecked={reviewOfSystems.checkReview.checkAllergicImmunologic}
+                                childCheckedState={Object.keys(reviewOfSystems.allergicImmunologic)
+                                  .map((key) => reviewOfSystems.allergicImmunologic[key as keyof typeof reviewOfSystems.allergicImmunologic] as boolean)}
+                                onParentChange={(checked) => handleParentChange("checkAllergicImmunologic", checked)}
+                                onChildChange={(index, checked) => {
+                                  const childKey = Object.keys(reviewOfSystems.allergicImmunologic)[index] as keyof typeof reviewOfSystems.allergicImmunologic;
+                                  handleChildChange("allergicImmunologic", childKey, checked);
+                                }}
+                              /> 
                             </Grid>
                             <Grid item xs={12} sm={12}>
                               <TextField fullWidth sx={{ m: 1 }} id="standard-basic"  variant="standard" />
                             </Grid> 
-                                                                                          
-                            
                           </div>
                           <div style={styles.container}>
                             <Grid container spacing={2}>                            
@@ -1843,14 +2262,14 @@ const PatientEncounterInfo = ({ patients }: any) => {
                           </Button>
                         </Grid>
                         <Grid item xs={2} sm={1}>
-                          <Button type="submit" variant="contained">
+                          <Button type="submit" variant="contained" onClick={handleSubmit}>
                             Save
                           </Button>                          
                         </Grid>
                         <Grid item xs={2} sm={1}>
                           <Button 
                            component={Link}
-                           to={`/patient-info-history/${patient.id}`}
+                           to={`/patient-info-history/${id}`}
                            color="warning"
                            variant="contained"
                            >
@@ -1858,11 +2277,8 @@ const PatientEncounterInfo = ({ patients }: any) => {
                           </Button>                          
                         </Grid>
                       </Grid>
-                    </Form>
-                  )}
-                </Formik>
-              </Grid>
-            </Grid>
+                   </Grid>
+                </Grid>
           </Paper>
         </Container>
         <StickySpeedDial/>

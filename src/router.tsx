@@ -92,7 +92,7 @@ export const router = createBrowserRouter([
     path: "/patient-info-history/:id",
     element: (
       <AdminElement>
-        <PatientHistoryInfo patients={mockPatientData} />
+        <PatientHistoryInfo />
       </AdminElement>
     )
   },
@@ -100,7 +100,7 @@ export const router = createBrowserRouter([
     path: "/patient-info-encounter/:id",
     element: (
       <AdminElement>
-        <PatientEncounterInfo patients={mockPatientData} />
+        <PatientEncounterInfo />
       </AdminElement>
     )
   },  

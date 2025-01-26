@@ -1,6 +1,6 @@
-import * as Yup from "yup";
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { Formik, Form, Field } from "formik";
+import dayjs from "dayjs";
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import '../../styles.css'
 import {
@@ -55,40 +55,108 @@ const name8 = ['No relations', 'Bisexual', 'Heterosexual', 'Homosexual']
 const name9 = [['Never', 'Daily', 'Weekly', 'Occasional',''], ['Walks', 'Runs', 'Swims']]
 const name10 = ['Less than 6 hours', '6 to 8 hours', 'More than 8 hours']
 
-// allergen status
-
-export function AllergenStatus () {
-
-  const [allergenStatus, setAllergenStatus] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setAllergenStatus(event.target.value);
-  };
-  return (
-      <>
-        <FormControl variant="standard" fullWidth>
-          <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={allergenStatus}
-            onChange={handleChange}
-            label="Status"
-          >
-            <MenuItem value={10}>Active</MenuItem>
-            <MenuItem value={20}>Inactive</MenuItem>
-          </Select>
-        </FormControl>
-      </>
-    );
+// Declare Data Type
+interface KnownAllergies {
+  allergen:string,
+  reaction:string,
+  status: string,
 }
+
+interface Vaccine {
+  date:string,
+  sts:string,
+  next:string,
+  dose:string,
+  unit:string,
+  site:string,
+  route:string,
+  mfr:string,
+  lot:string,
+  expiry: string,
+  note:string,
+}
+
+interface Screening {
+  date:string,
+  sts:string,
+  next:string,
+  note:string,
+}
+
+interface HealthMaintenance {
+  influenzaVaccine:Vaccine,
+  pneumococcalVaccine:Vaccine,
+  colorectalScreening:Screening,
+  prostateScreening:Screening,
+  screeningMammogram:Screening,
+  screeningPapSmear:Screening,
+}
+
+interface History {
+  check:boolean,
+  textfield:string,
+}
+
+
+interface FamilyHistory {
+  diabetes:History,
+  stroke:History,
+  hypertension:History,
+  heartDisease:History,
+  cancer:History, 
+  asthma:History,
+  hayFever:History,
+  arthritis:History,
+  osteoporosis:History,
+  anemia:History, 
+  migraine:History,  
+  alzheimers:History,
+  epilepsy:History,
+  glaucoma:History,
+}
+
+interface SocialHistory {
+  alcoholUse:History,
+  caffeineUse:History,
+  tobaccoUse:History,
+  drugsUse:History,
+  chmExposure:History,
+  tbExposure:History,
+  hivExposure:History,
+  sexRelations:History,
+  exercise:History,
+  sleepHabits:History,
+}
+
+
+interface MasterProblemList {
+  code:string,
+  onset:string,
+  nature:string,
+  desc:string,
+  status:string,
+}
+
+interface MasterMedicationList {
+  rx:string,
+  sig:string,
+  select:string,
+  status:string,
+}
+
+interface StsProps {
+  value:string;
+  onChange:(value:string)=>void;
+}
+
+
 
 // select sts
 
-export function Sts () {
+export function Sts ({value, onChange}:StsProps) {
   
-  const [sts, setSts] = useState<string>('');
   const handleChange = (event: SelectChangeEvent) => {
-    setSts(event.target.value);
+    onChange(event.target.value);
   };
 
   return (
@@ -98,15 +166,15 @@ export function Sts () {
         <Select
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
-          value={sts}
+          value={value}
           onChange={handleChange}
           label="Sts"
         >
-          <MenuItem value={10}>Completed</MenuItem>
-          <MenuItem value={20}>Parental Refusal</MenuItem>
-          <MenuItem value={30}>Patient Refusal</MenuItem>
-          <MenuItem value={40}>Religious Refusal</MenuItem>
-          <MenuItem value={50}>Historical Data</MenuItem>
+          <MenuItem value="Completed">Completed</MenuItem>
+          <MenuItem value="Parental Refusal">Parental Refusal</MenuItem>
+          <MenuItem value="Patient Refusal">Patient Refusal</MenuItem>
+          <MenuItem value="Religious Refusal">Religious Refusal</MenuItem>
+          <MenuItem value="Historical Data">Historical Data</MenuItem>
         </Select>
       </FormControl>
     </>
@@ -114,26 +182,24 @@ export function Sts () {
 }
 
 // unit 
+export function Unit ({value, onChange}:StsProps) {
 
-export function Unit () {
-
-  const [unit, setUnit] = useState<string>('');
   const handleChange = (event: SelectChangeEvent) => {
-    setUnit(event.target.value);
+    onChange(event.target.value);
   };
   return (
     <>
       <FormControl variant="standard" fullWidth>
         
         <Select
-          labelId="demo-simple-select-standard-label"
+          labelId="Unit"
           id="demo-simple-select-standard"
-          value={unit}
+          value={value}
           onChange={handleChange}
           label="Unit"
         >
-          <MenuItem value={10}>mL</MenuItem>
-          <MenuItem value={20}>mg</MenuItem>
+          <MenuItem value="mL">mL</MenuItem>
+          <MenuItem value="mg">mg</MenuItem>
         </Select>
       </FormControl>
     </>
@@ -142,11 +208,10 @@ export function Unit () {
 
 // select site
 
-export function Site () {
+function Site ({value, onChange}:StsProps) {
 
-  const [site, setSite] = useState<string>('');
   const handleChange = (event: SelectChangeEvent) => {
-    setSite(event.target.value);
+    onChange(event.target.value);
   };
 
   return (
@@ -155,23 +220,23 @@ export function Site () {
         <InputLabel id="demo-simple-select-standard-label">Site</InputLabel>
         <Select
           labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={site}
+          id="Site"
+          value={value}
           onChange={handleChange}
-          label="Unit"
+          label="Site"
         >
-          <MenuItem value={10}>Left Arm</MenuItem>
-          <MenuItem value={20}>Left Deltoid</MenuItem>
-          <MenuItem value={30}>Left Gluteus Medius</MenuItem>
-          <MenuItem value={40}>Left Lower Forearm</MenuItem>
-          <MenuItem value={50}>Left Thigh</MenuItem>
-          <MenuItem value={60}>Left Vastus Lateralis</MenuItem>
-          <MenuItem value={70}>Right Arm</MenuItem>
-          <MenuItem value={80}>Right Deltoid</MenuItem>
-          <MenuItem value={90}>Right Gluteus Medius</MenuItem>
-          <MenuItem value={100}>Right Lower Forearm</MenuItem>
-          <MenuItem value={110}>Right Thigh</MenuItem>
-          <MenuItem value={120}>Right Vastus Lateralis</MenuItem>
+          <MenuItem value="Left Arm">Left Arm</MenuItem>
+          <MenuItem value="Left Deltoid">Left Deltoid</MenuItem>
+          <MenuItem value="Left Gluteus Medius">Left Gluteus Medius</MenuItem>
+          <MenuItem value="Left Lower Forearm">Left Lower Forearm</MenuItem>
+          <MenuItem value="Left Thigh">Left Thigh</MenuItem>
+          <MenuItem value="Left Vastus Lateralis">Left Vastus Lateralis</MenuItem>
+          <MenuItem value="Right Arm">Right Arm</MenuItem>
+          <MenuItem value="Right Deltoid">Right Deltoid</MenuItem>
+          <MenuItem value="Right Gluteus Medius">Right Gluteus Medius</MenuItem>
+          <MenuItem value="Right Lower Forearm">Right Lower Forearm</MenuItem>
+          <MenuItem value="Right Thigh">Right Thigh</MenuItem>
+          <MenuItem value="Right Vastus Lateralis">Right Vastus Lateralis</MenuItem>
         </Select>
       </FormControl>
     </>
@@ -181,11 +246,10 @@ export function Site () {
 
 // set Route
 
-export function Influenza_Vaccine_Route () {
+function Influenza_Vaccine_Route ({value, onChange}:StsProps) {
 
-  const [vaccineRoute, setVaccineRoute] = useState<string>('');
   const handleChange = (event: SelectChangeEvent) => {
-    setVaccineRoute(event.target.value);
+    onChange(event.target.value);
   };
 
   return (
@@ -195,23 +259,23 @@ export function Influenza_Vaccine_Route () {
         <Select
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
-          value={vaccineRoute}
+          value={value}
           onChange={handleChange}
           label="Vaccine_Route"
         >
-          <MenuItem value={10}>Inhalation</MenuItem>
-          <MenuItem value={20}>Intramuscular</MenuItem>
-          <MenuItem value={30}>Intranasal</MenuItem>
-          <MenuItem value={40}>Intravenous</MenuItem>
-          <MenuItem value={50}>Mouth</MenuItem>
-          <MenuItem value={60}>Oral</MenuItem>
-          <MenuItem value={70}>Rectal</MenuItem>
-          <MenuItem value={80}>Subcutaneous</MenuItem>
-          <MenuItem value={90}>Sublingual</MenuItem>
-          <MenuItem value={100}>Topical</MenuItem>
-          <MenuItem value={110}>Urethral</MenuItem>
-          <MenuItem value={120}>Vaginal</MenuItem>
-          <MenuItem value={130}>Other</MenuItem>
+          <MenuItem value="Inhalation">Inhalation</MenuItem>
+          <MenuItem value="Intramuscular">Intramuscular</MenuItem>
+          <MenuItem value="Intranasal">Intranasal</MenuItem>
+          <MenuItem value="Intravenous">Intravenous</MenuItem>
+          <MenuItem value="Mouth">Mouth</MenuItem>
+          <MenuItem value="Oral">Oral</MenuItem>
+          <MenuItem value="Rectal">Rectal</MenuItem>
+          <MenuItem value="Subcutaneous">Subcutaneous</MenuItem>
+          <MenuItem value="Sublingual">Sublingual</MenuItem>
+          <MenuItem value="Topical">Topical</MenuItem>
+          <MenuItem value="Urethral">Urethral</MenuItem>
+          <MenuItem value="Vaginal">Vaginal</MenuItem>
+          <MenuItem value="Other">Other</MenuItem>
         </Select>
       </FormControl>
     </>
@@ -280,11 +344,10 @@ export function Mfr() {
 const options:string[] = ['AB-Abbott', 'AD-Adams', 'ALP-Alpha', 'AVI-Aviron', 'BAH-Baxter Health Care', 'BAY-Bayer', 'BPC-Berna Products', 'CNJ-Cangene Corporation', 'CSL-CSL Behring', 'DVC-DynPort', 'GEO-GeoVax', 'GRE-Greer', 'IUS-Immuno US', 'JPN-RFMD Osaka University', 'KGC-Korea Green Cross', 'MBL-Massachusetts Biologic', 'MED-MedImmune', 'MIP-BioPort', 'MSD-Merck'
 , 'NAB-North American Biologic', 'NOV-Novartis', 'NVX-Novavax, Inc', 'NYB-New York Blood Center', 'ORT-Ortho', 'OTC-Organon Teknika', 'PD-Parkdale Pharmaceuticals', 'PMC-Sanofi Pasteur', 'SCL-Sclavo', 'SKB-GlaxoSmithKline', 'SOL-Solvay', 'TAL-Talecris', 'USA-US Army Medical Research', 'VXG-VaxGen', 'WAL-Wyeth Ayerst', 'ZLB-ZLB Behring', '', 'OTH-Other Manufacturer', 'UNK-Unknown Manufacturer'
 ];
-export function Mfr () {
+function Mfr ({value, onChange}:StsProps) {
 
-  const [mfr, setMfr] = useState<string>('');
   const handleChange = (event: SelectChangeEvent) => {
-    setMfr(event.target.value);
+    onChange(event.target.value);
   };
   return (
       <>
@@ -293,7 +356,7 @@ export function Mfr () {
           <Select
             labelId="demo-simple-select-standard-label"
             id="demo-simple-select-standard"
-            value={mfr}
+            value={value}
             onChange={handleChange}
             label="MFR"
           >
@@ -315,38 +378,43 @@ export function Mfr () {
 interface HistoryProps {
   label?: string; // Optional prop to customize the label
   names?: string[] | string[][]; // Accepts either a 1D or 2D array
+  checked: boolean; // Pass the current checkbox state
+  textFieldValue: string; // Pass the current textfield value
+  onCheckChange: (checked: boolean) => void; // Callback for checkbox changes
+  onTextFieldChange: (value: string) => void; // Callback for textfield changes
 }
 
-export function History({
+function History({
   label = "Diabetes",
   names = [],
+  checked,
+  textFieldValue,
+  onCheckChange,
+  onTextFieldChange,
 }: HistoryProps) {
-  const [checked, setChecked] = useState<boolean>(false);
-  const [textFieldValue, setTextFieldValue] = useState<string>("");
-  const [dropdownValue, setDropdownValue] = useState<string[]>([]); // Dropdown value must be an array for `multiple`
+  const [dropdownValue, setDropdownValue] = useState<string[]>([]);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked);
-  };
-  
   const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
     const selectedValues = event.target.value as string[];
-    const latestSelection = selectedValues[selectedValues.length - 1]; // Get the latest selected item
+    const latestSelection = selectedValues[selectedValues.length - 1];
+
+    // Append the latest selection to the text field if it's valid
     if (latestSelection.trim() !== "") {
-      setTextFieldValue((prev) =>
-        prev.trim() === "" ? latestSelection : `${prev} | ${latestSelection}`
+      onTextFieldChange(
+        textFieldValue
+          ? `${textFieldValue} | ${latestSelection}` // Append with a separator
+          : latestSelection // Start with the first value
       );
     }
-    setDropdownValue([]); // Reset dropdown value to prevent display of selected items
+
+    // Reset dropdown value to allow repeated selections
+    setDropdownValue([]);
   };
 
-  const handleTextFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setTextFieldValue(event.target.value);
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onCheckChange(event.target.checked); // Update the checkbox state in the parent
   };
 
-  // Ensure names is always a 2D array for consistent processing
   const processedNames = Array.isArray(names[0])
     ? (names as string[][])
     : [names as string[]];
@@ -368,6 +436,8 @@ export function History({
             color="success"
           />
         </Grid>
+
+        {/* Text Field and Dropdown */}
         <Grid container item xs={8} alignItems={"end"}>
           <Grid item xs={11} sx={{ mb: 1 }}>
             <TextField
@@ -375,23 +445,30 @@ export function History({
               variant="standard"
               multiline
               value={textFieldValue}
-              onChange={handleTextFieldChange}
+              onChange={(e) => onTextFieldChange(e.target.value)}
               disabled={!checked} // Disable when unchecked
             />
           </Grid>
 
-          {/* Select Dropdown */}
+          {/* Dropdown */}
           <Grid item xs={1} sx={{ mb: 1 }}>
             <FormControl variant="standard">
               <Select
                 labelId="select-quality-label"
                 id="multi-select"
                 multiple
-                value={dropdownValue} // Dropdown value must be an array
-                onChange={handleSelectChange}
-                renderValue={() => null} // Prevent displaying values in the dropdown
+                value={dropdownValue} // Maintain dropdown state
+                onChange={handleSelectChange} // Handle selection changes
+                renderValue={() => null} // Prevent values from displaying in dropdown
                 disabled={!checked} // Disable when unchecked
                 displayEmpty
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200, // Limit height
+                    },
+                  },
+                }}
               >
                 {processedNames.flat().map((name, index) =>
                   name === "" ? (
@@ -414,185 +491,179 @@ export function History({
     </Box>
   );
 }
-// set master problem status
-
-export function Master_Problem_List () {
-  const [problemListStatus, setProblemListStatus] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setProblemListStatus(event.target.value);
-  };
-  return (
-      <>
-        <FormControl variant="standard" fullWidth>
-          <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={problemListStatus}
-            onChange={handleChange}
-            label="Status"
-          >
-            <MenuItem value={10}>Improving</MenuItem>
-            <MenuItem value={20}>Stable</MenuItem>
-            <MenuItem value={30}>Controlled</MenuItem>
-            <MenuItem value={40}>Worsening</MenuItem>
-            <MenuItem value={50}>Uncontrolled</MenuItem>
-            <MenuItem value={60}>Resolved</MenuItem>
-            <MenuItem value={70}>Ruled Out</MenuItem>
-            <MenuItem value={80}>Active</MenuItem>
-            <MenuItem value={90}>Inactive</MenuItem>
-          </Select>
-        </FormControl>
-      </>
-    );
-}
-
-// set Nature
-
-export function Nature () {
-
-  const [nature, setNature] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setNature(event.target.value);
-  };
-  return (
-      <>
-        <FormControl variant="standard" fullWidth>
-          <InputLabel id="demo-simple-select-standard-label">Nature</InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={nature}
-            onChange={handleChange}
-            label="Status"
-          >
-            <MenuItem value={10}>Minor</MenuItem>
-            <MenuItem value={20}>Self Limited</MenuItem>
-            <MenuItem value={30}>Time Limited</MenuItem>
-            <MenuItem value={40}>Acute</MenuItem>
-            <MenuItem value={50}>Chronic</MenuItem>
-            <MenuItem value={60}>Intermittent</MenuItem>
-            <MenuItem value={70}>Recurrent</MenuItem>
-            <MenuItem value={80}>Condition</MenuItem>
-            <MenuItem value={90}>Symptom</MenuItem>
-            <MenuItem value={100}>Finding</MenuItem>
-            <MenuItem value={110}>Limitation</MenuItem>
-          </Select>
-        </FormControl>
-      </>
-    );
-}
-
-// set medication list status
-
-export function Medication_List_Status () {
-
-  const [medicationListStatus, setMedicationListStatus] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setMedicationListStatus(event.target.value);
-  };
-  return (
-      <>
-        <FormControl variant="standard" fullWidth>
-          <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={medicationListStatus}
-            onChange={handleChange}
-            label="Status"
-          >
-            <MenuItem value={10}>Active</MenuItem>
-            <MenuItem value={20}>Inactive</MenuItem>
-            <MenuItem value={30}>Completed</MenuItem>
-            <MenuItem value={40}>Discontinued</MenuItem>
-            <MenuItem value={50}>Erroneous</MenuItem>
-            <MenuItem value={60}>Not Covered</MenuItem>
-          </Select>
-        </FormControl>
-      </>
-    );
-
-}
-
-// set Rx unit
-
-export function Rx () {
-
-  const [unit, setUnit] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-    setUnit(event.target.value);
-  };
-  return (
-    <>
-      <FormControl variant="standard" fullWidth>
-        
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={unit}
-          onChange={handleChange}
-          label="Unit"
-        >
-          <MenuItem value={10}>GEQ</MenuItem>
-          <MenuItem value={20}>DAW</MenuItem>
-        </Select>
-      </FormControl>
-    </>
-  );
-}
 
 
 
-const PatientInfoSchema = Yup.object().shape({
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
-  address: Yup.string().required("Required"),
-  phoneNumber: Yup.string()
-    .required("Required")
-    .matches(/^\d+$/, "Phone number must contain only digits"),
-  email: Yup.string().email("Invalid email").required("Required"),
-  age: Yup.number().required("Required").positive("Age must be positive"),
-  bloodGroup: Yup.string().required("Required"),
-  referredByDoctor: Yup.string().required("Required"),
-  referredByDoctorEmail: Yup.string().email("Invalid email"),
-  referredByDoctorPhoneNumber: Yup.string().matches(
-    /^\d+$/,
-    "Phone number must contain only digits"
-  ),
-  diseases: Yup.string().required("Required"),
-  patientHistory: Yup.string(),
-});
 
 
-const PatientHistoryInfo = ({ patients }: any) => {
+const PatientHistoryInfo:React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const patient = patients?.find(
-    (patient: any) => patient.id === parseInt(id || "", 10)
-  );
-  const initialValues = {
-    id: patient.id,
-    firstName: patient.firstName,
-    lastName: patient.lastName,
-    address: patient.address,
-    phoneNumber: patient.phoneNumber,
-    email: patient.email,
-    age: patient.age,
-    bloodGroup: patient.bloodGroup,
-    referredByDoctor: patient.referredByDoctor,
-    referredByDoctorEmail: patient.referredByDoctorEmail,
-    referredByDoctorPhoneNumber: patient.referredByDoctorPhoneNumber,
-    diseases: patient.diseases,
-    patientHistory: patient.patientHistory,
+
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [age, setAge] = useState<string>("");
+  const [avatarSrc, setAvatarSrc] = useState<string>("");
+  const [pastMedicalHistory, setPastMedicalHistory] = useState<string>("");
+  const [pastSurgicalHistory, setPastSurgicalHistory] = useState<string>("");
+  const [knownAllergies, setKnownAllergies] = useState<KnownAllergies>({allergen:"", reaction:"", status:"",});
+  const [healthMaintenance, setHealthMaintenance] = useState<HealthMaintenance>({influenzaVaccine:{date:"", sts:"", next:"",dose:"",unit:"", site:"", route:"", mfr:"", lot:"", expiry:"", note:"",}, pneumococcalVaccine:{date:"", sts:"", next:"",dose:"",unit:"", site:"", route:"", mfr:"", lot:"", expiry:"", note:"",},
+    colorectalScreening:{date:"", sts:"", next:"", note:"",}, prostateScreening:{date:"", sts:"", next:"", note:"",}, screeningMammogram:{date:"", sts:"", next:"", note:"",}, screeningPapSmear:{date:"", sts:"", next:"", note:"",},});
+  const [familyHistory, setFamilyHistory] = useState<FamilyHistory>({diabetes:{check:false, textfield:""}, stroke:{check:false, textfield:""},  hypertension:{check:false, textfield:""},  heartDisease:{check:false, textfield:""},  cancer:{check:false, textfield:""},   asthma:{check:false, textfield:""},  hayFever:{check:false, textfield:""},  arthritis:{check:false, textfield:""},  osteoporosis:{check:false, textfield:""}, anemia:{check:false, textfield:""}, migraine:{check:false, textfield:""}, alzheimers:{check:false, textfield:""},  epilepsy:{check:false, textfield:""},  glaucoma:{check:false, textfield:""},});
+  const [socialHistory, setSocialHistory] = useState<SocialHistory>({alcoholUse:{check:false, textfield:""},  caffeineUse:{check:false, textfield:""},  tobaccoUse:{check:false, textfield:""},  drugsUse:{check:false, textfield:""},  chmExposure:{check:false, textfield:""},  tbExposure:{check:false, textfield:""},  hivExposure:{check:false, textfield:""},  sexRelations:{check:false, textfield:""},  exercise:{check:false, textfield:""}, sleepHabits:{check:false, textfield:""},});
+  const [masterProblemList, setMasterProblemList] = useState<MasterProblemList>({code:"", onset:"", nature:"", desc:"", status:"",});
+  const [masterMedicationList, setMasterMedicationList] = useState<MasterMedicationList>({rx:"", sig:"", select:"", status:"",});
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/general/${id}`);
+        const patientData = response.data;
+
+        if (patientData.PHOTO) {
+          setAvatarSrc(`http://localhost:5000/${patientData.PHOTO}`);
+      
+        } 
+
+        // Populate states with fetched data
+        setFirstName(patientData.FIRST_NAME || "");
+        setLastName(patientData.LAST_NAME || "");
+        setAge(patientData.AGE || "");
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
+      } 
+
+    };
+
+    fetchPatient();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/history/${id}`);
+        const data = response.data;
+  
+        // Assuming your data comes in the correct format
+        setPastMedicalHistory(data.PAST_MEDICAL_HISTORY || "");
+        setPastSurgicalHistory(data.PAST_SURGICAL_HISTORY || "");
+        setKnownAllergies(JSON.parse(data.KNOWN_ALLERGIES || '{}'));
+        setHealthMaintenance(JSON.parse(data.HEALTH_MAINTENANCE || '{}'));
+        setFamilyHistory(JSON.parse(data.FAMILY_HISTORY || '{}'));
+        setSocialHistory(JSON.parse(data.SOCIAL_HISTORY || '{}'));
+        setMasterProblemList(JSON.parse(data.MASTER_PROBLEM_LIST || '{}'));
+        setMasterMedicationList(JSON.parse(data.MASTER_MEDICATION_LIST || '{}'));
+    
+        console.log("Health Maintenance:", healthMaintenance);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [id]);
+
+
+  const handlePastMedicalHistoryChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> ) => {
+    setPastMedicalHistory(e.target.value);
+  }
+  const handlePastSurgicalHistoryChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> ) => {
+    setPastSurgicalHistory(e.target.value);
+  }
+ 
+  
+  const handleKnownAllergiesChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+      const { name, value } = e.target;
+      setKnownAllergies((prev) => ({
+        ...prev,
+        [name as keyof KnownAllergies]: value as string
+      }));
   };
-  const handleSubmit = (values: any, { resetForm }: any) => {
-    console.log(values);
-    //resetForm();
+  
+
+  const handleHealthMaintenanceChange = (
+    category: keyof HealthMaintenance,
+    field: keyof Vaccine | keyof Screening,
+    value: string
+  ) => {
+    setHealthMaintenance((prev) => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [field]: value,
+      },
+    }));
   };
+
+
+const handleMasterProblemListChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+    const { name, value } = e.target;
+    setMasterProblemList((prev) => ({
+      ...prev,
+      [name as keyof MasterProblemList]: value as string
+    }));
+};
+
+const handleMasterMedicationListChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+  const { name, value } = e.target;
+  setMasterMedicationList((prev) => ({
+    ...prev,
+    [name as keyof MasterMedicationList]: value as string
+  }));
+};
+
+const handleFamilyHistoryChange = (
+  key: keyof FamilyHistory, // The specific condition (e.g., "diabetes", "stroke")
+  field: keyof History, // Either "check" or "textfield"
+  value: boolean | string // The new value (boolean for checkbox, string for textfield)
+) => {
+  setFamilyHistory((prev) => ({
+    ...prev,
+    [key]: {
+      ...prev[key],
+      [field]: value,
+    },
+  }));
+};
+
+const handleSocialHistoryChange = (
+  key: keyof SocialHistory, 
+  field: keyof History, // Either "check" or "textfield"
+  value: boolean | string 
+) => {
+  setSocialHistory((prev) => ({
+    ...prev,
+    [key]: {
+      ...prev[key],
+      [field]: value,
+    },
+  }));
+};
+
+
+const handleSubmit = async () => {
+  const data = {
+    CSN: id,  // This is your CSN (id)
+    PAST_MEDICAL_HISTORY: pastMedicalHistory,
+    PAST_SURGICAL_HISTORY: pastSurgicalHistory,
+    KNOWN_ALLERGIES: JSON.stringify(knownAllergies),
+    HEALTH_MAINTENANCE: JSON.stringify(healthMaintenance),
+    FAMILY_HISTORY: JSON.stringify(familyHistory),
+    SOCIAL_HISTORY: JSON.stringify(socialHistory),
+    MASTER_PROBLEM_LIST: JSON.stringify(masterProblemList),
+    MASTER_MEDICATION_LIST: JSON.stringify(masterMedicationList),
+  };
+
+  try {
+    const response = await axios.post('http://localhost:5000/api/history', data);
+    console.log(response.data.message);
+  } catch (error) {
+    console.error("Error submitting data:", error);
+  }
+};
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar_Patient appBarTitle="HISTORY" id={patient.id}/>
+      <Appbar_Patient appBarTitle="HISTORY" id={id}/>
       <Box
         component="main"
         sx={{
@@ -614,71 +685,73 @@ const PatientHistoryInfo = ({ patients }: any) => {
               spacing={2}
               sx={{ marginleft: "10px", padding: "20px" }}
             >           
-              <Grid item xs={12}>
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={PatientInfoSchema}
-                  onSubmit={handleSubmit}
-                >
-                  {({ errors, touched }) => (
-                    
-                    <Form>
+              <Grid container item xs={12}>
                       <Grid item xs={12} sm={12}>
-                      <div className="setside">
-                        <div className="left">
-                          <IconButton component={Link} to="/patient-list" color="inherit">
-                            <ArrowBackIcon />
-                          </IconButton>
-                        </div>                        
-                      </div>
-                        </Grid>  
-                      
-                     <Grid container rowSpacing={2} sx={{justifyContent: "space-between",alignItems: "center",}}>
+                        <div className="setside">
+                          <div className="left">
+                            <IconButton component={Link} to="/patient-list" color="inherit">
+                              <ArrowBackIcon />
+                            </IconButton>
+                          </div>                        
+                        </div>
+                      </Grid>  
+                      <Grid container spacing={2} sx={{justifyContent: "space-between",alignItems: "center",}}>
                         <Grid item xs={12} sm={2}>
-                          <Field
-                            as={TextField}
-                            name="id"
+                          <TextField
+                            id="chart"
                             label="Chart"
+                            multiline
+                            value={id}
+                            variant="standard"
                             fullWidth
+                            name="chart"
                           />
                           
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                          <Field
-                            as={TextField}
-                            name="firstName"
+                          <TextField
+                            id="first-name"
                             label="First Name"
+                            multiline
+                            value={firstName}
+                            variant="standard"
                             fullWidth
-                            error={errors.firstName && touched.firstName}
-                            helperText={touched.firstName && errors.firstName}
+                            name="firstName"
                           />
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                          <Field
-                            as={TextField}
-                            name="lastName"
+                          <TextField
+                            id="last-name"
                             label="Last Name"
+                            multiline
+                            value={lastName}
+                            variant="standard"
                             fullWidth
-                            error={errors.lastName && touched.lastName}
-                            helperText={touched.lastName && errors.lastName}
+                            name="lastName"
                           />
                         </Grid>                     
                         <Grid item xs={12} sm={1}>
-                          <Field
-                            as={TextField}
-                            name="age"
+                          <TextField
+                            id="age"
                             label="Age"
+                            multiline
+                            value={age}
+                            variant="standard"
                             fullWidth
-                            error={touched.age && Boolean(errors.age)}
-                            helperText={touched.age && errors.age}
+                            name="age"
                           />
                         </Grid>
-                      
                         <Grid item xs={12} sm={2} style={{textAlign:'right', paddingRight:'0'}}>
-                          <ClickableAvatar/>
+                          <IconButton style={{ padding: "0" }} component="span">
+                            <Avatar
+                              variant="square"
+                              src={avatarSrc}
+                              alt="Avatar"
+                              style={{ width: "100px", height: "100px" }}
+                            />
+                          </IconButton>
                         </Grid>
-                      
-                      </Grid>                     
+                      </Grid>                  
                       <Grid container spacing={2} >                        
                         <Grid item xs={12} sm={6} md={6}>
                           <div className="past-medical-history" style={styles.container} >
@@ -688,70 +761,126 @@ const PatientHistoryInfo = ({ patients }: any) => {
                               fullWidth
                               multiline 
                               rows={8}
-                              placeholder="Please write the past medical history" />
+                              placeholder="Please write the past medical history"
+                              value={pastMedicalHistory}
+                              onChange={handlePastMedicalHistoryChange} 
+                              />
                           </div>
-                          <div style={styles.container} className="past-surgical-history">
+                          <div style={styles.container} className="known-allergies">
                             <h2>Known Allergies</h2>
                             <Grid container rowSpacing={1} columnSpacing={1}>
                               <Grid item xs={12}>
-                                <FormControl variant="standard" fullWidth>
-                                  <InputLabel htmlFor="component-simple">Allergen</InputLabel>
-                                  <Input id="component-simple" />
-                                </FormControl>
+                                <TextField
+                                  id="allergen"
+                                  label="Allergen"
+                                  multiline
+                                  value={knownAllergies.allergen ||""}
+                                  variant="standard"
+                                  fullWidth
+                                  name="allergen"
+                                  onChange={handleKnownAllergiesChange}
+                                />                                
                               </Grid>
                               <Grid item xs={8}>
-                                <FormControl variant="standard" fullWidth>
-                                  <InputLabel htmlFor="component-simple">Reaction</InputLabel>
-                                  <Input id="component-simple" />
-                                </FormControl>
+                                <TextField
+                                  id="reaction"
+                                  label="Reaction"
+                                  multiline
+                                  value={knownAllergies.reaction}
+                                  variant="standard"
+                                  fullWidth
+                                  name="reaction"
+                                  onChange={handleKnownAllergiesChange}
+                                />
                               </Grid>
                               <Grid item xs={4}>
-                                <AllergenStatus/>
+                                <FormControl variant="standard" fullWidth>
+                                  <InputLabel id="known-allergies-status">Status</InputLabel>
+                                  <Select
+                                    labelId="known-allergies-status"
+                                    id="known-allergies-status"
+                                    value={knownAllergies.status ||""}
+                                    onChange={handleKnownAllergiesChange}
+                                    label="Status"
+                                    name="status"
+                                  >
+                                    <MenuItem value="Active">Active</MenuItem>
+                                    <MenuItem value="Inactive">Inactive</MenuItem>
+                                  </Select>
+                                </FormControl>
                               </Grid>
                             </Grid>
                           </div>
-                          <div style={styles.container} className="past-surgical-history">
+                          <div style={styles.container} className="health-maintenance">
                             <h2>Health Maintenance</h2>
                             <div className="influenza-vaccine" style={styles.container}>
                               <label>Influenza Vaccine</label>
                               <Grid container rowSpacing={1} columnSpacing={1} alignItems={"end"}>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DemoItem>
-                                      <DatePicker label="Date"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
-                                    </DemoItem>
+                                    <DatePicker
+                                      label="Date"
+                                      value={healthMaintenance.influenzaVaccine.date ? dayjs(healthMaintenance.influenzaVaccine.date) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("influenzaVaccine", "date", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"date" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Sts/>
+                                  <Sts value={healthMaintenance.influenzaVaccine.sts}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("influenzaVaccine", "sts", newValue)}/>
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Next"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Next"
+                                      value={healthMaintenance.influenzaVaccine.next ? dayjs(healthMaintenance.influenzaVaccine.next) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("influenzaVaccine", "next", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"next" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item container xs={4} alignItems='end'>
                                   <Grid item xs={8}>
                                     <TextField
-                                      id="outlined-multiline-static"
+                                      id="health-maintenance-influenza-vaccine-dose"
                                       label="Dose"
                                       multiline
                                       variant="standard"
                                       fullWidth
+                                      value={healthMaintenance.influenzaVaccine.dose}
+                                      onChange={(e) =>
+                                        handleHealthMaintenanceChange("influenzaVaccine", "dose", e.target.value)
+                                      }
                                     />
                                   </Grid>
                                   <Grid item xs={4}>
-                                    <Unit/>
+                                    <Unit
+                                      value={healthMaintenance.influenzaVaccine.unit}
+                                      onChange={(newValue) => handleHealthMaintenanceChange("influenzaVaccine", "unit", newValue)}
+                                    />
                                   </Grid>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Site/>
+                                  <Site value={healthMaintenance.influenzaVaccine.site}
+                                      onChange={(newValue) => handleHealthMaintenanceChange("influenzaVaccine", "site", newValue)}
+                                  />
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Influenza_Vaccine_Route/>
+                                  <Influenza_Vaccine_Route 
+                                    value={healthMaintenance.influenzaVaccine.route}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("influenzaVaccine", "route", newValue)}
+                                  />
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Mfr/>
+                                  <Mfr 
+                                    value={healthMaintenance.influenzaVaccine.mfr}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("influenzaVaccine", "mfr", newValue)}
+                                  />
                                 </Grid>
                                 <Grid item xs={4}>
                                   <TextField
@@ -760,11 +889,22 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("influenzaVaccine", "lot", e.target.value)
+                                    }
+                                    value={healthMaintenance.influenzaVaccine.lot}
                                   />
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Expiry"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Expiry"
+                                      value={healthMaintenance.influenzaVaccine.expiry ? dayjs(healthMaintenance.influenzaVaccine.expiry) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("influenzaVaccine", "expiry", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"expiry" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -774,6 +914,10 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("influenzaVaccine", "note", e.target.value)
+                                    }
+                                    value={healthMaintenance.influenzaVaccine.note}
                                   />
                                 </Grid>
                               </Grid>
@@ -783,15 +927,30 @@ const PatientHistoryInfo = ({ patients }: any) => {
                               <Grid container rowSpacing={1} columnSpacing={1}>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Date"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Date"
+                                      value={healthMaintenance.pneumococcalVaccine.date ? dayjs(healthMaintenance.pneumococcalVaccine.date) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("pneumococcalVaccine", "date", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"date" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Sts/>
+                                  <Sts value={healthMaintenance.pneumococcalVaccine.sts}
+                                      onChange={(newValue) => handleHealthMaintenanceChange("pneumococcalVaccine", "sts", newValue)}/>
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Next"  slotProps={{ textField: { variant: 'standard', fullWidth: true} }} />
+                                    <DatePicker
+                                      label="Next"
+                                      value={healthMaintenance.pneumococcalVaccine.next ? dayjs(healthMaintenance.pneumococcalVaccine.next) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("pneumococcalVaccine", "next", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"next" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item container xs={4} alignItems='end'>
@@ -802,20 +961,33 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                       multiline
                                       variant="standard"
                                       fullWidth
+                                      onChange={(e) =>
+                                        handleHealthMaintenanceChange("pneumococcalVaccine", "dose", e.target.value)
+                                      }
+                                      value={healthMaintenance.pneumococcalVaccine.dose}
                                     />
                                   </Grid>
                                   <Grid item xs={4}>
-                                    <Unit/>
+                                    <Unit value={healthMaintenance.pneumococcalVaccine.unit}
+                                      onChange={(newValue) => handleHealthMaintenanceChange("pneumococcalVaccine", "unit", newValue)}
+                                    />
                                   </Grid>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Site/>
+                                  <Site value={healthMaintenance.pneumococcalVaccine.site}
+                                      onChange={(newValue) => handleHealthMaintenanceChange("pneumococcalVaccine", "site", newValue)}
+                                  />
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Influenza_Vaccine_Route/>
+                                  <Influenza_Vaccine_Route 
+                                    value={healthMaintenance.pneumococcalVaccine.route}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("pneumococcalVaccine", "route", newValue)}
+                                 />
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Mfr/>
+                                  <Mfr value={healthMaintenance.pneumococcalVaccine.mfr}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("pneumococcalVaccine", "mfr", newValue)}
+                                  />
                                 </Grid>
                                 <Grid item xs={4}>
                                   <TextField
@@ -824,11 +996,22 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("pneumococcalVaccine", "lot", e.target.value)
+                                    }
+                                    value={healthMaintenance.pneumococcalVaccine.lot}
                                   />
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Expiry"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Expiry"
+                                      value={healthMaintenance.pneumococcalVaccine.expiry ? dayjs(healthMaintenance.pneumococcalVaccine.expiry) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("pneumococcalVaccine", "expiry", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Expiry" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -838,6 +1021,10 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("pneumococcalVaccine", "note", e.target.value)
+                                    }
+                                    value={healthMaintenance.pneumococcalVaccine.note}
                                   />
                                 </Grid>
                               </Grid>
@@ -847,15 +1034,30 @@ const PatientHistoryInfo = ({ patients }: any) => {
                               <Grid container rowSpacing={1} columnSpacing={1}>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Date"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Date"
+                                      value={healthMaintenance.colorectalScreening.date ? dayjs(healthMaintenance.colorectalScreening.date) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("colorectalScreening", "date", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Date" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Sts/>
+                                  <Sts value={healthMaintenance.colorectalScreening.sts}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("colorectalScreening", "sts", newValue)}/>
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Next"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Next"
+                                      value={healthMaintenance.colorectalScreening.next ? dayjs(healthMaintenance.colorectalScreening.next) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("colorectalScreening", "next", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Next" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -865,6 +1067,10 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("colorectalScreening", "note", e.target.value)
+                                    }
+                                    value={healthMaintenance.colorectalScreening.note}
                                   />
                                 </Grid>
                               </Grid>
@@ -874,15 +1080,30 @@ const PatientHistoryInfo = ({ patients }: any) => {
                               <Grid container rowSpacing={1} columnSpacing={1}>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Date"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Date"
+                                      value={healthMaintenance.prostateScreening.date ? dayjs(healthMaintenance.prostateScreening.date) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("prostateScreening", "date", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Date" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Sts/>
+                                  <Sts value={healthMaintenance.prostateScreening.sts}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("prostateScreening", "sts", newValue)}/>
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Next"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Next"
+                                      value={healthMaintenance.prostateScreening.next ? dayjs(healthMaintenance.prostateScreening.next) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("prostateScreening", "next", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Next" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -892,6 +1113,10 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("prostateScreening", "note", e.target.value)
+                                    }
+                                    value={healthMaintenance.prostateScreening.note}
                                   />
                                 </Grid>
                               </Grid>
@@ -901,15 +1126,30 @@ const PatientHistoryInfo = ({ patients }: any) => {
                               <Grid container rowSpacing={1} columnSpacing={1}>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Date"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Date"
+                                      value={healthMaintenance.screeningMammogram.date ? dayjs(healthMaintenance.screeningMammogram.date) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("screeningMammogram", "date", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Date" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Sts/>
+                                  <Sts value={healthMaintenance.screeningMammogram.sts}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("screeningMammogram", "sts", newValue)}/>
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Next"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Next"
+                                      value={healthMaintenance.screeningMammogram.next ? dayjs(healthMaintenance.screeningMammogram.next) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("screeningMammogram", "next", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Next" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -919,6 +1159,10 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("screeningMammogram", "note", e.target.value)
+                                    }
+                                    value={healthMaintenance.screeningMammogram.note}
                                   />
                                 </Grid>
                               </Grid>
@@ -928,15 +1172,30 @@ const PatientHistoryInfo = ({ patients }: any) => {
                               <Grid container rowSpacing={1} columnSpacing={1}>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Date"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Date"
+                                      value={healthMaintenance.screeningPapSmear.date ? dayjs(healthMaintenance.screeningPapSmear.date) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("screeningPapSmear", "date", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Date" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Sts/>
+                                  <Sts value={healthMaintenance.screeningPapSmear.sts}
+                                    onChange={(newValue) => handleHealthMaintenanceChange("screeningPapSmear", "sts", newValue)}/>
                                 </Grid>
                                 <Grid item xs={4}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker label="Next"  slotProps={{ textField: { variant: 'standard', fullWidth: true } }} />
+                                    <DatePicker
+                                      label="Next"
+                                      value={healthMaintenance.screeningPapSmear.next ? dayjs(healthMaintenance.screeningPapSmear.next) : null}
+                                      onChange={(newValue) =>
+                                        handleHealthMaintenanceChange("screeningPapSmear", "next", newValue ? newValue.format('YYYY-MM-DD') : '',)
+                                      }
+                                      slotProps={{ textField: { variant: "standard", fullWidth: true, name:"Next" } }}
+                                    />
                                   </LocalizationProvider>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -946,6 +1205,10 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                     multiline
                                     variant="standard"
                                     fullWidth
+                                    onChange={(e) =>
+                                      handleHealthMaintenanceChange("screeningPapSmear", "note", e.target.value)
+                                    }
+                                    value={healthMaintenance.screeningPapSmear.note}
                                   />
                                 </Grid>
                               </Grid>
@@ -960,87 +1223,144 @@ const PatientHistoryInfo = ({ patients }: any) => {
                               fullWidth
                               multiline 
                               rows={8}
-                              placeholder="Please write the past surgical history" />
+                              placeholder="Please write the past surgical history" 
+                              value={pastSurgicalHistory}
+                              onChange={handlePastSurgicalHistoryChange}
+                              />
                           </div>
                           <div className="family-history" style={styles.container}>
                             <h2>Family History</h2>
                             <Grid container rowSpacing={1}>
-                              <Grid item xs={12}>
-                                <History names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Stroke" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Hypertension" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Heart Disease" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Cancer" names={name2}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Asthma" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Hay Fever" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Arthritis" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Osteoporosis" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Anemia" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Migraine" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Alzheimers" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Epilepsy" names={name1}/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <History label="Glaucoma" names={name1}/>
-                              </Grid>
+                              {Object.keys(familyHistory).map((key) => (
+                                <Grid item xs={12} key={key}>
+                                  <History
+                                    label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the label
+                                    names={name1} // You can customize the names array as needed
+                                    checked={familyHistory[key as keyof FamilyHistory].check}
+                                    textFieldValue={familyHistory[key as keyof FamilyHistory].textfield}
+                                    onCheckChange={(checked) =>
+                                      handleFamilyHistoryChange(key as keyof FamilyHistory, "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleFamilyHistoryChange(key as keyof FamilyHistory, "textfield", value)
+                                    }
+                                  />
+                                </Grid>
+                              ))}
                             </Grid>
                           </div>  
                           <div className="social-history" style={styles.container}>
                             <h2>Social History</h2>
                             <Grid container rowSpacing={1}>
                               <Grid item xs={12}>
-                                <History label="Alcohol Use" names={name3}/>
+                                <History label="Alcohol Use" names={name3} checked={socialHistory.alcoholUse.check}
+                                    textFieldValue={socialHistory.alcoholUse.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("alcoholUse", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("alcoholUse", "textfield", value)
+                                    }
+                                  />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="Caffeine Use" names={name3}/>
+                                <History label="Caffeine Use" names={name3} checked={socialHistory.caffeineUse.check}
+                                    textFieldValue={socialHistory.caffeineUse.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("caffeineUse", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("caffeineUse", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="Tobacco Use" names={name3}/>
+                                <History label="Tobacco Use" names={name3} checked={socialHistory.tobaccoUse.check}
+                                    textFieldValue={socialHistory.tobaccoUse.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("tobaccoUse", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("tobaccoUse", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="Drugs Use" names={name4}/>
+                                <History label="Drugs Use" names={name4}  checked={socialHistory.drugsUse.check}
+                                    textFieldValue={socialHistory.drugsUse.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("drugsUse", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("drugsUse", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="Chm Exposure" names={name5}/>
+                                <History label="Chm Exposure" names={name5} checked={socialHistory.chmExposure.check}
+                                    textFieldValue={socialHistory.chmExposure.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("chmExposure", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("chmExposure", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="TB Exposure" names={name6}/>
+                                <History label="TB Exposure" names={name6} checked={socialHistory.tbExposure.check}
+                                    textFieldValue={socialHistory.tbExposure.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("tbExposure", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("tbExposure", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="HIV Exposure" names={name7}/>
+                                <History label="HIV Exposure" names={name7} checked={socialHistory.hivExposure.check}
+                                    textFieldValue={socialHistory.hivExposure.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("hivExposure", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("hivExposure", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="Sex Relations" names={name8}/>
+                                <History label="Sex Relations" names={name8} checked={socialHistory.sexRelations.check}
+                                    textFieldValue={socialHistory.sexRelations.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("sexRelations", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("sexRelations", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="Exercise" names={name9}/>
+                                <History label="Exercise" names={name9} checked={socialHistory.exercise.check}
+                                    textFieldValue={socialHistory.exercise.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("exercise", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("exercise", "textfield", value)
+                                    }
+                                />
                               </Grid>
                               <Grid item xs={12}>
-                                <History label="Sleep Habits" names={name10}/>
+                                <History label="Sleep Habits" names={name10} checked={socialHistory.sleepHabits.check}
+                                    textFieldValue={socialHistory.sleepHabits.textfield}
+                                    onCheckChange={(checked) =>
+                                      handleSocialHistoryChange("sleepHabits", "check", checked)
+                                    }
+                                    onTextFieldChange={(value) =>
+                                      handleSocialHistoryChange("sleepHabits", "textfield", value)
+                                    }
+                                />
                               </Grid>
                             </Grid>       
                           </div>
@@ -1054,6 +1374,9 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                       multiline
                                       variant="standard"
                                       fullWidth
+                                      value={masterProblemList.code}
+                                      onChange={handleMasterProblemListChange}
+                                      name="code"
                                     />
                                 </Grid>
                                 <Grid item xs={4}>
@@ -1063,10 +1386,35 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                       multiline
                                       variant="standard"
                                       fullWidth
+                                      value={masterProblemList.onset}
+                                      onChange={handleMasterProblemListChange}
+                                      name="onset"
                                     />
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Nature/>
+                                  <FormControl variant="standard" fullWidth>
+                                    <InputLabel id="demo-simple-select-standard-label">Nature</InputLabel>
+                                    <Select
+                                      labelId="demo-simple-select-standard-label"
+                                      id="demo-simple-select-standard"
+                                      value={masterProblemList.nature}
+                                      onChange={handleMasterProblemListChange}
+                                      label="Nature"
+                                      name="nature"
+                                    >
+                                      <MenuItem value="Minor">Minor</MenuItem>
+                                      <MenuItem value="Self Limited">Self Limited</MenuItem>
+                                      <MenuItem value="Time Limited">Time Limited</MenuItem>
+                                      <MenuItem value="Acute">Acute</MenuItem>
+                                      <MenuItem value="Chronic">Chronic</MenuItem>
+                                      <MenuItem value="Intermittent">Intermittent</MenuItem>
+                                      <MenuItem value="Recurrent">Recurrent</MenuItem>
+                                      <MenuItem value="Condition">Condition</MenuItem>
+                                      <MenuItem value="Symptom">Symptom</MenuItem>
+                                      <MenuItem value="Finding">Finding</MenuItem>
+                                      <MenuItem value="Limitation">Limitation</MenuItem>
+                                    </Select>
+                                  </FormControl>
                                 </Grid>
                                 <Grid item xs={8}>
                                   <TextField
@@ -1075,10 +1423,33 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                       multiline
                                       variant="standard"
                                       fullWidth
+                                      onChange={handleMasterProblemListChange}
+                                      value={masterProblemList.desc}
+                                      name="desc"
                                     />
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Master_Problem_List/>
+                                  <FormControl variant="standard" fullWidth>
+                                    <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
+                                    <Select
+                                      labelId="demo-simple-select-standard-label"
+                                      id="demo-simple-select-standard"
+                                      value={masterProblemList.status}
+                                      onChange={handleMasterProblemListChange}
+                                      label="Status"
+                                      name="status"
+                                    >
+                                      <MenuItem value="Improving">Improving</MenuItem>
+                                      <MenuItem value="Stable">Stable</MenuItem>
+                                      <MenuItem value="Controlled">Controlled</MenuItem>
+                                      <MenuItem value="Worsening">Worsening</MenuItem>
+                                      <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
+                                      <MenuItem value="Resolved">Resolved</MenuItem>
+                                      <MenuItem value="Ruled Out">Ruled Out</MenuItem>
+                                      <MenuItem value="Active">Active</MenuItem>
+                                      <MenuItem value="Inactive">Inactive</MenuItem>
+                                    </Select>
+                                  </FormControl>
                                 </Grid>
                               </Grid>
                           </div>
@@ -1092,10 +1463,26 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                       multiline
                                       variant="standard"
                                       fullWidth
+                                      onChange={handleMasterMedicationListChange}
+                                      value={masterMedicationList.rx}
+                                      name="rx"
                                     />
                                 </Grid>
                                 <Grid item xs={2}>
-                                  <Rx/>
+                                  <FormControl variant="standard" fullWidth>
+          
+                                    <Select
+                                      labelId="demo-simple-select-standard-label"
+                                      id="demo-simple-select-standard"
+                                      value={masterMedicationList.select}
+                                      onChange={handleMasterMedicationListChange}
+                                      label="Unit"
+                                      name="select"
+                                    >
+                                      <MenuItem value="GEQ">GEQ</MenuItem>
+                                      <MenuItem value="DAW">DAW</MenuItem>
+                                    </Select>
+                                  </FormControl>
                                 </Grid>
                                 <Grid item xs={8}>
                                   <TextField
@@ -1104,10 +1491,30 @@ const PatientHistoryInfo = ({ patients }: any) => {
                                       multiline
                                       variant="standard"
                                       fullWidth
+                                      onChange={handleMasterMedicationListChange}
+                                      value={masterMedicationList.sig}
+                                      name="sig"
                                     />
                                 </Grid>
                                 <Grid item xs={4}>
-                                  <Medication_List_Status/>
+                                  <FormControl variant="standard" fullWidth>
+                                    <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
+                                    <Select
+                                      labelId="demo-simple-select-standard-label"
+                                      id="demo-simple-select-standard"
+                                      value={masterMedicationList.status}
+                                      onChange={handleMasterMedicationListChange}
+                                      label="Status"
+                                      name="status"
+                                    >
+                                      <MenuItem value="Active">Active</MenuItem>
+                                      <MenuItem value="Inactive">Inactive</MenuItem>
+                                      <MenuItem value="Completed">Completed</MenuItem>
+                                      <MenuItem value="Discontinued">Discontinued</MenuItem>
+                                      <MenuItem value="Erroneous">Erroneous</MenuItem>
+                                      <MenuItem value="Not Covered">Not Covered</MenuItem>
+                                    </Select>
+                                  </FormControl>
                                 </Grid>
                               </Grid>
                           </div>                        
@@ -1118,21 +1525,21 @@ const PatientHistoryInfo = ({ patients }: any) => {
                         <Grid item xs={2} sm={1}>
                           <Button
                             component={Link}
-                            to={`/patient-info/${patient.id}`}
+                            to={`/patient-info/${id}`}
                             color="inherit"
                           >
                             Cancel
                           </Button>
                         </Grid>
                         <Grid item xs={2} sm={1}>
-                          <Button type="submit" variant="contained">
+                          <Button type="submit" variant="contained" onClick={handleSubmit}>
                             Save
                           </Button>                          
                         </Grid>
                         <Grid item xs={2} sm={1}>
                           <Button 
                            component={Link}
-                           to={`/patient-info-encounter/${patient.id}`}
+                           to={`/patient-info-encounter/${id}`}
                            color="warning"
                            variant="contained"
                            >
@@ -1141,9 +1548,9 @@ const PatientHistoryInfo = ({ patients }: any) => {
                         </Grid>
                       </Grid>
                       
-                    </Form>
-                  )}
-                </Formik>
+                    
+                  
+                
               </Grid>
             </Grid>
           </Paper>
