@@ -64,14 +64,14 @@ import StickySpeedDial from "./StickySpeedDial"
 
 // History of Present Illness
 
-const location = [['All over', 'Ankle, left', 'Ankle right', 'Arm, left', 'Arm, right', 'Back', 'Back, lower', 'Back, upper', 'Chest', 'Chest, right side', 'Chest, left side',
- 'Elbow, left', 'Elbow, right', 'Epigastrium', 'Ears', 'Ear, left', 'Ear, right', 'Eyes', 'Eye, left', 'Eye, right', 'Face', 'Fingers', 'Fingers, left hand', 'Fingers, right hand', 
- 'Forearm, left', 'Forearm, right', 'Feet', 'Foot, left', 'Foot, right', 'Genitals', 'Groin', 'Hands', 'Hand, left', 'Hand, right', 'Head', 'Head, frontal', 'Head, occipital', 'Head, left side', 'Head, right side', 'Hip', 'Jaw', 'Knees', 'Knees, left', 'Knees, right', 'Legs', 'Leg, left',
- 'Leg, right', 'Mouth', 'Neck', 'Nose', 'Shoulders', 'Shoulders, left', 'Shoulders, right', 'Skin',
- 'Stomach', 'Substemal', 'Suprapubic', 'Teeth', 'Testes', 'Thigh', 'Throat', 'Thumb', 'Toes', 'Tongue', 'Wrist',''], ['bilateral', 'diffuse', 'fixed', 'generalized', 'localized', 'migratory', 'unilateral',
+const location = [['All over', 'Ankle left', 'Ankle right', 'Arm left', 'Arm right', 'Back', 'Back lower', 'Back upper', 'Chest', 'Chest right side', 'Chest left side',
+ 'Elbow left', 'Elbow right', 'Epigastrium', 'Ears', 'Ear left', 'Ear right', 'Eyes', 'Eye left', 'Eye right', 'Face', 'Fingers', 'Fingers left hand', 'Fingers right hand', 
+ 'Forearm left', 'Forearm right', 'Feet', 'Foot left', 'Foot right', 'Genitals', 'Groin', 'Hands', 'Hand left', 'Hand right', 'Head', 'Head frontal', 'Head occipital', 'Head left side', 'Head right side', 'Hip', 'Jaw', 'Knees', 'Knees left', 'Knees right', 'Legs', 'Leg left',
+ 'Leg right', 'Mouth', 'Neck', 'Nose', 'Shoulders', 'Shoulders left', 'Shoulders right', 'Skin',
+ 'Stomach', 'Substemal', 'Suprapubic', 'Teeth', 'Testes', 'Thigh', 'Throat', 'Thumb', 'Toes', 'Tongue', 'Wrist',], ['bilateral', 'diffuse', 'fixed', 'generalized', 'localized', 'migratory', 'unilateral',
 ]];
 const quality = [ ['Burning', 'Cramping', 'Crushing', 'Dull', 'Fullness', 'Pressure', 'Pressure sensation', 'Plusation', 'Radiating', 'Sharp',
- 'Shooting', 'Stabbing', 'Tender', 'Throbbing', 'Vague', ''], ['acute', 'chronic', 'constant', 'deep', 'improving', 'intermittent', 'lessening', 'same as prior', 'stable', 'superficial', 'unchanged', 'worsening',
+ 'Shooting', 'Stabbing', 'Tender', 'Throbbing', 'Vague',], ['acute', 'chronic', 'constant', 'deep', 'improving', 'intermittent', 'lessening', 'same as prior', 'stable', 'superficial', 'unchanged', 'worsening',
 ]];
 const severity = ['1 on a scale of 1 to 5', '2 on a scale of 1 to 5', '3 on a scale of 1 to 5', '4 on a scale of 1 to 5', '5 on a scale of 1 to 5', 'Critical', 'Disabling', 'Intolerable', 'Life threatening', 'Mild', 'Mild severity', 'Mild to moderate severity', 'Moderate severity', 'High severity', 'Severe', 'Writhing in pain',
 ];
@@ -237,18 +237,6 @@ interface Head {
   attendBy:string,
 }
 
-interface PresentIllness {
-  text:string,
-  location:string,
-  quality:string,
-  severity:string,
-  duration:string,
-  onsetTiming:string,
-  context:string,
-  modifyingFactors:string,
-  signsSymptoms:string,
-}
-
 
 interface ReviewOfSystems {
   general : {fevers:boolean, sweats:boolean, weightLoss:boolean, Chills:boolean, appetiteLoss:boolean, fatigue:boolean},
@@ -271,8 +259,64 @@ interface ReviewOfSystems {
   checkReview:{checkGeneral:boolean, checkEyes:boolean, checkENMT:boolean, checkCardiovascular:boolean, checkRespiratory:boolean, checkGastrointestinal:boolean, checkGenitourinaryMale:boolean, checkGenitourinaryFemale:boolean, checkMusculoskeletal:boolean, checkSkin:boolean, checkNeurologic:boolean, checkPsychiatric:boolean, checkEndocrine:boolean, checkHematologicLymphatic:boolean, checkAllergicImmunologic:boolean,}, 
 }
 
+interface HistoryOfIllness {
+  Location: string,
+  Quality: string,
+  Severity: string,
+  Duration: string,
+  OnsetTiming: string,
+  Context: string,
+  ModifyingFactors: string,
+  SignsSymptoms: string,
+}
 
+interface VitalSigns {
+  systolic: string,
+  diastolic: string,
+  temperature: string,
+  weight: string,
+  height: string,
+  respiration: string,
+  pulse: string,
+  waist: string,
+  spO2: string,
 
+}
+
+interface Checkbox_Textfield {
+  frontCheck:boolean,
+  backCheck:boolean,
+  textfield:string,
+}
+
+interface PhysicalExamination {
+  constitutional_1:Checkbox_Textfield,
+  eyes_1:Checkbox_Textfield, eyes_2:Checkbox_Textfield, eyes_3:Checkbox_Textfield,
+  enmt_1:Checkbox_Textfield, enmt_2:Checkbox_Textfield, enmt_3:Checkbox_Textfield, enmt_4:Checkbox_Textfield, enmt_5:Checkbox_Textfield, enmt_6:Checkbox_Textfield,
+  neck_1:Checkbox_Textfield, neck_2:Checkbox_Textfield,
+  respiratory_1:Checkbox_Textfield, respiratory_2:Checkbox_Textfield, respiratory_3:Checkbox_Textfield, respiratory_4:Checkbox_Textfield,
+  cardiovascular_1:Checkbox_Textfield, cardiovascular_2:Checkbox_Textfield, cardiovascular_3:Checkbox_Textfield, cardiovascular_4:Checkbox_Textfield, cardiovascular_5:Checkbox_Textfield, cardiovascular_6:Checkbox_Textfield, cardiovascular_7:Checkbox_Textfield,
+  breasts_1:Checkbox_Textfield, breasts_2:Checkbox_Textfield,
+  gastrointestinal_1:Checkbox_Textfield, gastrointestinal_2:Checkbox_Textfield, gastrointestinal_3:Checkbox_Textfield, gastrointestinal_4:Checkbox_Textfield, gastrointestinal_5:Checkbox_Textfield,
+  genitourinaryFemale_1:Checkbox_Textfield, genitourinaryFemale_2:Checkbox_Textfield, genitourinaryFemale_3:Checkbox_Textfield, genitourinaryFemale_4:Checkbox_Textfield, genitourinaryFemale_5:Checkbox_Textfield, genitourinaryFemale_6:Checkbox_Textfield,
+  genitourinaryMale_1:Checkbox_Textfield, genitourinaryMale_2:Checkbox_Textfield,genitourinaryMale_3:Checkbox_Textfield,
+  lymphatic_1:Checkbox_Textfield, lymphatic_2:Checkbox_Textfield, lymphatic_3:Checkbox_Textfield, lymphatic_4:Checkbox_Textfield,
+  musculoskeletal_1:Checkbox_Textfield, musculoskeletal_2:Checkbox_Textfield, musculoskeletal_3:Checkbox_Textfield,
+  skin_1:Checkbox_Textfield, skin_2:Checkbox_Textfield,
+  neurologic_1:Checkbox_Textfield, neurologic_2:Checkbox_Textfield, neurologic_3:Checkbox_Textfield, 
+  psychiatric_1:Checkbox_Textfield, psychiatric_2:Checkbox_Textfield, psychiatric_3:Checkbox_Textfield, psychiatric_4:Checkbox_Textfield,
+}
+
+interface Meeting {
+
+  emcode:string,
+  emcodeEdit:string,
+  codeBasis:string,
+  codeBasisEdit:string,
+  calculation:string,
+  period:string,
+  time:string,
+}
 
 // selected options and check box component  
 interface NameProps {
@@ -329,7 +373,7 @@ function ChiefEncounter({
   const processedNames = normalizedNames.flat();
 
   return (
-    <Box sx={{ display: "flex", m:1 }}>
+    <Box sx={{ display: "flex",}}>
         {/* TextField */}
         <Grid item xs={11}>
           <TextField
@@ -375,50 +419,58 @@ function ChiefEncounter({
     </Box>
   );
 }
-
-
-
-
+ // select checkbox
 function Select_Checkbox({
-  names = [["Option 1", "Option 2"], ["Option 3", "Option 4"]],
-  checked1 = true,
-}: NameProps) {
-  const [textFieldValue, setTextFieldValue] = useState<string>("");
+  names,
+  checked1,
+  textfield,
+  onTextFieldChange,
+}: {
+  names: string[] | string[][];
+  checked1: boolean;
+  textfield: string;
+  onTextFieldChange: (value: string) => void;
+}) {
   const [dropdownValue, setDropdownValue] = useState<string[]>([]);
 
   const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
     const selectedValues = event.target.value as string[];
-    const latestSelection = selectedValues[selectedValues.length - 1]; // Get the latest selected item
+    const latestSelection = selectedValues[selectedValues.length - 1];
+
     if (latestSelection.trim() !== "") {
-      setTextFieldValue((prev) =>
-        prev.trim() === "" ? latestSelection : `${prev} | ${latestSelection}`
+      if (onTextFieldChange) {
+        onTextFieldChange(
+        textfield.trim() === "" ? latestSelection : `${textfield} | ${latestSelection}`
       );
+      }
     }
     setDropdownValue([]); // Reset dropdown value to prevent display of selected items
   };
 
   const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTextFieldValue(event.target.value);
+    if (onTextFieldChange) {
+      onTextFieldChange(event.target.value);
+    }
   };
 
-  // Normalize names into a 2D array
-  const normalizedNames: string[][] =
-    Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+  const normalizedNames: string[][] = Array.isArray(names[0])
+    ? (names as string[][])
+    : [names as string[]];
 
-  // Flatten names for dropdown processing
   const processedNames = normalizedNames.flat();
 
   return (
-    <Box sx={{ display: "flex", m:1 }}>
+    <Box sx={{ display: "flex", gap: 2 }}>
+      <Grid container item xs={11} alignItems={"end"}>
         {/* TextField */}
         <Grid item xs={11}>
           <TextField
             fullWidth
             variant="standard"
             multiline
-            value={textFieldValue}
+            value={textfield}
             onChange={handleTextFieldChange}
-            disabled={!checked1} // Disable when unchecked
+            disabled={!checked1}
           />
         </Grid>
 
@@ -426,13 +478,11 @@ function Select_Checkbox({
         <Grid item xs={1}>
           <FormControl variant="standard">
             <Select
-              labelId="select-quality-label"
-              id="multi-select"
               multiple
-              value={dropdownValue} // Dropdown value must be an array
+              value={dropdownValue}
               onChange={handleSelectChange}
-              renderValue={() => null} // Prevent displaying values in the dropdown
-              disabled={!checked1} // Disable when unchecked
+              renderValue={() => null}
+              disabled={!checked1}
               displayEmpty
             >
               {processedNames.map((name, index) =>
@@ -451,26 +501,45 @@ function Select_Checkbox({
             </Select>
           </FormControl>
         </Grid>
-      
+      </Grid>
     </Box>
   );
 }
+
 // new selected options and checkbox
 
-function New_Select_Checkbox ({names=name1, checked1=true, subname=constitutional_1} : NameProps) {
-
-  const [check, setCheck] = useState<boolean>(false);
- 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCheck(event.target.checked);
-  };
-
+function New_Select_Checkbox({
+  names,
+  backCheck,
+  onBackCheckChange,
+  textfield,
+  onTextFieldChange,
+}: {
+  names: string[] | string[][];
+  backCheck: boolean;
+  onBackCheckChange: (checked: boolean) => void;
+  textfield: string;
+  onTextFieldChange: (value: string) => void;
+}) {
   return (
-    <Box sx={{display:'flex', gap:1}}>
-      <Grid item xs={1}><Checkbox color="success" disabled={!checked1} checked={check&&checked1} onChange={handleCheckboxChange}/></Grid>
-      <Grid item xs={10} >
-        {check?<Select_Checkbox names={names} checked1={checked1}/>:<Box sx={{ display: "flex", gap: 2 }}>
-        <Grid container item xs={11} alignItems={"end"}><Grid item xs={11}><TextField variant="standard" fullWidth disabled defaultValue={subname} multiline/></Grid><Grid item xs={1}><FormControl variant="standard"><Select disabled /></FormControl></Grid></Grid></Box>}
+    <Box sx={{ display: "flex", gap: 1 }}>
+      {/* Checkbox for backCheck */}
+      <Grid item xs={1}>
+        <Checkbox
+          color="success"
+          checked={backCheck}
+          onChange={(event) => onBackCheckChange(event.target.checked)}
+        />
+      </Grid>
+
+      {/* Select and TextField */}
+      <Grid item xs={10}>
+        <Select_Checkbox
+          names={names}
+          checked1={backCheck}
+          textfield={textfield}
+          onTextFieldChange={onTextFieldChange}
+        />
       </Grid>
     </Box>
   );
@@ -478,36 +547,63 @@ function New_Select_Checkbox ({names=name1, checked1=true, subname=constitutiona
 
 // selected options and checkbox switch component
 
-function Select_Checkbox_Switch ({label='Constitutional', names=name1,subname=constitutional_1} : NameProps) {
-
-  const [checked, setChecked] = useState<boolean>(false);
-
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked);
-  };
-
+function Select_Checkbox_Switch({
+  label = "Constitutional",
+  names,
+  frontCheck,
+  onFrontCheckChange,
+  backCheck,
+  onBackCheckChange,
+  textfield,
+  onTextFieldChange,
+}: {
+  label: string;
+  names: string[] | string[][];
+  frontCheck: boolean;
+  onFrontCheckChange: (checked: boolean) => void;
+  backCheck: boolean;
+  onBackCheckChange: (checked: boolean) => void;
+  textfield: string;
+  onTextFieldChange: (value: string) => void;
+}) {
   return (
-    <Box sx={{display:"flex", gap:1}}>
+    <Box sx={{ display: "flex", gap: 1 }}>
+      {/* Checkbox for frontCheck */}
       <Grid item xs={1}>
         <Checkbox
           color="success"
-          checked={checked}
-          onChange={handleCheckboxChange}
+          checked={frontCheck}
+          onChange={(event) => onFrontCheckChange(event.target.checked)}
         />
       </Grid>
-      <Grid item xs={3} sx={{mt:1.2}}>
+
+      {/* Label */}
+      <Grid item xs={3} sx={{ mt: 1.2 }}>
         <label>{label}</label>
       </Grid>
-      <Grid item xs={9} >
-        {checked?<New_Select_Checkbox names={names} subname={subname}/>:
-          <Box sx={{display:'flex', gap:1}}>
-            <Grid item xs={1}><Checkbox color="success" disabled /></Grid>
+
+      {/* Conditional rendering of New_Select_Checkbox */}
+      <Grid item xs={9}>
+        {frontCheck ? (
+          <New_Select_Checkbox
+            names={names}
+            backCheck={backCheck}
+            onBackCheckChange={onBackCheckChange}
+            textfield={textfield}
+            onTextFieldChange={onTextFieldChange}
+          />
+        ) : (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Grid item xs={1}>
+              <Checkbox color="success" disabled />
+            </Grid>
             <Grid item xs={10}>
               <FormControl variant="standard" fullWidth>
-                <Select multiple disabled={true}/>
+                <Select multiple disabled={true} />
               </FormControl>
             </Grid>
-          </Box>}
+          </Box>
+        )}
       </Grid>
     </Box>
   );
@@ -515,32 +611,37 @@ function Select_Checkbox_Switch ({label='Constitutional', names=name1,subname=co
 
 // history of illness checkbox
 function Select_History_Checkbox({
-  names = name1,
+  names = [],
   checked1 = true,
-  label = ''
-}: NameProps) {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-
-  const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedOptions(typeof value === "string" ? value.split(",") : value);
-  };
-
+  label = "",
+  selectedOptions = [],
+  onValueChange,
+}: {
+  names: string[] | string[][];
+  checked1?: boolean;
+  label?: string;
+  selectedOptions: string[];
+  onValueChange: (newValues: string[]) => void;
+}) {
   // Normalize names into a 2D array
   const normalizedNames: string[][] =
     Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
 
+  const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
+    const { value } = event.target;
+    const newSelectedOptions = typeof value === "string" ? value.split(",") : value;
+    onValueChange(newSelectedOptions); // Notify parent of the change
+  };
+
   return (
-    <Box sx={{ display: "flex", gap: 2,}}>
-      {/* label */}
-      <Grid item xs={2} >
+    <Box sx={{ display: "flex", gap: 2 }}>
+      {/* Label */}
+      <Grid item xs={2}>
         <label>{label}:</label>
       </Grid>
       {/* Select Component */}
       <Grid item xs={10}>
-        <FormControl variant="standard" fullWidth >
+        <FormControl variant="standard" fullWidth>
           <Select
             labelId="demo-simple-select-standard-label"
             id="select-checkbox"
@@ -548,23 +649,7 @@ function Select_History_Checkbox({
             disabled={!checked1}
             value={selectedOptions}
             onChange={handleSelectChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => {
-                  // Determine chip color based on the array it belongs to
-                  const isInFirstArray = normalizedNames[0].includes(value);
-                  const chipColor = isInFirstArray ? "success" : "error";
-
-                  return (
-                    <Chip
-                      key={value}
-                      label={value}
-                      color={chipColor}
-                    />
-                  );
-                })}
-              </Box>
-            )}
+            renderValue={(selected) => selected.join(' | ')}
           >
             {normalizedNames.map((array, arrayIndex) =>
               array.map((name) => (
@@ -585,29 +670,47 @@ function Select_History_Checkbox({
 // Adding Procedures / Services
 
 {/* Addable Component props */}
-interface AddableComponentProps {
+
+type AddableComponentProps = {
   id: number;
-  place: number; // Add an order prop
   onDelete: (id: number) => void;
   disableDelete: boolean;
-}
+  place: number;
+  procedure: { code: string; description: string; note: string };
+  onFieldChange: (id: number, field: string, value: string) => void;
+};
 
 function Addable_Procedure_Service({
   id,
-  place,
   onDelete,
   disableDelete,
+  place,
+  procedure,
+  onFieldChange,
 }: AddableComponentProps) {
+
+  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'code', event.target.value);
+  };
+
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'description', event.target.value);
+  };
+
+  const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'note', event.target.value);
+  };
+
   return (
     <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
-          {/* Display the order number */}
-      <div style={{ fontWeight: 'bold'}}>{place}</div>
+      <div style={{ fontWeight: 'bold' }}>{place}</div>
       <Grid container spacing={1} alignItems="center">
-        
         <Grid item xs={2}>
           <FormControl fullWidth variant="standard">
             <Input
               id={`procedures-services-code-${id}`}
+              value={procedure.code}
+              onChange={handleCodeChange}
               startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
             />
           </FormControl>
@@ -616,6 +719,8 @@ function Addable_Procedure_Service({
           <FormControl fullWidth variant="standard">
             <Input
               id={`procedures-services-desc-${id}`}
+              value={procedure.description}
+              onChange={handleDescriptionChange}
               startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
             />
           </FormControl>
@@ -633,6 +738,8 @@ function Addable_Procedure_Service({
           <FormControl fullWidth variant="standard">
             <Input
               id={`procedures-services-note-${id}`}
+              value={procedure.note}
+              onChange={handleNoteChange}
               multiline
               startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
             />
@@ -643,68 +750,79 @@ function Addable_Procedure_Service({
   );
 }
 
-function Procedures_Services() {
-  const [components, setComponents] = useState<{ id: number }[]>([{ id: 1 }]);
+type Procedures_ServicesProps = {
+  procedures: { id: number; code: string; description: string; note: string }[];
+  onAddProcedure: () => void;
+  onDeleteProcedure: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string) => void;
+};
 
-  const handleAdd = () => {
-    const nextId = components.length ? Math.max(...components.map((c) => c.id)) + 1 : 1;
-    setComponents([...components, { id: nextId }]);
-  };
-
-  const handleDelete = (id: number) => {
-    if (components.length > 1) {
-      setComponents(components.filter((component) => component.id !== id));
-    }
-  };
-
+const Procedures_Services: React.FC<Procedures_ServicesProps> = ({
+  procedures,
+  onAddProcedure,
+  onDeleteProcedure,
+  onFieldChange,
+}) => {
   return (
     <Grid>
-      {components.map((component, index) => (
+      {procedures.map((procedure, index) => (
         <Addable_Procedure_Service
-          key={component.id}
-          id={component.id}
+          key={procedure.id}
+          id={procedure.id}
           place={index + 1} // Pass the order number (index + 1)
-          onDelete={handleDelete}
-          disableDelete={components.length === 1} // Disable delete if only one item remains
+          onDelete={onDeleteProcedure}
+          disableDelete={procedures.length === 1} // Disable delete if only one item remains
+          procedure={procedure}
+          onFieldChange={onFieldChange}
         />
       ))}
-      <IconButton onClick={handleAdd} color="success">
+      <IconButton onClick={onAddProcedure} color="success">
         <AddIcon />
       </IconButton>
     </Grid>
   );
-}
+};
 
 
 // Add Order / Requistion
 
-function Addable_Order_Requisition ({
+type Addable_Order_RequisitionProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  order: { order: string; requisition: string };
+  onFieldChange: (id: number, field: string, value: string) => void;
+};
+
+function Addable_Order_Requisition({
   id,
   onDelete,
   disableDelete,
   place,
-}:AddableComponentProps) 
-{
+  order,
+  onFieldChange,
+}: Addable_Order_RequisitionProps) {
+  const handleOrderChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'order', event.target.value);
+  };
 
-  const [order, setOrder] = useState<string>('');
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setOrder(event.target.value);
-  }
-
+  const handleRequisitionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'requisition', event.target.value);
+  };
 
   return (
     <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold'}}>{place}</div>
+      <div style={{ fontWeight: 'bold' }}>{place}</div>
       <Grid container spacing={1} alignItems={'end'}>
         <Grid item xs={2}>
           <FormControl fullWidth variant="standard">
-            <InputLabel id={`orders-requsition-order-${id}`}>Order</InputLabel>
+            <InputLabel id={`orders-requisition-order-${id}`}>Order</InputLabel>
             <Select
-              labelId={`orders-requsition-order-select-${id}`}
-              id={`orders-requsition-order-select-${id}`}
-              value={order}
-              onChange={handleChange}
+              labelId={`orders-requisition-order-select-${id}`}
+              id={`orders-requisition-order-select-${id}`}
+              value={order.order}
+              onChange={handleOrderChange}
               label="Order"
             >
               <MenuItem value={10}>Lab</MenuItem>
@@ -717,8 +835,10 @@ function Addable_Order_Requisition ({
           <FormControl fullWidth variant="standard">
             <Input
               id={`procedures-services-desc-${id}`}
+              value={order.requisition}
+              onChange={handleRequisitionChange}
               multiline
-              startAdornment={<InputAdornment position="start">Requsition:</InputAdornment>}
+              startAdornment={<InputAdornment position="start">Requisition:</InputAdornment>}
             />
           </FormControl>
         </Grid>
@@ -734,34 +854,36 @@ function Addable_Order_Requisition ({
       </Grid>
     </Paper>
   );
+}
+
+
+type Orders_RequisitionsProps = {
+  orders: { id: number; order: string; requisition: string }[];
+  onAddOrder: () => void;
+  onDeleteOrder: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string) => void;
 };
 
-function Orders_Requisitions () {
-  const [components, setComponents] = useState<{ id: number }[]>([{ id: 1 }]);
-
-  const handleAdd = () => {
-    const nextId = components.length ? Math.max(...components.map(c => c.id)) + 1 : 1;
-    setComponents([...components, { id: nextId }]);
-  };
-
-  const handleDelete = (id: number) => {
-    if (components.length > 1) {
-      setComponents(components.filter((component) => component.id !== id));
-    }
-  };
-
+const Orders_Requisitions: React.FC<Orders_RequisitionsProps> = ({
+  orders,
+  onAddOrder,
+  onDeleteOrder,
+  onFieldChange,
+}) => {
   return (
     <Grid>
-      {components.map((component, index) => (
+      {orders.map((order, index) => (
         <Addable_Order_Requisition
-          key={component.id}
-          id={component.id}
-          onDelete={handleDelete}
+          key={order.id}
+          id={order.id}
+          onDelete={onDeleteOrder}
           place={index + 1}
-          disableDelete={components.length === 1} // Disable delete if only one item remains
+          disableDelete={orders.length === 1} // Disable delete if only one item remains
+          order={order}
+          onFieldChange={onFieldChange}
         />
       ))}
-      <IconButton onClick={handleAdd} color="success">
+      <IconButton onClick={onAddOrder} color="success">
         <AddIcon />
       </IconButton>
     </Grid>
@@ -771,30 +893,60 @@ function Orders_Requisitions () {
 // Add Medications / Rx  
 
 
-function Addable_Medication_Rx ({
+type Addable_Medication_RxProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  medication: {
+    order: string;
+    qty: string;
+    refills: string;
+    sig: string;
+    rx: string;
+  };
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+function Addable_Medication_Rx({
   id,
   onDelete,
   disableDelete,
   place,
-}:AddableComponentProps) 
-{
-
-  const [order, setOrder] = useState<string>('');
-
+  medication,
+  onFieldChange,
+}: Addable_Medication_RxProps) {
   const handleChange = (event: SelectChangeEvent) => {
-    setOrder(event.target.value);
-  }
+    onFieldChange(id, 'order', event.target.value);
+  };
 
+  const handleQtyChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'qty', event.target.value);
+  };
+
+  const handleRefillsChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'refills', event.target.value);
+  };
+
+  const handleSigChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'sig', event.target.value);
+  };
+
+  const handleRxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'rx', event.target.value);
+  };
 
   return (
     <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold'}}>{place}</div>
+      <div style={{ fontWeight: 'bold' }}>{place}</div>
       <Grid container spacing={1} alignItems={'end'}>
         <Grid item xs={9}>
           <FormControl fullWidth variant="standard">
             <Input
               id={`medication-rx-${id}`}
               multiline
+              value={medication.rx}
+              onChange={handleRxChange}
               startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
             />
           </FormControl>
@@ -804,12 +956,12 @@ function Addable_Medication_Rx ({
             <Select
               labelId={`medication-rx-unit-select-${id}`}
               id={`medication-rx-unit-select-${id}`}
-              value={order}
+              value={medication.order}
               onChange={handleChange}
               label="unit"
             >
-              <MenuItem value={10}>GEQ</MenuItem>
-              <MenuItem value={20}>DAW</MenuItem>
+              <MenuItem value="GEQ">GEQ</MenuItem>
+              <MenuItem value="DAW">DAW</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -827,47 +979,50 @@ function Addable_Medication_Rx ({
             <Input
               id={`medication-sig-${id}`}
               multiline
+              value={medication.sig}
+              onChange={handleSigChange}
               startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
             />
           </FormControl>
         </Grid>
         <Grid item xs={2}>
-          <SelectQty/>
+          <SelectQty qty={medication.qty} onChange={handleQtyChange} />
         </Grid>
         <Grid item xs={2}>
-          <SelectRefills/>
+          <SelectRefills refills={medication.refills} onChange={handleRefillsChange} />
         </Grid>
       </Grid>
     </Paper>
   );
+}
+
+type Medications_RxProps = {
+  medications: { id: number; order: string; qty: string; refills: string; sig: string; rx: string }[];
+  onAddMedication: () => void;
+  onDeleteMedication: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string | number) => void;
 };
 
-function Medications_Rx () {
-  const [components, setComponents] = useState<{ id: number }[]>([{ id: 1 }]);
-
-  const handleAdd = () => {
-    const nextId = components.length ? Math.max(...components.map(c => c.id)) + 1 : 1;
-    setComponents([...components, { id: nextId }]);
-  };
-
-  const handleDelete = (id: number) => {
-    if (components.length > 1) {
-      setComponents(components.filter((component) => component.id !== id));
-    }
-  };
-
+const Medications_Rx: React.FC<Medications_RxProps> = ({
+  medications,
+  onAddMedication,
+  onDeleteMedication,
+  onFieldChange,
+}) => {
   return (
     <Grid>
-      {components.map((component, index) => (
+      {medications.map((medication, index) => (
         <Addable_Medication_Rx
-          key={component.id}
-          id={component.id}
-          onDelete={handleDelete}
+          key={medication.id}
+          id={medication.id}
+          onDelete={onDeleteMedication}
           place={index + 1}
-          disableDelete={components.length === 1} // Disable delete if only one item remains
+          disableDelete={medications.length === 1} // Disable delete if only one item remains
+          medication={medication}
+          onFieldChange={onFieldChange}
         />
       ))}
-      <IconButton onClick={handleAdd} color="success">
+      <IconButton onClick={onAddMedication} color="success">
         <AddIcon />
       </IconButton>
     </Grid>
@@ -875,18 +1030,17 @@ function Medications_Rx () {
 };
 
 
-function SelectQty() {
+type SelectQtyProps = {
+  qty: string;
+  onChange: (event: SelectChangeEvent) => void;
+};
 
+function SelectQty({ qty, onChange }: SelectQtyProps) {
   const options = [
-    ...Array.from({ length: 120 }, (_, i) => i + 1), // Numbers 1 to 120
-    125, 130, 135, 140, 145, 150, 160, 180, 220, 270, 360, 450, 540, 
-    "1MO", "2MO", "3MO", // Monthly options
+    ...Array.from({ length: 120 }, (_, i) => i + 1),
+    125, 130, 135, 140, 145, 150, 160, 180, 220, 270, 360, 450, 540,
+    "1MO", "2MO", "3MO",
   ];
-  const [qty, setQty] = useState<Number|String>('');
-
-  const handleChange = (event: SelectChangeEvent<typeof qty>) => {
-    setQty(event.target.value as Number|String);
-  };
 
   return (
     <div>
@@ -896,30 +1050,27 @@ function SelectQty() {
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
           value={qty}
-          onChange={handleChange}
-          label="Status"
+          onChange={onChange}
+          label="Qty"
         >
           {options.map((option, index) => (
-          <MenuItem key={index} value={option}>
-            {option}
-          </MenuItem>
-        ))}
+            <MenuItem key={index} value={option}>
+              {option}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
-      
     </div>
   );
 }
 
-function SelectRefills() {
+type SelectRefillsProps = {
+  refills: string;
+  onChange: (event: SelectChangeEvent) => void;
+};
 
-  const options = [
-    ...Array.from({ length: 12 }, (_, i) => i + 1)];
-  const [refills, setRefills] = useState<Number|String>('');
-
-  const handleChange = (event: SelectChangeEvent<typeof refills>) => {
-    setRefills(event.target.value as Number);
-  };
+function SelectRefills({ refills, onChange }: SelectRefillsProps) {
+  const options = [...Array.from({ length: 12 }, (_, i) => i + 1)];
 
   return (
     <div>
@@ -929,99 +1080,76 @@ function SelectRefills() {
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
           value={refills}
-          onChange={handleChange}
-          label="Status"
+          onChange={onChange}
+          label="Refills"
         >
           {options.map((option, index) => (
-          <MenuItem key={index} value={option}>
-            {option}
-          </MenuItem>
-        ))}
+            <MenuItem key={index} value={option}>
+              {option}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
-      
     </div>
   );
 }
 
+
 // Select E/M Code:
 
-function Select_Code () {
-
-  const [code, setCode] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-      setCode(event.target.value);
-    };
+function Select_Code({ emcode, onChange }: { emcode: string; onChange: (value: string) => void }) {
   return (
-    <>
-      <FormControl fullWidth variant="standard">
-        <InputLabel id="demo-simple-select-standard-label">E/M Code:</InputLabel>
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={code}
-          onChange={handleChange}
-          label="Code"
-        >
-          <MenuItem value={10}>90791 - Psychiatric diagnostic eval, no medical services</MenuItem>
-          <MenuItem value={20}>90792 - Psychiatric diagnostic eval, w/medical services</MenuItem>
-          <MenuItem value={30}>90832 - Psychotherapy, 30 min(actual time 16-37min)</MenuItem>
-          <MenuItem value={40}>90834 - Psychotherapy, 45 min(actual time 38-52min)</MenuItem>
-        </Select>
-      </FormControl>
-    </>
+    <FormControl fullWidth variant="standard">
+      <InputLabel id="demo-simple-select-standard-label">E/M Code:</InputLabel>
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={emcode}
+        onChange={(e) => onChange(e.target.value)}
+        label="Code"
+      >
+        <MenuItem value={10}>90791 - Psychiatric diagnostic eval, no medical services</MenuItem>
+        <MenuItem value={20}>90792 - Psychiatric diagnostic eval, w/medical services</MenuItem>
+        <MenuItem value={30}>90832 - Psychotherapy, 30 min(actual time 16-37min)</MenuItem>
+        <MenuItem value={40}>90834 - Psychotherapy, 45 min(actual time 38-52min)</MenuItem>
+      </Select>
+    </FormControl>
   );
-
 }
 
 // Select Code Basis
 
-function Select_Code_Basis () {
-
-  const [code, setCode] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-      setCode(event.target.value);
-    };
+function Select_Code_Basis({ codeBasis, onChange }: { codeBasis: string; onChange: (value: string) => void }) {
   return (
-    <>
-      <FormControl fullWidth variant="standard">
-        <InputLabel id="demo-simple-select-standard-label">Code Basis:</InputLabel>
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={code}
-          onChange={handleChange}
-          label="Code Basis"
-        >
-          <MenuItem value={10}>Service</MenuItem>
-          <MenuItem value={20}>Time</MenuItem>
-        </Select>
-      </FormControl>
-    </>
+    <FormControl fullWidth variant="standard">
+      <InputLabel id="demo-simple-select-standard-label">Code Basis:</InputLabel>
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={codeBasis}
+        onChange={(e) => onChange(e.target.value)}
+        label="Code Basis"
+      >
+        <MenuItem value={10}>Service</MenuItem>
+        <MenuItem value={20}>Time</MenuItem>
+      </Select>
+    </FormControl>
   );
-
-
 }
 
 // Select Period
 
-function Select_Period () {
-
-  const [period, setPeriod] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-      setPeriod(event.target.value);
-    };
+function Select_Period({ period, onChange }: { period: string; onChange: (value: string) => void }) {
   return (
-    <>
-      <FormControl fullWidth variant="standard">
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={period}
-          onChange={handleChange}
-          label="Follow-up Visit"
-        >
-          <MenuItem value={10}>PRN</MenuItem>
+    <FormControl fullWidth variant="standard">
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={period}
+        onChange={(e) => onChange(e.target.value)}
+        label="Follow-up Visit"
+      >
+        <MenuItem value={10}>PRN</MenuItem>
           <MenuItem value={20}>48 to 72 hours</MenuItem>
           <MenuItem value={30}>Tomorrow</MenuItem>
           <MenuItem value={40}>in 2 days</MenuItem>
@@ -1051,32 +1179,24 @@ function Select_Period () {
           <MenuItem value={280}>call if not better</MenuItem>
           <MenuItem value={290}>no further followup needed</MenuItem>
           <MenuItem value={300}>as scheduled earlier</MenuItem>
-        </Select>
-      </FormControl>
-    </>
+        {/* Add other MenuItems */}
+      </Select>
+    </FormControl>
   );
-
-
 }
 
 // Select Time
-function Select_Time () {
-
-  const [time, setTime] = useState<string>('');
-  const handleChange = (event: SelectChangeEvent) => {
-      setTime(event.target.value);
-    };
+function Select_Time({ time, onChange }: { time: string; onChange: (value: string) => void }) {
   return (
-    <>
-      <FormControl fullWidth variant="standard">
-        <Select
-          labelId="demo-simple-select-standard-label"
-          id="demo-simple-select-standard"
-          value={time}
-          onChange={handleChange}
-          label="Join Work-School"
-        >
-          <MenuItem value={10}>after 2 days</MenuItem>
+    <FormControl fullWidth variant="standard">
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={time}
+        onChange={(e) => onChange(e.target.value)}
+        label="Join Work-School"
+      >
+         <MenuItem value={10}>after 2 days</MenuItem>
           <MenuItem value={20}>after 3 days</MenuItem>
           <MenuItem value={30}>after 4 days</MenuItem>
           <MenuItem value={40}>after 5 days</MenuItem>
@@ -1088,12 +1208,10 @@ function Select_Time () {
           <MenuItem value={100}>after 1 month</MenuItem>
           <MenuItem value={110}>after 2 months</MenuItem>
           <MenuItem value={120}>after 3 months</MenuItem>
-        </Select>
-      </FormControl>
-    </>
+        {/* Add other MenuItems */}
+      </Select>
+    </FormControl>
   );
-
-
 }
 
 // Review of Systems
@@ -1195,9 +1313,39 @@ const PatientEncounterInfo:React.FC = () => {
     checkReview:{checkGeneral:false, checkEyes:false, checkENMT:false, checkCardiovascular:false, checkRespiratory:false, checkGastrointestinal:false, checkGenitourinaryMale:false, checkGenitourinaryFemale:false, checkMusculoskeletal:false, checkSkin:false, checkNeurologic:false, checkPsychiatric:false, checkEndocrine:false, checkHematologicLymphatic:false, checkAllergicImmunologic:false,},
   });
   const [chief, setChief] = useState<string>("");
-
-
-
+  const [historyOfIllness, setHistoryOfIllness] = useState<HistoryOfIllness>({Location:"", Quality:"", Severity:"", Duration:"", OnsetTiming:"", Context:"", ModifyingFactors:"", SignsSymptoms:"",})
+  const [vitalSigns, setVitalSigns] = useState<VitalSigns>({systolic:"", diastolic:"", temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"",})
+  const [physicalExamination, setPhysicalExamination] = useState<PhysicalExamination>({constitutional_1:{ frontCheck: false, backCheck: false, textfield: "" },
+    eyes_1:{ frontCheck: false, backCheck: false, textfield: "" }, eyes_2:{ frontCheck: false, backCheck: false, textfield: "" }, eyes_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    enmt_1:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_2:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_3:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_4:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_5:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_6:{ frontCheck: false, backCheck: false, textfield: "" },
+    neck_1:{ frontCheck: false, backCheck: false, textfield: "" }, neck_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    respiratory_1:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_2:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_3:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_4:{ frontCheck: false, backCheck: false, textfield: "" },
+    cardiovascular_1:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_2:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_3:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_4:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_5:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_6:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_7:{ frontCheck: false, backCheck: false, textfield: "" },
+    breasts_1:{ frontCheck: false, backCheck: false, textfield: "" }, breasts_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    gastrointestinal_1:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_2:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_3:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_4:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_5:{ frontCheck: false, backCheck: false, textfield: "" },
+    genitourinaryFemale_1:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_2:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_3:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_4:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_5:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_6:{ frontCheck: false, backCheck: false, textfield: "" },
+    genitourinaryMale_1:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryMale_2:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryMale_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    lymphatic_1:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_2:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_3:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_4:{ frontCheck: false, backCheck: false, textfield: "" },
+    musculoskeletal_1:{ frontCheck: false, backCheck: false, textfield: "" }, musculoskeletal_2:{ frontCheck: false, backCheck: false, textfield: "" }, musculoskeletal_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    skin_1:{ frontCheck: false, backCheck: false, textfield: "" }, skin_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    neurologic_1:{ frontCheck: false, backCheck: false, textfield: "" }, neurologic_2:{ frontCheck: false, backCheck: false, textfield: "" }, neurologic_3:{ frontCheck: false, backCheck: false, textfield: "" }, 
+    psychiatric_1:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_2:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_3:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_4:{ frontCheck: false, backCheck: false, textfield: "" },});
+    const [open, setOpen] = useState<Record<string, boolean>>({});  
+    const [presentIllness, setPresentIllness] = useState<string>("");
+    
+    const [medications, setMedications] = useState<{ id: number; order: string; qty: string; refills:string; sig: string; rx: string }[]>([
+      { id: 1, order: '', qty: '', refills: '', sig: '', rx: '' },
+    ]);
+    const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
+      { id: 1, order: '', requisition: '' },
+    ]);
+    const [procedures, setProcedures] = useState<{ id: number; code: string; description: string; note: string }[]>([
+      { id: 1, code: '', description: '', note: '' },
+    ]);
+    const [meeting, setMeeting] = useState<Meeting>({emcode:"", emcodeEdit:"", codeBasis:"", codeBasisEdit:"", calculation:"", period:"", time:"",})
+    const cleanString = (str:string) => {
+      return str.replace(/\\{1,}/g, '').replace(/^"|"$/g, '');  // Removes all escape characters
+    };
   useEffect(() => {
     const fetchPatient = async () => {
       try {
@@ -1221,12 +1369,89 @@ const PatientEncounterInfo:React.FC = () => {
 
     fetchPatient();
   }, [id]);
-  const handleSubmit = () => {
-    console.log(reviewOfSystems, chief, head);
-    //resetForm();
-  };
 
+  useEffect(()=>{
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/encounter/${id}`);
+        const data = response.data;
 
+        setHead(JSON.parse(data.head || '{}'));
+        setReviewOfSystems(JSON.parse(data.reviewOfSystems || '{}'));
+        setChief(cleanString(data.chief || ''));
+        setHistoryOfIllness(JSON.parse(data.historyOfIllness || '{}'));
+        setVitalSigns(JSON.parse(data.vitalSigns || '{}'));
+        setPhysicalExamination(JSON.parse(data.physicalExamination || '{}'));
+        setMeeting(JSON.parse(data.meeting || '{}'));
+        setOpen(JSON.parse(data.open || '{}'));
+        setPresentIllness(JSON.parse(data.presentIllness || ""));
+        if (data.medications && data.medications.length > 0) {
+          // Update medications state with the fetched data
+          setMedications(data.medications.map((med:any) => ({
+            id: med.id, order: med.order_type, qty: med.qty, refills: med.refills, sig: med.sig, rx: med.rx
+          })));
+        }
+
+        // Set orders data if available
+      if (data.orders && data.orders.length > 0) {
+        setOrders(data.orders.map((order:any) => ({
+          id: order.id, order: order.order_type, requisition: order.requisition
+        })));
+      }
+
+      // Set procedures data if available
+      if (data.procedures && data.procedures.length > 0) {
+        setProcedures(data.procedures.map((procedure:any) => ({
+          id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
+        })));
+      }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    fetchData();
+  },[id]);
+
+const handleSubmit = async () => {
+  try {
+    // Adding a delay of 2 seconds (2000ms) before sending the request
+    await new Promise(resolve => setTimeout(resolve, 2000)); 
+
+    const response = await axios.post(
+      'http://localhost:5000/api/encounter', 
+      {
+        id,
+        head,
+        reviewOfSystems,
+        chief,
+        historyOfIllness,
+        vitalSigns,
+        physicalExamination,
+        meeting,
+        open,
+        presentIllness,
+        medications,
+        orders,
+        procedures,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json', // Set the correct content-type
+        },
+      }
+    );
+    
+    alert(response.data.message);
+    console.log("physicalExamination state:", physicalExamination);
+  } catch (error) {
+    console.error('Error saving data:', error); // Log the error for debugging
+    alert('Error saving data');
+  }
+};
+
+const handlePresentIllnessChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  setPresentIllness(e.target.value as string);
+}
   
 // 
 const handleHeadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
@@ -1241,6 +1466,15 @@ const handleHeadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaEl
 
 const handleChiefChange = (newValue: string) => {
   setChief(newValue);
+};
+
+// History of present illness
+
+const handleHistoryOfIllnessChange = (field: keyof HistoryOfIllness, values: string[]) => {
+  setHistoryOfIllness((prev) => ({
+    ...prev,
+    [field]: values.join(", "), // Convert array to a comma-separated string
+  }));
 };
 
 
@@ -1271,27 +1505,6 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
 };
 
 
-
-  
-
-
-
-  
-  interface VitalSigns {
-    systolic: string,
-    diastolic: string,
-    temperature: string,
-    weight: string,
-    height: string,
-    respiration: string,
-    pulse: string,
-    waist: string,
-    spO2: string,
-
-  }
-
-
-  const [vitalSigns, setVitalSigns] = useState<VitalSigns>({systolic:'', diastolic:'', temperature:'', weight:'', height:'', respiration:'', pulse:'',waist:'', spO2:''});
 
   const handleVitalSigns = (e: React.ChangeEvent<HTMLInputElement |  HTMLTextAreaElement> | SelectChangeEvent) => {
     const { name, value } = e.target;
@@ -1374,7 +1587,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   // nest list handle
 
 
-  const [open, setOpen] = useState<Record<string, boolean>>({});
+  
 
   const handleListClick = (section:string) => {
     setOpen((prevState) => ({
@@ -1382,6 +1595,102 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
       [section]: !prevState[section],
     }));
   }
+
+  const handleFrontCheckChange = (key: keyof PhysicalExamination, checked: boolean) => {
+    setPhysicalExamination((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], frontCheck: checked },
+    }));
+  };
+
+  const handleBackCheckChange = (key: keyof PhysicalExamination, checked: boolean) => {
+    setPhysicalExamination((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], backCheck: checked },
+    }));
+  };
+
+  const handleTextFieldChange = (key: keyof PhysicalExamination, value: string) => {
+    setPhysicalExamination((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], textfield: value },
+    }));
+  };
+
+  const handleAddMedication = () => {
+    const nextId = medications.length ? Math.max(...medications.map(m => m.id)) + 1 : 1;
+    setMedications([...medications, { id: nextId, order: '', qty: '', refills: '', sig: '', rx: '' }]);
+  };
+
+  const handleDeleteMedication = (id: number) => {
+    if (medications.length > 1) {
+      setMedications(medications.filter((med) => med.id !== id));
+    }
+  };
+
+  const handleChangeMedicationField = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
+    setMedications(medications.map((med) =>
+      med.id === id ? { ...med, [field]: value } : med
+    ));
+  };
+
+
+  const handleAddOrder = () => {
+    const nextId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+    setOrders([...orders, { id: nextId, order: '', requisition: '' }]);
+  };
+
+  const handleDeleteOrder = (id: number) => {
+    if (orders.length > 1) {
+      setOrders(orders.filter((order) => order.id !== id));
+    }
+  };
+
+  const handleChangeOrderField = (
+    id: number,
+    field: string,
+    value: string
+  ) => {
+    setOrders(orders.map((order) =>
+      order.id === id ? { ...order, [field]: value } : order
+    ));
+  };
+
+  const handleAddProcedure = () => {
+    const nextId = procedures.length ? Math.max(...procedures.map(p => p.id)) + 1 : 1;
+    setProcedures([...procedures, { id: nextId, code: '', description: '', note: '' }]);
+  };
+
+  const handleDeleteProcedure = (id: number) => {
+    if (procedures.length > 1) {
+      setProcedures(procedures.filter((procedure) => procedure.id !== id));
+    }
+  };
+
+  const handleChangeProcedureField = (
+    id: number,
+    field: string,
+    value: string
+  ) => {
+    setProcedures(procedures.map((procedure) =>
+      procedure.id === id ? { ...procedure, [field]: value } : procedure
+    ));
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setMeeting((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+
+
+
   return (
     <Box sx={{ display: "flex" }}>
       <Appbar_Patient appBarTitle="HISTORY" id={id}/>
@@ -1517,6 +1826,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                   fullWidth
                                   onChange={handleHeadChange}
                                   value={head.type}
+                                  name="type"
                                 />
                               </Grid>
                               <Grid item xs={12}>
@@ -1528,6 +1838,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                   fullWidth
                                   onChange={handleHeadChange}
                                   value={head.attendBy}
+                                  name="attendBy"
                                 /> 
                               </Grid>                            
                             </Grid>                       
@@ -1550,31 +1861,58 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                   }}
                                   multiline 
                                   rows={2}
+                                  value={presentIllness}
+                                  name="presentIllness"
+                                  onChange={handlePresentIllnessChange}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12} sx={{mt:3}}>
-                                <Select_History_Checkbox label="Location" names={location}/>
+                                <Select_History_Checkbox label="Location" names={location} 
+                                  selectedOptions={historyOfIllness.Location.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("Location", values)}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label='Quality' names={quality}/>
+                                <Select_History_Checkbox label='Quality' names={quality}
+                                  selectedOptions={historyOfIllness.Quality.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("Quality", values)}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label="Severity" names={severity}/>
+                                <Select_History_Checkbox label="Severity" names={severity}
+                                  selectedOptions={historyOfIllness.Severity.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("Severity", values)}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label="Duration" names={duration}/>
+                                <Select_History_Checkbox label="Duration" names={duration}
+                                  selectedOptions={historyOfIllness.Duration.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("Duration", values)}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label="Onset - Timing" names={onset}/>
+                                <Select_History_Checkbox label="Onset - Timing" names={onset}
+                                  selectedOptions={historyOfIllness.OnsetTiming.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("OnsetTiming", values)}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label="Context" names={context}/>
+                                <Select_History_Checkbox label="Context" names={context}
+                                  selectedOptions={historyOfIllness.Context.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("Context", values)}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label="Modifying Factors" names={modifying}/>
+                                <Select_History_Checkbox label="Modifying Factors" names={modifying}
+                                  selectedOptions={historyOfIllness.ModifyingFactors.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("ModifyingFactors", values)}
+                                />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label="Signs - Symptoms" names={signs}/>
+                                <Select_History_Checkbox label="Signs - Symptoms" names={signs}
+                                  selectedOptions={historyOfIllness.SignsSymptoms.split(", ")}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("SignsSymptoms", values)}
+                                />
                               </Grid>
                             </Grid>                            
                           </div>                         
@@ -1942,7 +2280,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               <TextField fullWidth sx={{ m: 1 }} id="standard-basic"  variant="standard" />
                             </Grid> 
                           </div>
-                          <div style={styles.container}>
+                          <div className="Reviewed History" style={styles.container}>
                             <Grid container spacing={2}>                            
                               <Grid item xs={12} sm={12}>
                                 <FormControlLabel control={<Checkbox  />} label="Reviewed Past, Family and Social History" />
@@ -1956,8 +2294,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                   <FormControlLabel control={<Checkbox  />} label="Discussed / Reviewed tests" />                              
                               </Grid>
                             </Grid>
-                          </div> 
-                                                                         
+                          </div>                                                   
                         </Grid>                          
                         <Grid item xs={6} sm={6}>
                           <div className="physical-examination" style={styles.container}>
@@ -1969,7 +2306,14 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.constitutional} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="General Appearance" names={general_1} />
+                                  <Select_Checkbox_Switch label="General Appearance" names={general_1} 
+                                    frontCheck={physicalExamination.constitutional_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("constitutional_1", checked)}
+                                    backCheck={physicalExamination.constitutional_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("constitutional_1", checked)}
+                                    textfield={physicalExamination.constitutional_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("constitutional_1", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -1980,9 +2324,30 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.eyes} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Conjunctivae-Lids" names={conjunctivae_2} subname={eyes_1}/>
-                                  <Select_Checkbox_Switch label="Pupil-Iris Exam" names={pupil_2} subname={eyes_2}/>
-                                  <Select_Checkbox_Switch label="Optic Disc Exam" names={optic_2} subname={eyes_3}/>
+                                  <Select_Checkbox_Switch label="Conjunctivae-Lids" names={conjunctivae_2}
+                                    frontCheck={physicalExamination.eyes_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("eyes_1", checked)}
+                                    backCheck={physicalExamination.eyes_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("eyes_1", checked)}
+                                    textfield={physicalExamination.eyes_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("eyes_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Pupil-Iris Exam" names={pupil_2}
+                                    frontCheck={physicalExamination.eyes_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("eyes_2", checked)}
+                                    backCheck={physicalExamination.eyes_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("eyes_2", checked)}
+                                    textfield={physicalExamination.eyes_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("eyes_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Optic Disc Exam" names={optic_2}
+                                    frontCheck={physicalExamination.eyes_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("eyes_3", checked)}
+                                    backCheck={physicalExamination.eyes_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("eyes_3", checked)}
+                                    textfield={physicalExamination.eyes_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("eyes_3", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -1993,12 +2358,54 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.enmt} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="External Ears-Nose" names={external_3} subname={enmt_1}/>
-                                  <Select_Checkbox_Switch label="Canals-TM Exam" names={canal_3} subname={enmt_2}/>
-                                  <Select_Checkbox_Switch label="Hearing Assessment" names={hearing_3} subname={enmt_3}/>
-                                  <Select_Checkbox_Switch label="Mucosa-Sept-Turb" names={mucosa_3} subname={enmt_4}/>
-                                  <Select_Checkbox_Switch label="Lips-Teeth-Gums" names={lips_3} subname={enmt_5}/>
-                                  <Select_Checkbox_Switch label="Oropharynx Exam" names={oroph_3} subname={enmt_6}/>
+                                  <Select_Checkbox_Switch label="External Ears-Nose" names={external_3}
+                                    frontCheck={physicalExamination.enmt_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("enmt_1", checked)}
+                                    backCheck={physicalExamination.enmt_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("enmt_1", checked)}
+                                    textfield={physicalExamination.enmt_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("enmt_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Canals-TM Exam" names={canal_3} 
+                                    frontCheck={physicalExamination.enmt_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("enmt_2", checked)}
+                                    backCheck={physicalExamination.enmt_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("enmt_2", checked)}
+                                    textfield={physicalExamination.enmt_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("enmt_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Hearing Assessment" names={hearing_3}
+                                    frontCheck={physicalExamination.enmt_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("enmt_3", checked)}
+                                    backCheck={physicalExamination.enmt_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("enmt_3", checked)}
+                                    textfield={physicalExamination.enmt_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("enmt_3", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Mucosa-Sept-Turb" names={mucosa_3} 
+                                    frontCheck={physicalExamination.enmt_4.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("enmt_4", checked)}
+                                    backCheck={physicalExamination.enmt_4.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("enmt_4", checked)}
+                                    textfield={physicalExamination.enmt_4.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("enmt_4", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Lips-Teeth-Gums" names={lips_3} 
+                                    frontCheck={physicalExamination.enmt_5.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("enmt_5", checked)}
+                                    backCheck={physicalExamination.enmt_5.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("enmt_5", checked)}
+                                    textfield={physicalExamination.enmt_5.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("enmt_5", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Oropharynx Exam" names={oroph_3} 
+                                    frontCheck={physicalExamination.enmt_6.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("enmt_6", checked)}
+                                    backCheck={physicalExamination.enmt_6.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("enmt_6", checked)}
+                                    textfield={physicalExamination.enmt_6.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("enmt_6", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2009,8 +2416,22 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.neck} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Neck Exam" names={neck_4} subname={neck_1}/>
-                                  <Select_Checkbox_Switch label="Thyroid Exam" names={thyroid_4} subname={neck_2}/>
+                                  <Select_Checkbox_Switch label="Neck Exam" names={neck_4}
+                                    frontCheck={physicalExamination.neck_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("neck_1", checked)}
+                                    backCheck={physicalExamination.neck_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("neck_1", checked)}
+                                    textfield={physicalExamination.neck_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("neck_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Thyroid Exam" names={thyroid_4}
+                                    frontCheck={physicalExamination.neck_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("neck_2", checked)}
+                                    backCheck={physicalExamination.neck_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("neck_2", checked)}
+                                    textfield={physicalExamination.neck_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("neck_2", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2021,10 +2442,38 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.respiratory} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Respiratory Effort" names={respiratory_5} subname={respiratory_1}/>
-                                  <Select_Checkbox_Switch label="Chest Percussion" names={chestper_5} subname={respiratory_2}/>
-                                  <Select_Checkbox_Switch label="Chest Palpation" names={chestpal_5} subname={respiratory_3}/>
-                                  <Select_Checkbox_Switch label="Lungs Auscultation" names={lungs_5} subname={respiratory_4}/>
+                                  <Select_Checkbox_Switch label="Respiratory Effort" names={respiratory_5} 
+                                    frontCheck={physicalExamination.respiratory_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("respiratory_1", checked)}
+                                    backCheck={physicalExamination.respiratory_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("respiratory_1", checked)}
+                                    textfield={physicalExamination.respiratory_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("respiratory_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Chest Percussion" names={chestper_5} 
+                                    frontCheck={physicalExamination.respiratory_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("respiratory_2", checked)}
+                                    backCheck={physicalExamination.respiratory_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("respiratory_2", checked)}
+                                    textfield={physicalExamination.respiratory_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("respiratory_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Chest Palpation" names={chestpal_5} 
+                                    frontCheck={physicalExamination.respiratory_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("respiratory_3", checked)}
+                                    backCheck={physicalExamination.respiratory_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("respiratory_3", checked)}
+                                    textfield={physicalExamination.respiratory_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("respiratory_3", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Lungs Auscultation" names={lungs_5}
+                                    frontCheck={physicalExamination.respiratory_4.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("respiratory_4", checked)}
+                                    backCheck={physicalExamination.respiratory_4.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("respiratory_4", checked)}
+                                    textfield={physicalExamination.respiratory_4.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("respiratory_4", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2035,13 +2484,62 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.cardiovascular} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Heart Palpation" names={heartpal_6} subname={cardiovascular_1}/>
-                                  <Select_Checkbox_Switch label="Heart Auscultation" names={heartaus_6} subname={cardiovascular_2}/>
-                                  <Select_Checkbox_Switch label="Carotid Arteries" names={carotid_6} subname={cardiovascular_3}/>
-                                  <Select_Checkbox_Switch label="Abdominal Aorta" names={abdominal_6} subname={cardiovascular_4}/>
-                                  <Select_Checkbox_Switch label="Femoral Arteries" names={femoral_6} subname={cardiovascular_5}/>
-                                  <Select_Checkbox_Switch label="Pedal Pulses" names={pedal_6} subname={cardiovascular_6}/>
-                                  <Select_Checkbox_Switch label="Extremities" names={extremities_6} subname={cardiovascular_7}/>
+                                  <Select_Checkbox_Switch label="Heart Palpation" names={heartpal_6} 
+                                    frontCheck={physicalExamination.cardiovascular_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("cardiovascular_1", checked)}
+                                    backCheck={physicalExamination.cardiovascular_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("cardiovascular_1", checked)}
+                                    textfield={physicalExamination.cardiovascular_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("cardiovascular_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Heart Auscultation" names={heartaus_6} 
+                                    frontCheck={physicalExamination.cardiovascular_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("cardiovascular_2", checked)}
+                                    backCheck={physicalExamination.cardiovascular_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("cardiovascular_2", checked)}
+                                    textfield={physicalExamination.cardiovascular_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("cardiovascular_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Carotid Arteries" names={carotid_6} 
+                                    frontCheck={physicalExamination.cardiovascular_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("cardiovascular_3", checked)}
+                                    backCheck={physicalExamination.cardiovascular_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("cardiovascular_3", checked)}
+                                    textfield={physicalExamination.cardiovascular_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("cardiovascular_3", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Abdominal Aorta" names={abdominal_6} 
+                                    frontCheck={physicalExamination.cardiovascular_4.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("cardiovascular_4", checked)}
+                                    backCheck={physicalExamination.cardiovascular_4.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("cardiovascular_4", checked)}
+                                    textfield={physicalExamination.cardiovascular_4.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("cardiovascular_4", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Femoral Arteries" names={femoral_6} 
+                                    frontCheck={physicalExamination.cardiovascular_5.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("cardiovascular_5", checked)}
+                                    backCheck={physicalExamination.cardiovascular_5.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("cardiovascular_5", checked)}
+                                    textfield={physicalExamination.cardiovascular_5.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("cardiovascular_5", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Pedal Pulses" names={pedal_6} 
+                                    frontCheck={physicalExamination.cardiovascular_6.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("cardiovascular_6", checked)}
+                                    backCheck={physicalExamination.cardiovascular_6.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("cardiovascular_6", checked)}
+                                    textfield={physicalExamination.cardiovascular_6.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("cardiovascular_6", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Extremities" names={extremities_6} 
+                                    frontCheck={physicalExamination.cardiovascular_7.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("cardiovascular_7", checked)}
+                                    backCheck={physicalExamination.cardiovascular_7.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("cardiovascular_7", checked)}
+                                    textfield={physicalExamination.cardiovascular_7.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("cardiovascular_7", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2052,8 +2550,22 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.breasts} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Breasts Inspection" names={breastsinspec_7} subname={breasts_1}/>
-                                  <Select_Checkbox_Switch label="Breasts Palpation" names={breastpal_7} subname={breasts_2}/>
+                                  <Select_Checkbox_Switch label="Breasts Inspection" names={breastsinspec_7} 
+                                    frontCheck={physicalExamination.breasts_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("breasts_1", checked)}
+                                    backCheck={physicalExamination.breasts_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("breasts_1", checked)}
+                                    textfield={physicalExamination.breasts_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("breasts_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Breasts Palpation" names={breastpal_7} 
+                                    frontCheck={physicalExamination.breasts_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("breasts_2", checked)}
+                                    backCheck={physicalExamination.breasts_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("breasts_2", checked)}
+                                    textfield={physicalExamination.breasts_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("breasts_2", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2064,11 +2576,46 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.gastrointestinal} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Abdomen Exam" names={abodomen_8} subname={gastrointestinal_1}/>
-                                  <Select_Checkbox_Switch label="Liver-Spleen" names={liver_8} subname={gastrointestinal_2}/>
-                                  <Select_Checkbox_Switch label="Hernia" names={hernia_8} subname={gastrointestinal_3}/>
-                                  <Select_Checkbox_Switch label="Anus-Perineum-Rectum" names={anus_8} subname={gastrointestinal_4}/>
-                                  <Select_Checkbox_Switch label="Stool Occult" names={stool_8} subname={gastrointestinal_5}/>
+                                  <Select_Checkbox_Switch label="Abdomen Exam" names={abodomen_8} 
+                                    frontCheck={physicalExamination.gastrointestinal_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("gastrointestinal_1", checked)}
+                                    backCheck={physicalExamination.gastrointestinal_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("gastrointestinal_1", checked)}
+                                    textfield={physicalExamination.gastrointestinal_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("gastrointestinal_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Liver-Spleen" names={liver_8}
+                                    frontCheck={physicalExamination.gastrointestinal_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("gastrointestinal_2", checked)}
+                                    backCheck={physicalExamination.gastrointestinal_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("gastrointestinal_2", checked)}
+                                    textfield={physicalExamination.gastrointestinal_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("gastrointestinal_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Hernia" names={hernia_8} 
+                                    frontCheck={physicalExamination.gastrointestinal_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("gastrointestinal_3", checked)}
+                                    backCheck={physicalExamination.gastrointestinal_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("gastrointestinal_3", checked)}
+                                    textfield={physicalExamination.gastrointestinal_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("gastrointestinal_3", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Anus-Perineum-Rectum" names={anus_8} 
+                                    frontCheck={physicalExamination.gastrointestinal_4.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("gastrointestinal_4", checked)}
+                                    backCheck={physicalExamination.gastrointestinal_4.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("gastrointestinal_4", checked)}
+                                    textfield={physicalExamination.gastrointestinal_4.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("gastrointestinal_4", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Stool Occult" names={stool_8} 
+                                    frontCheck={physicalExamination.gastrointestinal_5.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("gastrointestinal_5", checked)}
+                                    backCheck={physicalExamination.gastrointestinal_5.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("gastrointestinal_5", checked)}
+                                    textfield={physicalExamination.gastrointestinal_5.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("gastrointestinal_5", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2079,12 +2626,54 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.genitourinary_female} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Genitalia" names={genitalia_9} subname={genitourinary_female_1}/>
-                                  <Select_Checkbox_Switch label="Urethra" names={urethra_9} subname={genitourinary_female_2}/>
-                                  <Select_Checkbox_Switch label="Bladder" names={bladder_9} subname={genitourinary_female_3}/>
-                                  <Select_Checkbox_Switch label="Cervix" names={cervix_9} subname={genitourinary_female_4}/>
-                                  <Select_Checkbox_Switch label="Uterus" names={uterus_9} subname={genitourinary_female_5}/>
-                                  <Select_Checkbox_Switch label="Adnexa" names={adnexa_9} subname={genitourinary_female_6}/>
+                                  <Select_Checkbox_Switch label="Genitalia" names={genitalia_9} 
+                                    frontCheck={physicalExamination.genitourinaryFemale_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryFemale_1", checked)}
+                                    backCheck={physicalExamination.genitourinaryFemale_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryFemale_1", checked)}
+                                    textfield={physicalExamination.genitourinaryFemale_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryFemale_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Urethra" names={urethra_9} 
+                                    frontCheck={physicalExamination.genitourinaryFemale_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryFemale_2", checked)}
+                                    backCheck={physicalExamination.genitourinaryFemale_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryFemale_2", checked)}
+                                    textfield={physicalExamination.genitourinaryFemale_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryFemale_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Bladder" names={bladder_9} 
+                                    frontCheck={physicalExamination.genitourinaryFemale_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryFemale_3", checked)}
+                                    backCheck={physicalExamination.genitourinaryFemale_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryFemale_3", checked)}
+                                    textfield={physicalExamination.genitourinaryFemale_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryFemale_3", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Cervix" names={cervix_9} 
+                                    frontCheck={physicalExamination.genitourinaryFemale_4.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryFemale_4", checked)}
+                                    backCheck={physicalExamination.genitourinaryFemale_4.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryFemale_4", checked)}
+                                    textfield={physicalExamination.genitourinaryFemale_4.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryFemale_4", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Uterus" names={uterus_9} 
+                                    frontCheck={physicalExamination.genitourinaryFemale_5.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryFemale_5", checked)}
+                                    backCheck={physicalExamination.genitourinaryFemale_5.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryFemale_5", checked)}
+                                    textfield={physicalExamination.genitourinaryFemale_5.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryFemale_5", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Adnexa" names={adnexa_9} 
+                                    frontCheck={physicalExamination.genitourinaryFemale_6.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryFemale_6", checked)}
+                                    backCheck={physicalExamination.genitourinaryFemale_6.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryFemale_6", checked)}
+                                    textfield={physicalExamination.genitourinaryFemale_6.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryFemale_6", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2095,9 +2684,30 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.genitourinary_male} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Scrotum" names={scrotum_10} subname={genitourinary_male_1}/>
-                                  <Select_Checkbox_Switch label="Penis" names={penis_10} subname={genitourinary_male_2}/>
-                                  <Select_Checkbox_Switch label="Prostate" names={prostate_10} subname={genitourinary_male_3}/>
+                                  <Select_Checkbox_Switch label="Scrotum" names={scrotum_10} 
+                                    frontCheck={physicalExamination.genitourinaryMale_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryMale_1", checked)}
+                                    backCheck={physicalExamination.genitourinaryMale_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryMale_1", checked)}
+                                    textfield={physicalExamination.genitourinaryMale_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryMale_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Penis" names={penis_10} 
+                                    frontCheck={physicalExamination.genitourinaryMale_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryMale_2", checked)}
+                                    backCheck={physicalExamination.genitourinaryMale_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryMale_2", checked)}
+                                    textfield={physicalExamination.genitourinaryMale_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryMale_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Prostate" names={prostate_10} 
+                                    frontCheck={physicalExamination.genitourinaryMale_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("genitourinaryMale_3", checked)}
+                                    backCheck={physicalExamination.genitourinaryMale_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("genitourinaryMale_3", checked)}
+                                    textfield={physicalExamination.genitourinaryMale_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("genitourinaryMale_3", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2108,10 +2718,38 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.lymphatic} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Neck Nodes" names={necknode_11} subname={lymphatic_1}/>
-                                  <Select_Checkbox_Switch label="Axillae Nodes" names={axillae_11} subname={lymphatic_2}/>
-                                  <Select_Checkbox_Switch label="Groin Nodes" names={groin_11} subname={lymphatic_3}/>
-                                  <Select_Checkbox_Switch label="Generalized" names={generalized_11} subname={lymphatic_4}/>
+                                  <Select_Checkbox_Switch label="Neck Nodes" names={necknode_11} 
+                                    frontCheck={physicalExamination.lymphatic_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("lymphatic_1", checked)}
+                                    backCheck={physicalExamination.lymphatic_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("lymphatic_1", checked)}
+                                    textfield={physicalExamination.lymphatic_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("lymphatic_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Axillae Nodes" names={axillae_11} 
+                                    frontCheck={physicalExamination.lymphatic_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("lymphatic_2", checked)}
+                                    backCheck={physicalExamination.lymphatic_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("lymphatic_2", checked)}
+                                    textfield={physicalExamination.lymphatic_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("lymphatic_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Groin Nodes" names={groin_11}
+                                    frontCheck={physicalExamination.lymphatic_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("lymphatic_3", checked)}
+                                    backCheck={physicalExamination.lymphatic_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("lymphatic_3", checked)}
+                                    textfield={physicalExamination.lymphatic_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("lymphatic_3", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Generalized" names={generalized_11} 
+                                    frontCheck={physicalExamination.lymphatic_4.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("lymphatic_4", checked)}
+                                    backCheck={physicalExamination.lymphatic_4.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("lymphatic_4", checked)}
+                                    textfield={physicalExamination.lymphatic_4.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("lymphatic_4", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2122,9 +2760,30 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.musculoskeletal} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Gait-Station" names={gait_12} subname={musculoskeletal_1}/>
-                                  <Select_Checkbox_Switch label="Digits-Nails" names={digits_12} subname={musculoskeletal_2}/>
-                                  <Select_Checkbox_Switch label="Joints-Bones-Muscles" names={joints_12} subname={musculoskeletal_3}/>
+                                  <Select_Checkbox_Switch label="Gait-Station" names={gait_12} 
+                                    frontCheck={physicalExamination.musculoskeletal_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("musculoskeletal_1", checked)}
+                                    backCheck={physicalExamination.musculoskeletal_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("musculoskeletal_1", checked)}
+                                    textfield={physicalExamination.musculoskeletal_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("musculoskeletal_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Digits-Nails" names={digits_12} 
+                                    frontCheck={physicalExamination.musculoskeletal_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("musculoskeletal_2", checked)}
+                                    backCheck={physicalExamination.musculoskeletal_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("musculoskeletal_2", checked)}
+                                    textfield={physicalExamination.musculoskeletal_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("musculoskeletal_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Joints-Bones-Muscles" names={joints_12} 
+                                    frontCheck={physicalExamination.musculoskeletal_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("musculoskeletal_3", checked)}
+                                    backCheck={physicalExamination.musculoskeletal_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("musculoskeletal_3", checked)}
+                                    textfield={physicalExamination.musculoskeletal_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("musculoskeletal_3", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2135,8 +2794,22 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.skin} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Skin Inspection" names={skininspection_13} subname={skin_1}/>
-                                  <Select_Checkbox_Switch label="Skin Palpation" names={skinpal_13} subname={skin_2}/>
+                                  <Select_Checkbox_Switch label="Skin Inspection" names={skininspection_13} 
+                                    frontCheck={physicalExamination.skin_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("skin_1", checked)}
+                                    backCheck={physicalExamination.skin_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("skin_1", checked)}
+                                    textfield={physicalExamination.skin_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("skin_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Skin Palpation" names={skinpal_13} 
+                                    frontCheck={physicalExamination.skin_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("skin_2", checked)}
+                                    backCheck={physicalExamination.skin_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("skin_2", checked)}
+                                    textfield={physicalExamination.skin_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("skin_2", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2147,9 +2820,30 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.neurologic} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Cranial Nerves" names={cranial_14} subname={neurologic_1}/>
-                                  <Select_Checkbox_Switch label="DTR Exam" names={dtr_14} subname={neurologic_2}/>
-                                  <Select_Checkbox_Switch label="Sensory Exam" names={sensory_14} subname={neurologic_3}/>
+                                  <Select_Checkbox_Switch label="Cranial Nerves" names={cranial_14}
+                                    frontCheck={physicalExamination.neurologic_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("neurologic_1", checked)}
+                                    backCheck={physicalExamination.neurologic_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("neurologic_1", checked)}
+                                    textfield={physicalExamination.neurologic_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("neurologic_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="DTR Exam" names={dtr_14} 
+                                    frontCheck={physicalExamination.neurologic_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("neurologic_2", checked)}
+                                    backCheck={physicalExamination.neurologic_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("neurologic_2", checked)}
+                                    textfield={physicalExamination.neurologic_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("neurologic_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Sensory Exam" names={sensory_14} 
+                                    frontCheck={physicalExamination.neurologic_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("neurologic_3", checked)}
+                                    backCheck={physicalExamination.neurologic_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("neurologic_3", checked)}
+                                    textfield={physicalExamination.neurologic_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("neurologic_3", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2160,10 +2854,38 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </ListItemButton>
                               <Collapse in={open.psychiatric} timeout="auto" unmountOnExit>
                                 <Grid sx={{pl:4}}>
-                                  <Select_Checkbox_Switch label="Judgment-Insight" names={judgment_15} subname={psychiatric_1}/>
-                                  <Select_Checkbox_Switch label="Orientation TPP" names={orientation_15} subname={psychiatric_2}/>
-                                  <Select_Checkbox_Switch label="Recent Remote Memory" names={recent_15} subname={psychiatric_3}/>
-                                  <Select_Checkbox_Switch label="Mood-Affect" names={mood_15} subname={psychiatric_4}/>
+                                  <Select_Checkbox_Switch label="Judgment-Insight" names={judgment_15} 
+                                    frontCheck={physicalExamination.psychiatric_1.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("psychiatric_1", checked)}
+                                    backCheck={physicalExamination.psychiatric_1.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("psychiatric_1", checked)}
+                                    textfield={physicalExamination.psychiatric_1.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("psychiatric_1", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Orientation TPP" names={orientation_15} 
+                                    frontCheck={physicalExamination.psychiatric_2.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("psychiatric_2", checked)}
+                                    backCheck={physicalExamination.psychiatric_2.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("psychiatric_2", checked)}
+                                    textfield={physicalExamination.psychiatric_2.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("psychiatric_2", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Recent Remote Memory" names={recent_15} 
+                                    frontCheck={physicalExamination.psychiatric_3.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("psychiatric_3", checked)}
+                                    backCheck={physicalExamination.psychiatric_3.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("psychiatric_3", checked)}
+                                    textfield={physicalExamination.psychiatric_3.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("psychiatric_3", value)}
+                                  />
+                                  <Select_Checkbox_Switch label="Mood-Affect" names={mood_15} 
+                                    frontCheck={physicalExamination.psychiatric_4.frontCheck}
+                                    onFrontCheckChange={(checked) => handleFrontCheckChange("psychiatric_4", checked)}
+                                    backCheck={physicalExamination.psychiatric_4.backCheck}
+                                    onBackCheckChange={(checked) => handleBackCheckChange("psychiatric_4", checked)}
+                                    textfield={physicalExamination.psychiatric_4.textfield}
+                                    onTextFieldChange={(value) => handleTextFieldChange("psychiatric_4", value)}
+                                  />
                                 </Grid>
                               </Collapse>
                             </Grid>
@@ -2174,78 +2896,101 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                           </div> 
                           <div className="order-requistion" style={styles.container}>
                             <h2>Order / Requistion</h2>
-                            <Orders_Requisitions />                                          
+                            <Orders_Requisitions
+                              orders={orders}
+                              onAddOrder={handleAddOrder}
+                              onDeleteOrder={handleDeleteOrder}
+                              onFieldChange={handleChangeOrderField}
+                            />                                         
                           </div>  
                           <div className="medications-rx" style={styles.container}>
                             <h2>Medications / Rx</h2>
-                            <Medications_Rx />                                          
+                            <Medications_Rx
+                              medications={medications}
+                              onAddMedication={handleAddMedication}
+                              onDeleteMedication={handleDeleteMedication}
+                              onFieldChange={handleChangeMedicationField}
+                            />                                          
                           </div> 
-                          <div style={styles.container}>
-                            <Grid container spacing={1} >
+                          <div className="meeting" style={styles.container}>
+                          <Grid container spacing={1}>
                               <Grid container item xs={4} alignItems={'end'}>
                                 <Grid item xs={9}>
-                                  <Select_Code/>
+                                  <Select_Code emcode={meeting.emcode} onChange={(value) => handleInputChange('emcode', value)} />
                                 </Grid>
                                 <Grid item xs={3}>
                                   <TextField
-                                    id="outlined-multiline-static"
+                                    value={meeting.emcodeEdit}
+                                    onChange={(e) => handleInputChange('emcodeEdit', e.target.value)}
                                     variant="standard"
                                     fullWidth
                                   />
                                 </Grid>
                               </Grid>
+
                               <Grid item xs={4} container alignItems={"end"}>
                                 <Grid item xs={9}>
-                                  <Select_Code_Basis/>
+                                  <Select_Code_Basis
+                                    codeBasis={meeting.codeBasis}
+                                    onChange={(value) => handleInputChange('codeBasis', value)}
+                                  />
                                 </Grid>
                                 <Grid item xs={3}>
                                   <TextField
-                                    id="outlined-multiline-static"
+                                    value={meeting.codeBasisEdit}
+                                    onChange={(e) => handleInputChange('codeBasisEdit', e.target.value)}
                                     variant="standard"
                                     fullWidth
                                   />
                                 </Grid>
                               </Grid>
+
                               <Grid item xs={4} container alignItems={"end"}>
                                 <Grid item xs={9}>
                                   <TextField
-                                    id="outlined-multiline-static"
+                                    value={meeting.calculation}
+                                    onChange={(e) => handleInputChange('calculation', e.target.value)}
                                     variant="standard"
                                     fullWidth
                                   />
                                 </Grid>
                                 <Grid item xs={3}>
                                   <IconButton color="success">
-                                    <CalculateIcon/>
+                                    <CalculateIcon />
                                   </IconButton>
                                 </Grid>
                               </Grid>
+
                               <Grid item container xs={4} alignItems={'center'}>
-                                <Grid item xs={3}>
-                                  <IconButton color="success" component={Link} to="/calender" >
-                                    <ScheduleIcon/>
-                                  </IconButton>
-                                </Grid>
-                                <Grid item xs={9}>
+                                <Grid item xs={12} component={Link} to="/calender">
                                   <label>Follow-up Visit:</label>
                                 </Grid>
                               </Grid>
                               <Grid item xs={8}>
-                                <Select_Period/>
+                                <Select_Period
+                                  period={meeting.period}
+                                  onChange={(value) => handleInputChange('period', value)}
+                                />
                               </Grid>
                               <Grid item xs={4}>
                                 <label>Join Work-School:</label>
                               </Grid>
                               <Grid item xs={8}>
-                                <Select_Time/>
+                                <Select_Time
+                                  time={meeting.time}
+                                  onChange={(value) => handleInputChange('time', value)}
+                                />
                               </Grid>
                             </Grid>
                           </div>
-                          <div style={styles.container}>
-                            <h2>Procedures / Services</h2>
-                            <Grid container spacing={2}>                                                        
-                              <Procedures_Services />                                                      
-                            </Grid>
+                          <div className="procedures-services" style={styles.container}>
+                            <h2>Procedures / Services</h2>                                                   
+                            <Procedures_Services
+                              procedures={procedures}
+                              onAddProcedure={handleAddProcedure}
+                              onDeleteProcedure={handleDeleteProcedure}
+                              onFieldChange={handleChangeProcedureField}
+                            />                                                       
                           </div>
                           {/* Refer patient */}                    
                         </Grid>                      

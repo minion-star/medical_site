@@ -447,6 +447,7 @@ function History({
               value={textFieldValue}
               onChange={(e) => onTextFieldChange(e.target.value)}
               disabled={!checked} // Disable when unchecked
+              
             />
           </Grid>
 
@@ -459,7 +460,7 @@ function History({
                 multiple
                 value={dropdownValue} // Maintain dropdown state
                 onChange={handleSelectChange} // Handle selection changes
-                renderValue={() => null} // Prevent values from displaying in dropdown
+                renderValue={(selected) => selected.join(', ')}
                 disabled={!checked} // Disable when unchecked
                 displayEmpty
                 MenuProps={{

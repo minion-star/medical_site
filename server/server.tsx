@@ -260,7 +260,210 @@ app.post('/api/history', async (req, res) => {
 });
 
 
+app.get('/api/encounter/:id', async (req, res) => {
+  const { id } = req.params;  // CSN (encounter ID)
 
+  try {
+    // SQL query to fetch encounter data by CSN
+    const query = 'SELECT * FROM encounter WHERE CSN = ?';
+    const [record] = await db.query(query, [id]);
+
+    if (record.length > 0) {
+      // Fetch medications related to the encounter
+      const medicationsQuery = 'SELECT * FROM medications WHERE encounter_id = ?';
+      const [medications] = await db.query(medicationsQuery, [id]);
+
+      // Fetch orders related to the encounter
+      const ordersQuery = 'SELECT * FROM orders WHERE encounter_id = ?';
+      const [orders] = await db.query(ordersQuery, [id]);
+
+      // Fetch procedures related to the encounter
+      const proceduresQuery = 'SELECT * FROM procedures WHERE encounter_id = ?';
+      const [procedures] = await db.query(proceduresQuery, [id]);
+
+      // If record exists, send the data back in the response
+      res.json({
+        head: record[0].HEAD,
+        reviewOfSystems: record[0].REVIEW,
+        chief: record[0].CHIEF,
+        historyOfIllness: record[0].HISTORY,
+        vitalSigns: record[0].VITAL,
+        physicalExamination: record[0].PHYSICAL,
+        open: record[0].OPEN,
+        meeting: record[0].MEETING,
+        presentIllness: record[0].PRESENTILLNESS,
+        medications: medications, // Return medications for the encounter
+        orders: orders,           // Return orders for the encounter
+        procedures: procedures,   // Return procedures for the encounter
+      });
+    } else {
+      res.status(404).json({ message: 'Data not found' });
+    }
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+
+app.post('/api/encounter', async (req, res) => {
+  const {
+    id,
+    head,
+    reviewOfSystems,
+    chief,
+    historyOfIllness,
+    vitalSigns,
+    physicalExamination,
+    meeting,
+    open,
+    presentIllness,
+    medications,
+    orders,       // Adding orders to the request body
+    procedures    // Adding procedures to the request body
+  } = req.body;
+
+  try {
+    // Adding a delay of 2 seconds before processing the request
+    setTimeout(async () => {
+      // Serialize fields into JSON strings
+      const headJson = JSON.stringify(head);
+      const reviewJson = JSON.stringify(reviewOfSystems);
+      const chiefJson = JSON.stringify(chief);
+      const historyJson = JSON.stringify(historyOfIllness);
+      const vitalJson = JSON.stringify(vitalSigns);
+      const physicalJson = JSON.stringify(physicalExamination);
+      const meetingJson = JSON.stringify(meeting);
+      const openJson = JSON.stringify(open);
+      const presentIllnessJson = JSON.stringify(presentIllness);
+
+      // SQL query to check if the CSN exists
+      const checkCSNQuery = 'SELECT * FROM encounter WHERE CSN = ?';
+      const [existingRecord] = await db.query(checkCSNQuery, [id]);
+
+      if (existingRecord.length > 0) {
+        // CSN exists, perform an UPDATE query
+        const updateQuery = `
+          UPDATE encounter 
+          SET HEAD = ?, REVIEW = ?, CHIEF = ?, HISTORY = ?, VITAL = ?, PHYSICAL = ?, MEETING = ?, OPEN = ?, PRESENTILLNESS = ?
+          WHERE CSN = ?
+        `;
+        const updateParams = [
+          headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson, id,
+        ];
+        await db.query(updateQuery, updateParams);
+
+        // Optionally delete existing medications before inserting new ones
+        const deleteMedicationsQuery = 'DELETE FROM medications WHERE encounter_id = ?';
+        await db.query(deleteMedicationsQuery, [id]);
+
+        // Insert the medications into the database
+        if (medications && medications.length > 0) {
+          const insertMedicationQuery = `
+            INSERT INTO medications (order_type, qty, refills, sig, rx, encounter_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          for (let medication of medications) {
+            const { order, qty, refills, sig, rx } = medication;
+            const insertMedicationParams = [order, qty, refills, sig, rx, id];
+            await db.query(insertMedicationQuery, insertMedicationParams);
+          }
+        }
+
+        // Delete existing orders before inserting new ones
+        const deleteOrdersQuery = 'DELETE FROM orders WHERE encounter_id = ?';
+        await db.query(deleteOrdersQuery, [id]);
+
+        // Insert the orders into the database
+        if (orders && orders.length > 0) {
+          const insertOrderQuery = `
+            INSERT INTO orders (order_type, requisition, encounter_id)
+            VALUES (?, ?, ?)
+          `;
+          for (let order of orders) {
+            const { order: orderType, requisition } = order;
+            const insertOrderParams = [orderType, requisition, id];
+            await db.query(insertOrderQuery, insertOrderParams);
+          }
+        }
+
+        // Delete existing procedures before inserting new ones
+        const deleteProceduresQuery = 'DELETE FROM procedures WHERE encounter_id = ?';
+        await db.query(deleteProceduresQuery, [id]);
+
+        // Insert the procedures into the database
+        if (procedures && procedures.length > 0) {
+          const insertProcedureQuery = `
+            INSERT INTO procedures (code, description, note, encounter_id)
+            VALUES (?, ?, ?, ?)
+          `;
+          for (let procedure of procedures) {
+            const { code, description, note } = procedure;
+            const insertProcedureParams = [code, description, note, id];
+            await db.query(insertProcedureQuery, insertProcedureParams);
+          }
+        }
+
+        return res.json({ message: "Data updated successfully" });
+      } else {
+        // CSN does not exist, perform an INSERT query
+        const insertQuery = `
+          INSERT INTO encounter (CSN, HEAD, REVIEW, CHIEF, HISTORY, VITAL, PHYSICAL, MEETING, OPEN, PRESENTILLNESS)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const insertParams = [
+          id, headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson
+        ];
+        const result = await db.query(insertQuery, insertParams);
+        const newCSN = result.insertId; // Get the new encounter ID (CSN)
+
+        // Insert medications into the database
+        if (medications && medications.length > 0) {
+          const insertMedicationQuery = `
+            INSERT INTO medications (order_type, qty, refills, sig, rx, encounter_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          for (let medication of medications) {
+            const { order, qty, refills, sig, rx } = medication;
+            const insertMedicationParams = [order, qty, refills, sig, rx, newCSN];
+            await db.query(insertMedicationQuery, insertMedicationParams);
+          }
+        }
+
+        // Insert orders into the database
+        if (orders && orders.length > 0) {
+          const insertOrderQuery = `
+            INSERT INTO orders (order_type, requisition, encounter_id)
+            VALUES (?, ?, ?)
+          `;
+          for (let order of orders) {
+            const { order: orderType, requisition } = order;
+            const insertOrderParams = [orderType, requisition, newCSN];
+            await db.query(insertOrderQuery, insertOrderParams);
+          }
+        }
+
+        // Insert procedures into the database
+        if (procedures && procedures.length > 0) {
+          const insertProcedureQuery = `
+            INSERT INTO procedures (code, description, note, encounter_id)
+            VALUES (?, ?, ?, ?)
+          `;
+          for (let procedure of procedures) {
+            const { code, description, note } = procedure;
+            const insertProcedureParams = [code, description, note, newCSN];
+            await db.query(insertProcedureQuery, insertProcedureParams);
+          }
+        }
+
+        return res.json({ message: "Data inserted successfully" });
+      }
+    }, 2000); // Delay of 2 seconds
+  } catch (err) {
+    console.error("Error during database operation:", err);
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
 
   
