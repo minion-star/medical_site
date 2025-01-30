@@ -465,6 +465,34 @@ app.post('/api/encounter', async (req, res) => {
   }
 });
 
+app.post('/api/clinics', (req, res) => {
+    const {
+        clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
+        fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
+    } = req.body;
+
+    const query = `
+        INSERT INTO clinics (
+            clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
+            fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+        clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
+        fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
+    ];
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error("Error inserting data:", err);
+            res.status(500).json({ message: "Database error", error: err });
+        } else {
+            res.status(201).json({ message: "Clinic saved successfully", clinicId: result.insertId });
+        }
+    });
+});
+
 
   
 // Start the server
