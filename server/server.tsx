@@ -465,32 +465,48 @@ app.post('/api/encounter', async (req, res) => {
   }
 });
 
-app.post('/api/clinics', (req, res) => {
-    const {
-        clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
-        fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
-    } = req.body;
+// API Endpoint to Save Clinic Data
+app.post('/api/clinic', async(req, res) => {
+  const {
+      clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
+      fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
+  } = req.body;
 
-    const query = `
-        INSERT INTO clinics (
-            clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
-            fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+  const query = `
+      INSERT INTO clinic (
+          clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
+          fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
-    const values = [
-        clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
-        fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
-    ];
+  const values = [
+      clinicName, subTitle, address1, address2, city, postCode, country, state, telephoneNumber1, telephoneNumber2,
+      fax, email, id1, id2, type1, type2, specialization, slotDuration, bookingStartTime, bookingEndTime
+  ];
 
-    db.query(query, values, (err, result) => {
-        if (err) {
-            console.error("Error inserting data:", err);
-            res.status(500).json({ message: "Database error", error: err });
-        } else {
-            res.status(201).json({ message: "Clinic saved successfully", clinicId: result.insertId });
-        }
-    });
+  try {
+    await db.query(query, values)
+    console.log("success")
+  } catch (err){
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+app.get('/api/clinic', async (req, res) => {
+  const query = `SELECT * FROM clinic ORDER BY id DESC LIMIT 1`;
+
+  try {
+    const result = await db.query(query);
+    if (result.length > 0) {
+      res.status(200).json(result[0]);
+    } else {
+      res.status(404).send("No clinic found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
 });
 
 
