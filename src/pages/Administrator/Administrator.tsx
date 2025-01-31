@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import {
     ListItemIcon,
     ListItemButton,
@@ -131,6 +132,24 @@ const Administrator = () => {
         bookingStartTime: '',
         bookingEndTime: '',
       });
+      
+      useEffect(() => {
+        const fetchClinicData = async () => {
+          try {
+            const response = await axios.get("http://localhost:5000/api/clinic");
+            // Set the first item of the array as clinicData (if available)
+            if (response.data && response.data.length > 0) {
+              setClinicData(response.data[0]);
+            }
+            console.log("clinicData", response.data[0]);
+          } catch (error) {
+            console.error("Error fetching clinic data:", error);
+          }
+        };
+        fetchClinicData();
+      }, []);
+      
+      
 
     const updateClinic = (updatedClinic:Clinic):void => {
         setClinicData(updatedClinic); // Update the parent state
