@@ -4,7 +4,10 @@ const cors = require("cors");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+const JWT_SECRET = "your_secret_key";
 const app = express();
 const PORT = 5000;
 
@@ -158,7 +161,123 @@ app.get("/api/general/:csn", async (req, res) => {
       res.status(500).send("Server error");
     }
   });
+  app.post("/api/addBlankPatient", async (req, res) => {
+    try {
+      // Fetch the last CSN from the database
+      const [lastCSNResult] = await db.query("SELECT CSN FROM general ORDER BY CSN DESC LIMIT 1");
+        let newCSN = "000-00-0001"; // Default if there are no existing records
 
+        if (lastCSNResult.length > 0) {
+            const lastCSN = lastCSNResult[0].CSN; // e.g., "000-00-0001"
+            const match = lastCSN.match(/(\d+)$/); // Extract numeric part
+
+            if (match) {
+                const lastNumber = parseInt(match[1], 10); // Convert to integer
+                const incrementedNumber = (lastNumber + 1).toString().padStart(4, "0"); // Ensure four digits
+                newCSN = `000-00-${incrementedNumber}`; // Reconstruct CSN
+            }
+        }
+  
+      // Create a blank patient with empty or default values
+      const blankPatient = {
+        CSN: newCSN, // Use the incremented CSN
+        FIRST_NAME: "",    // Empty FIRST_NAME
+        LAST_NAME: "",     // Empty LAST_NAME
+        PHOTO: "",         // Empty PHOTO (empty string or placeholder image)
+        AGE: "",          // Default AGE (set to 0 or an empty string)
+        INFORMATION: {
+          personalInformation: {
+            id: "",
+            mrn: "",
+            dob: "",
+            gender: "",
+            marriage: "",
+            siblings: "",
+            race: "",
+            pharmacy: "",
+            other: "",
+          },
+          contactInformation: {
+            address: "",
+            city: "",
+            postcode: "",
+            country: "",
+            state: "",
+            homeph: "",
+            cellph: "",
+            email: "",
+            emergency: "",
+          },
+          insurance: {
+            carrier: "",
+            address: "",
+            city: "",
+            postcode: "",
+            country: "",
+            state: "",
+            phone: "",
+            facsimile: "",
+            plan: "",
+            expiry: "",
+            idno: "",
+            groupno: "",
+            copay: "",
+            authno: "",
+            remarks: "",
+            relation: "",
+            homeph: "",
+            lastname: "",
+            firstname: "",
+            mi: "",
+            dob: "",
+            gender: "",
+          },
+          workInformation: {
+            status: "",
+            workph: "",
+            employer: "",
+          },
+        },
+        CREATED_DATE: new Date(),
+        CREATED_BY: "",     // Empty CREATED_BY
+        LAST_SAVED_DATE: new Date(),
+        LAST_SAVED_BY: "",  // Empty LAST_SAVED_BY
+      };
+  
+      // Convert blank patient data to a JSON string
+      const INFORMATION = JSON.stringify(blankPatient.INFORMATION);
+  
+      // Insert a new blank row in the database with the incremented CSN
+      const query = `
+        INSERT INTO general (
+          CSN, FIRST_NAME, LAST_NAME, PHOTO, AGE, INFORMATION, CREATED_DATE, CREATED_BY, LAST_SAVED_DATE, LAST_SAVED_BY
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const values = [
+        blankPatient.CSN,
+        blankPatient.FIRST_NAME,
+        blankPatient.LAST_NAME,
+        blankPatient.PHOTO,
+        blankPatient.AGE,
+        INFORMATION,
+        blankPatient.CREATED_DATE,
+        blankPatient.CREATED_BY,
+        blankPatient.LAST_SAVED_DATE,
+        blankPatient.LAST_SAVED_BY,
+      ];
+  
+      // Execute the query to insert the blank row
+      await db.query(query, values);
+  
+      // Respond with a success message
+      res.status(200).send("Blank patient added successfully");
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Server error");
+    }
+  });
+  
+  
 
 
 app.get("/api/history/:csn", async (req, res) => {
@@ -191,10 +310,11 @@ app.get("/api/history/:csn", async (req, res) => {
 app.post('/api/history', async (req, res) => {
   const data = req.body;  // Incoming data from the frontend
   const { CSN } = data;
+  console.log("Received CSN:", CSN);
 
   try {
     const checkQuery = `SELECT * FROM history WHERE CSN = ?`;
-    const existingRecord = await db.query(checkQuery, [CSN]);
+    const [existingRecord] = await db.query(checkQuery, [CSN]);
 
     if (existingRecord.length > 0) {
       // CSN exists, perform an UPDATE query
@@ -210,16 +330,15 @@ app.post('/api/history', async (req, res) => {
           MASTER_MEDICATION_LIST = ? 
         WHERE CSN = ?`;
 
-      // Stringify JSON data before storing it
       await db.query(updateQuery, [
-        data.PAST_MEDICAL_HISTORY,
-        data.PAST_SURGICAL_HISTORY,
-        JSON.stringify(data.KNOWN_ALLERGIES),  // Stringify the JSON data
-        JSON.stringify(data.HEALTH_MAINTENANCE),
-        JSON.stringify(data.FAMILY_HISTORY),
-        JSON.stringify(data.SOCIAL_HISTORY),
-        JSON.stringify(data.MASTER_PROBLEM_LIST),
-        JSON.stringify(data.MASTER_MEDICATION_LIST),
+        data.PAST_MEDICAL_HISTORY || "",
+        data.PAST_SURGICAL_HISTORY || "",
+        JSON.stringify(data.KNOWN_ALLERGIES || {}),
+        JSON.stringify(data.HEALTH_MAINTENANCE || {}),
+        JSON.stringify(data.FAMILY_HISTORY || {}),
+        JSON.stringify(data.SOCIAL_HISTORY || {}),
+        JSON.stringify(data.MASTER_PROBLEM_LIST || {}),
+        JSON.stringify(data.MASTER_MEDICATION_LIST || {}),
         CSN,
       ]);
       return res.json({ message: "Record updated successfully" });
@@ -239,17 +358,16 @@ app.post('/api/history', async (req, res) => {
         ) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-      // Stringify JSON data before storing it
       await db.query(insertQuery, [
         CSN,
-        data.PAST_MEDICAL_HISTORY,
-        data.PAST_SURGICAL_HISTORY,
-        JSON.stringify(data.KNOWN_ALLERGIES),
-        JSON.stringify(data.HEALTH_MAINTENANCE),
-        JSON.stringify(data.FAMILY_HISTORY),
-        JSON.stringify(data.SOCIAL_HISTORY),
-        JSON.stringify(data.MASTER_PROBLEM_LIST),
-        JSON.stringify(data.MASTER_MEDICATION_LIST),
+        data.PAST_MEDICAL_HISTORY || "",
+        data.PAST_SURGICAL_HISTORY || "",
+        JSON.stringify(data.KNOWN_ALLERGIES || {}),
+        JSON.stringify(data.HEALTH_MAINTENANCE || {}),
+        JSON.stringify(data.FAMILY_HISTORY || {}),
+        JSON.stringify(data.SOCIAL_HISTORY || {}),
+        JSON.stringify(data.MASTER_PROBLEM_LIST || {}),
+        JSON.stringify(data.MASTER_MEDICATION_LIST || {}),
       ]);
       return res.json({ message: "New record added successfully" });
     }
@@ -270,15 +388,15 @@ app.get('/api/encounter/:id', async (req, res) => {
 
     if (record.length > 0) {
       // Fetch medications related to the encounter
-      const medicationsQuery = 'SELECT * FROM medications WHERE encounter_id = ?';
+      const medicationsQuery = 'SELECT * FROM medications WHERE CSN = ?';
       const [medications] = await db.query(medicationsQuery, [id]);
 
       // Fetch orders related to the encounter
-      const ordersQuery = 'SELECT * FROM orders WHERE encounter_id = ?';
+      const ordersQuery = 'SELECT * FROM orders WHERE CSN = ?';
       const [orders] = await db.query(ordersQuery, [id]);
 
       // Fetch procedures related to the encounter
-      const proceduresQuery = 'SELECT * FROM procedures WHERE encounter_id = ?';
+      const proceduresQuery = 'SELECT * FROM procedures WHERE CSN = ?';
       const [procedures] = await db.query(proceduresQuery, [id]);
 
       // If record exists, send the data back in the response
@@ -308,7 +426,7 @@ app.get('/api/encounter/:id', async (req, res) => {
 
 app.post('/api/encounter', async (req, res) => {
   const {
-    id,
+    CSN,
     head,
     reviewOfSystems,
     chief,
@@ -337,9 +455,10 @@ app.post('/api/encounter', async (req, res) => {
       const openJson = JSON.stringify(open);
       const presentIllnessJson = JSON.stringify(presentIllness);
 
+      
       // SQL query to check if the CSN exists
       const checkCSNQuery = 'SELECT * FROM encounter WHERE CSN = ?';
-      const [existingRecord] = await db.query(checkCSNQuery, [id]);
+      const [existingRecord] = await db.query(checkCSNQuery, [CSN]);
 
       if (existingRecord.length > 0) {
         // CSN exists, perform an UPDATE query
@@ -349,57 +468,57 @@ app.post('/api/encounter', async (req, res) => {
           WHERE CSN = ?
         `;
         const updateParams = [
-          headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson, id,
+          headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson, CSN,
         ];
         await db.query(updateQuery, updateParams);
 
         // Optionally delete existing medications before inserting new ones
-        const deleteMedicationsQuery = 'DELETE FROM medications WHERE encounter_id = ?';
-        await db.query(deleteMedicationsQuery, [id]);
+        const deleteMedicationsQuery = 'DELETE FROM medications WHERE CSN = ?';
+        await db.query(deleteMedicationsQuery, [CSN]);
 
         // Insert the medications into the database
         if (medications && medications.length > 0) {
           const insertMedicationQuery = `
-            INSERT INTO medications (order_type, qty, refills, sig, rx, encounter_id)
+            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN)
             VALUES (?, ?, ?, ?, ?, ?)
           `;
           for (let medication of medications) {
             const { order, qty, refills, sig, rx } = medication;
-            const insertMedicationParams = [order, qty, refills, sig, rx, id];
+            const insertMedicationParams = [order, qty, refills, sig, rx, CSN];
             await db.query(insertMedicationQuery, insertMedicationParams);
           }
         }
 
         // Delete existing orders before inserting new ones
-        const deleteOrdersQuery = 'DELETE FROM orders WHERE encounter_id = ?';
-        await db.query(deleteOrdersQuery, [id]);
+        const deleteOrdersQuery = 'DELETE FROM orders WHERE CSN = ?';
+        await db.query(deleteOrdersQuery, [CSN]);
 
         // Insert the orders into the database
         if (orders && orders.length > 0) {
           const insertOrderQuery = `
-            INSERT INTO orders (order_type, requisition, encounter_id)
+            INSERT INTO orders (order_type, requisition, CSN)
             VALUES (?, ?, ?)
           `;
           for (let order of orders) {
             const { order: orderType, requisition } = order;
-            const insertOrderParams = [orderType, requisition, id];
+            const insertOrderParams = [orderType, requisition, CSN];
             await db.query(insertOrderQuery, insertOrderParams);
           }
         }
 
         // Delete existing procedures before inserting new ones
-        const deleteProceduresQuery = 'DELETE FROM procedures WHERE encounter_id = ?';
-        await db.query(deleteProceduresQuery, [id]);
+        const deleteProceduresQuery = 'DELETE FROM procedures WHERE CSN = ?';
+        await db.query(deleteProceduresQuery, [CSN]);
 
         // Insert the procedures into the database
         if (procedures && procedures.length > 0) {
           const insertProcedureQuery = `
-            INSERT INTO procedures (code, description, note, encounter_id)
+            INSERT INTO procedures (code, description, note, CSN)
             VALUES (?, ?, ?, ?)
           `;
           for (let procedure of procedures) {
             const { code, description, note } = procedure;
-            const insertProcedureParams = [code, description, note, id];
+            const insertProcedureParams = [code, description, note, CSN];
             await db.query(insertProcedureQuery, insertProcedureParams);
           }
         }
@@ -412,7 +531,7 @@ app.post('/api/encounter', async (req, res) => {
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const insertParams = [
-          id, headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson
+          CSN, headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson
         ];
         const result = await db.query(insertQuery, insertParams);
         const newCSN = result.insertId; // Get the new encounter ID (CSN)
@@ -420,7 +539,7 @@ app.post('/api/encounter', async (req, res) => {
         // Insert medications into the database
         if (medications && medications.length > 0) {
           const insertMedicationQuery = `
-            INSERT INTO medications (order_type, qty, refills, sig, rx, encounter_id)
+            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN)
             VALUES (?, ?, ?, ?, ?, ?)
           `;
           for (let medication of medications) {
@@ -433,7 +552,7 @@ app.post('/api/encounter', async (req, res) => {
         // Insert orders into the database
         if (orders && orders.length > 0) {
           const insertOrderQuery = `
-            INSERT INTO orders (order_type, requisition, encounter_id)
+            INSERT INTO orders (order_type, requisition, CSN)
             VALUES (?, ?, ?)
           `;
           for (let order of orders) {
@@ -446,7 +565,7 @@ app.post('/api/encounter', async (req, res) => {
         // Insert procedures into the database
         if (procedures && procedures.length > 0) {
           const insertProcedureQuery = `
-            INSERT INTO procedures (code, description, note, encounter_id)
+            INSERT INTO procedures (code, description, note, CSN)
             VALUES (?, ?, ?, ?)
           `;
           for (let procedure of procedures) {
@@ -509,6 +628,54 @@ app.get('/api/clinic', async (req, res) => {
   }
 });
 
+
+// Get all users
+app.get("/users", async (req, res) => {
+  const [rows] = await db.query("SELECT * FROM users");
+  res.json(rows);
+});
+
+// Add a user
+app.post("/users", async (req, res) => {
+  const { userId, password } = req.body;
+  await db.query("INSERT INTO users (userId, password) VALUES (?, ?)", [userId, password]);
+  res.sendStatus(201);
+});
+
+// Update a user
+app.put("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { userId, password } = req.body;
+  await db.query("UPDATE users SET userId = ?, password = ? WHERE id = ?", [userId, password, id]);
+  res.sendStatus(200);
+});
+
+// Delete a user
+app.delete("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  await db.query("DELETE FROM users WHERE id = ?", [id]);
+  res.sendStatus(200);
+});
+
+// Sign-in Route
+app.post("/signin", async (req, res) => {
+  const { userId, password } = req.body;
+
+  try {
+    const result = await db.query("SELECT * FROM users WHERE userId = ? AND password = ?", [userId, password]);
+    const rows = result[0]; // Extract rows manually
+
+
+    if (rows.length > 0) {
+      res.status(200).json({ message: "Sign-in successful" });
+    } else {
+      res.status(401).json({ message: "Invalid credentials" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
   
 // Start the server
