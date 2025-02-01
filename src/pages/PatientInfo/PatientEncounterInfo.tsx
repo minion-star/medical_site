@@ -373,7 +373,7 @@ function ChiefEncounter({
   const processedNames = normalizedNames.flat();
 
   return (
-    <Box sx={{ display: "flex",}}>
+    <Box sx={{ display: "flex",alignItems:"end"}}>
         {/* TextField */}
         <Grid item xs={11}>
           <TextField
