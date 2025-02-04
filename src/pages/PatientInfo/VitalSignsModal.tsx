@@ -201,28 +201,28 @@ const VitalSignsModal: React.FC<{csn: string|undefined }> = ({csn}) => {
         labels: bmi18_5.weights.map((weight) => `${weight}`),
         datasets: [
         {
-            label: "BMI 18.5",
+            label: "Healthy Weight",
             data: bmi18_5.heights,
             borderColor: "green",
             backgroundColor: "green",
             fill: false,
         },
         {
-            label: "BMI 25",
+            label: "Overweight",
             data: bmi25.heights,
             borderColor: "yellow",
             backgroundColor: "yellow",
             fill: false,
         },
         {
-            label: "BMI 30",
+            label: "Obese",
             data: bmi30.heights,
             borderColor: "red",
             backgroundColor: "red",
             fill: false,
         },
         {
-            label: "BMI Data",
+            label: "Record",
             data: vitalSignsData.map((entry) => ({ x: entry.weight, y: entry.height })), // Scatter points
             borderColor: "blue", // Color for the dots
             backgroundColor: "blue",
@@ -250,7 +250,7 @@ const VitalSignsModal: React.FC<{csn: string|undefined }> = ({csn}) => {
                     text: "Weight (kg)",
                 },
                 type: "linear", // Ensure proper scatter representation for weight
-                min: 34,
+                min: 35,
                 max: 125,
             },
             y: {
