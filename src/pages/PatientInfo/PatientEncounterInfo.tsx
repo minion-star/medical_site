@@ -1585,7 +1585,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   const bp2 = Array.from({ length: 131  }, (_, index) => index + 10);
 
   const tp: string[] = [];
-  for (let i = 94; i <= 107; i += 0.1) {
+  for (let i = 34.4; i <= 41.7; i += 0.1) {
     tp.push(i.toFixed(1)); // Convert to string with one decimal place
   }
   const pr = Array.from({ length: 161  }, (_, index) => index + 40);
