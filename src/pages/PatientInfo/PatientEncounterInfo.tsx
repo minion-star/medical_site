@@ -957,33 +957,54 @@ function Addable_Medication_Rx({
   };
 
   return (
-    <Box style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold' }}>{place}</div>
-      <Grid container spacing={1} alignItems={'end'}>
-        <Grid item xs={9}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`medication-rx-${id}`}
-              multiline
-              value={medication.rx}
-              onChange={handleRxChange}
-              startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
-            />
-          </FormControl>
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
         </Grid>
-        <Grid item xs={2}>
-          <FormControl fullWidth variant="standard">
-            <Select
-              labelId={`medication-rx-unit-select-${id}`}
-              id={`medication-rx-unit-select-${id}`}
-              value={medication.order}
-              onChange={handleChange}
-              label="unit"
-            >
-              <MenuItem value="GEQ">GEQ</MenuItem>
-              <MenuItem value="DAW">DAW</MenuItem>
-            </Select>
-          </FormControl>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={9}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`medication-rx-${id}`}
+                multiline
+                value={medication.rx}
+                onChange={handleRxChange}
+                startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth variant="standard">
+              <Select
+                labelId={`medication-rx-unit-select-${id}`}
+                id={`medication-rx-unit-select-${id}`}
+                value={medication.order}
+                onChange={handleChange}
+                label="unit"
+              >
+                <MenuItem value="GEQ">GEQ</MenuItem>
+                <MenuItem value="DAW">DAW</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`medication-sig-${id}`}
+                multiline
+                value={medication.sig}
+                onChange={handleSigChange}
+                startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={2}>
+            <SelectQty qty={medication.qty} onChange={handleQtyChange} />
+          </Grid>
+          <Grid item xs={2}>
+            <SelectRefills refills={medication.refills} onChange={handleRefillsChange} />
+          </Grid>
         </Grid>
         <Grid item xs={1}>
           <IconButton
@@ -993,23 +1014,6 @@ function Addable_Medication_Rx({
           >
             <DeleteIcon />
           </IconButton>
-        </Grid>
-        <Grid item xs={8}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`medication-sig-${id}`}
-              multiline
-              value={medication.sig}
-              onChange={handleSigChange}
-              startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={2}>
-          <SelectQty qty={medication.qty} onChange={handleQtyChange} />
-        </Grid>
-        <Grid item xs={2}>
-          <SelectRefills refills={medication.refills} onChange={handleRefillsChange} />
         </Grid>
       </Grid>
       <Divider sx={{mt:4}}/>
