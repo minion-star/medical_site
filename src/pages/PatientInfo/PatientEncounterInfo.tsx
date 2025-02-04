@@ -1603,7 +1603,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   }
 
   const waist: string[] = [];
-  for (let i = 15; i <= 80; i += 0.5) {
+  for (let i = 38; i <= 203; i += 0.5) {
     waist.push(i.toFixed(1)); // Convert to string with one decimal place
   }
 
