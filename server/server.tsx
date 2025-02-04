@@ -270,7 +270,7 @@ app.get("/api/general/:csn", async (req, res) => {
       await db.query(query, values);
   
       // Respond with a success message
-      res.status(200).send("Blank patient added successfully");
+      res.status(200).send(newCSN);
     } catch (err) {
       console.error(err);
       res.status(500).send("Server error");
