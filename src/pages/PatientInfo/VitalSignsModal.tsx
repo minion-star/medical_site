@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Modal,
   Box,
@@ -34,6 +35,18 @@ import {
 import { vitalSignsData } from "../../mockData";
 
 
+interface VitalSigns {
+  systolic: string,
+  diastolic: string,
+  temperature: string,
+  weight: string,
+  height: string,
+  respiration: string,
+  pulse: string,
+  waist: string,
+  spO2: string,
+
+}
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -151,16 +164,30 @@ const TabPanel: React.FC<TabPanelProps> = ({ value, index, children }) => {
 };
 
 
-const VitalSignsModal: React.FC = () => {
+const VitalSignsModal: React.FC<{csn: string|undefined }> = ({csn}) => {
 
 
 
-
+    const [vitalSigns, setVitalSigns] = useState<VitalSigns>({systolic:"", diastolic:"", temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"",})
+  
+    useEffect(()=>{
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/encounter/${csn}`);
+          const data = response.data;
+          setVitalSigns(JSON.parse(data.vitalSigns || '{}'));
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+      fetchData();
+    },[]);
+          
     // Generate height for each weight based on BMI
     const generateHeightData = (bmi: number) => {
         const weights = Array.from({ length: 41 }, (_, i) => 75 + i * 5); // 75 to 275 lbs
         const heights = weights.map((weight) =>
-        Number((Math.sqrt(weight*703) / Math.sqrt(bmi)).toFixed(2)) // Height formula
+        Number((Math.sqrt(weight*10000) / Math.sqrt(bmi)).toFixed(2)) // Height formula
         );
         return { weights, heights };
     };
@@ -220,18 +247,18 @@ const VitalSignsModal: React.FC = () => {
             x: {
                 title: {
                     display: true,
-                    text: "Weight (lbs)",
+                    text: "Weight (kg)",
                 },
                 type: "linear", // Ensure proper scatter representation for weight
-                min: 75,
-                max: 275,
+                min: 34,
+                max: 125,
             },
             y: {
-                min: 58,
-                max: 78,
+                min: 150,
+                max: 200,
                 title: {
                     display: true,
-                    text: "Height (in)",
+                    text: "Height (cm)",
                 },
             },
         },
