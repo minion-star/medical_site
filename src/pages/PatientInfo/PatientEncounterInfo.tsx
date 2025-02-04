@@ -611,56 +611,66 @@ function Select_Checkbox_Switch({
 
 // history of illness checkbox
 function Select_History_Checkbox({
-  names = [],
-  checked1 = true,
-  label = "",
-  selectedOptions = [],
+  names,
+  label,
+  value,
   onValueChange,
 }: {
   names: string[] | string[][];
-  checked1?: boolean;
-  label?: string;
-  selectedOptions: string[];
-  onValueChange: (newValues: string[]) => void;
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
 }) {
-  // Normalize names into a 2D array
-  const normalizedNames: string[][] =
-    Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+  const [dropdownValue, setDropdownValue] = useState<string[]>([]);
 
   const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
-    const { value } = event.target;
-    const newSelectedOptions = typeof value === "string" ? value.split(",") : value;
-    onValueChange(newSelectedOptions); // Notify parent of the change
+    const selectedValues = event.target.value as string[];
+    const latestSelection = selectedValues[selectedValues.length - 1];
+
+    if (latestSelection.trim() !== "") {
+      onValueChange(value.trim() === "" ? latestSelection : `${value} | ${latestSelection}`);
+    }
+    setDropdownValue([]); // Reset dropdown value to prevent display of selected items
   };
+
+  const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onValueChange(event.target.value);
+  };
+
+  const normalizedNames: string[][] = Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+  const processedNames = normalizedNames.flat();
 
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
-      {/* Label */}
-      <Grid item xs={2}>
-        <label>{label}:</label>
-      </Grid>
-      {/* Select Component */}
-      <Grid item xs={10}>
-        <FormControl variant="standard" fullWidth>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="select-checkbox"
-            multiple
-            disabled={!checked1}
-            value={selectedOptions}
-            onChange={handleSelectChange}
-            renderValue={(selected) => selected.join(' | ')}
-          >
-            {normalizedNames.map((array, arrayIndex) =>
-              array.map((name) => (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={selectedOptions.includes(name)} />
-                  <ListItemText primary={name} />
-                </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+      <Grid container alignItems={"end"}>
+        {/* Label */}
+        <Grid item xs={2}>
+          <label>{label}</label>
+        </Grid>
+        {/* TextField */}
+        <Grid item xs={9}>
+          <TextField fullWidth variant="standard" multiline value={value} onChange={handleTextFieldChange} />
+        </Grid>
+        {/* Select Dropdown */}
+        <Grid item xs={1}>
+          <FormControl variant="standard">
+            <Select multiple value={dropdownValue} onChange={handleSelectChange} renderValue={() => null} displayEmpty>
+              {processedNames.map((name, index) =>
+                name === "" ? (
+                  <MenuItem key={`separator-${index}`} disabled>
+                    <Typography variant="body2" sx={{ color: "gray" }}>
+                      <>&nbsp;</>
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                )
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
     </Box>
   );
@@ -702,28 +712,43 @@ function Addable_Procedure_Service({
   };
 
   return (
-    <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold' }}>{place}</div>
-      <Grid container spacing={1} alignItems="center">
-        <Grid item xs={2}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-code-${id}`}
-              value={procedure.code}
-              onChange={handleCodeChange}
-              startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
-            />
-          </FormControl>
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
         </Grid>
-        <Grid item xs={9}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-desc-${id}`}
-              value={procedure.description}
-              onChange={handleDescriptionChange}
-              startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
-            />
-          </FormControl>
+        <Grid item xs={10} container spacing={1} alignItems="center">
+          <Grid item xs={2}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-code-${id}`}
+                value={procedure.code}
+                onChange={handleCodeChange}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={10}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-desc-${id}`}
+                value={procedure.description}
+                onChange={handleDescriptionChange}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-note-${id}`}
+                value={procedure.note}
+                onChange={handleNoteChange}
+                multiline
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
         </Grid>
         <Grid item xs={1}>
           <IconButton
@@ -734,19 +759,9 @@ function Addable_Procedure_Service({
             <DeleteIcon />
           </IconButton>
         </Grid>
-        <Grid item xs={12}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-note-${id}`}
-              value={procedure.note}
-              onChange={handleNoteChange}
-              multiline
-              startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
-            />
-          </FormControl>
-        </Grid>
       </Grid>
-    </Paper>
+      <Divider sx={{mt:4}}/>
+    </Box>
   );
 }
 
@@ -812,7 +827,7 @@ function Addable_Order_Requisition({
   };
 
   return (
-    <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
+    <Box style={{ padding: 16, margin: 8 }}>
       <div style={{ fontWeight: 'bold' }}>{place}</div>
       <Grid container spacing={1} alignItems={'end'}>
         <Grid item xs={2}>
@@ -852,7 +867,8 @@ function Addable_Order_Requisition({
           </IconButton>
         </Grid>
       </Grid>
-    </Paper>
+      <Divider sx={{mt:4}}/>
+    </Box>
   );
 }
 
@@ -937,7 +953,7 @@ function Addable_Medication_Rx({
   };
 
   return (
-    <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
+    <Box style={{ padding: 16, margin: 8 }}>
       <div style={{ fontWeight: 'bold' }}>{place}</div>
       <Grid container spacing={1} alignItems={'end'}>
         <Grid item xs={9}>
@@ -992,7 +1008,8 @@ function Addable_Medication_Rx({
           <SelectRefills refills={medication.refills} onChange={handleRefillsChange} />
         </Grid>
       </Grid>
-    </Paper>
+      <Divider sx={{mt:4}}/>
+    </Box>
   );
 }
 
@@ -1420,7 +1437,7 @@ const handleSubmit = async () => {
     const response = await axios.post(
       'http://localhost:5000/api/encounter', 
       {
-        id,
+        CSN:id,
         head,
         reviewOfSystems,
         chief,
@@ -1470,10 +1487,10 @@ const handleChiefChange = (newValue: string) => {
 
 // History of present illness
 
-const handleHistoryOfIllnessChange = (field: keyof HistoryOfIllness, values: string[]) => {
+const handleHistoryOfIllnessChange = (field: keyof HistoryOfIllness, value: string) => {
   setHistoryOfIllness((prev) => ({
     ...prev,
-    [field]: values.join(", "), // Convert array to a comma-separated string
+    [field]: value,
   }));
 };
 
@@ -1867,50 +1884,54 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12} sx={{mt:3}}>
-                                <Select_History_Checkbox label="Location" names={location} 
-                                  selectedOptions={historyOfIllness.Location.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Location", values)}
+                                <Select_History_Checkbox
+                                  label="Location"
+                                  names={location}
+                                  value={historyOfIllness.Location}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Location", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label='Quality' names={quality}
-                                  selectedOptions={historyOfIllness.Quality.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Quality", values)}
+                                <Select_History_Checkbox
+                                  label="Quality"
+                                  names={quality}
+                                  value={historyOfIllness.Quality}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Quality", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Severity" names={severity}
-                                  selectedOptions={historyOfIllness.Severity.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Severity", values)}
+                                  value={historyOfIllness.Severity}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Severity", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Duration" names={duration}
-                                  selectedOptions={historyOfIllness.Duration.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Duration", values)}
+                                  value={historyOfIllness.Duration}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Duration", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Onset - Timing" names={onset}
-                                  selectedOptions={historyOfIllness.OnsetTiming.split(", ")}
+                                  value={historyOfIllness.OnsetTiming}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("OnsetTiming", values)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Context" names={context}
-                                  selectedOptions={historyOfIllness.Context.split(", ")}
+                                  value={historyOfIllness.Context}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("Context", values)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Modifying Factors" names={modifying}
-                                  selectedOptions={historyOfIllness.ModifyingFactors.split(", ")}
+                                  value={historyOfIllness.ModifyingFactors}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("ModifyingFactors", values)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Signs - Symptoms" names={signs}
-                                  selectedOptions={historyOfIllness.SignsSymptoms.split(", ")}
+                                  value={historyOfIllness.SignsSymptoms}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("SignsSymptoms", values)}
                                 />
                               </Grid>
@@ -1922,7 +1943,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                 <h2>Vital Signs</h2> 
                               </Grid>                
                               <Grid item xs={1} sx={{mb:2}}>
-                                <VitalSignsModal />
+                                <VitalSignsModal csn={id}/>
                               </Grid>           
                               <Grid item container  xs={3}  sx={{display:"flex", alignItems:'end'}}>
                                 <Grid item xs={5} >
