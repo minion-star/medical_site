@@ -185,7 +185,7 @@ const VitalSignsModal: React.FC<{csn: string|undefined }> = ({csn}) => {
           
     // Generate height for each weight based on BMI
     const generateHeightData = (bmi: number) => {
-        const weights = Array.from({ length: 41 }, (_, i) => 75 + i * 5); // 75 to 275 lbs
+        const weights = Array.from({ length: 19 }, (_, i) => 35 + i * 5); // 75 to 275 lbs
         const heights = weights.map((weight) =>
         Number((Math.sqrt(weight*10000) / Math.sqrt(bmi)).toFixed(2)) // Height formula
         );
