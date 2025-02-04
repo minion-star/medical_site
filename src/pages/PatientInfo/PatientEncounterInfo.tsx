@@ -713,7 +713,7 @@ function Addable_Procedure_Service({
 
   return (
     <Box style={{ padding: 4, margin: 8 }}>
-      <Grid container>
+      <Grid container >
         <Grid item xs={1}>
           <div style={{ fontWeight: 'bold' }}>{place}</div>
         </Grid>
@@ -827,35 +827,39 @@ function Addable_Order_Requisition({
   };
 
   return (
-    <Box style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold' }}>{place}</div>
-      <Grid container spacing={1} alignItems={'end'}>
-        <Grid item xs={2}>
-          <FormControl fullWidth variant="standard">
-            <InputLabel id={`orders-requisition-order-${id}`}>Order</InputLabel>
-            <Select
-              labelId={`orders-requisition-order-select-${id}`}
-              id={`orders-requisition-order-select-${id}`}
-              value={order.order}
-              onChange={handleOrderChange}
-              label="Order"
-            >
-              <MenuItem value={10}>Lab</MenuItem>
-              <MenuItem value={20}>Rad</MenuItem>
-              <MenuItem value={30}>Gen</MenuItem>
-            </Select>
-          </FormControl>
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container alignItems={"end"}>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
         </Grid>
-        <Grid item xs={9}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-desc-${id}`}
-              value={order.requisition}
-              onChange={handleRequisitionChange}
-              multiline
-              startAdornment={<InputAdornment position="start">Requisition:</InputAdornment>}
-            />
-          </FormControl>
+        <Grid item xs={10} container spacing={1} alignItems={'end'}>
+          <Grid item xs={2}>
+            <FormControl fullWidth variant="standard">
+              <InputLabel id={`orders-requisition-order-${id}`}>Order</InputLabel>
+              <Select
+                labelId={`orders-requisition-order-select-${id}`}
+                id={`orders-requisition-order-select-${id}`}
+                value={order.order}
+                onChange={handleOrderChange}
+                label="Order"
+              >
+                <MenuItem value={10}>Lab</MenuItem>
+                <MenuItem value={20}>Rad</MenuItem>
+                <MenuItem value={30}>Gen</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={10}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-desc-${id}`}
+                value={order.requisition}
+                onChange={handleRequisitionChange}
+                multiline
+                startAdornment={<InputAdornment position="start">Requisition:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
         </Grid>
         <Grid item xs={1}>
           <IconButton
