@@ -1593,7 +1593,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   const sp02 = Array.from({ length: 91  }, (_, index) => index + 10);
 
   const ht: string[] = [];
-  for (let i = 15; i <= 82; i += 0.5) {
+  for (let i = 38; i <= 203; i += 1) {
     ht.push(i.toFixed(1)); // Convert to string with one decimal place
   }
 
