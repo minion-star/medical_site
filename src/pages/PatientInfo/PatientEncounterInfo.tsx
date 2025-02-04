@@ -1598,7 +1598,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   }
 
   const wt: string[] = [];
-  for (let i = 1; i <= 400; i += 0.5) {
+  for (let i = 0.5; i <= 182; i += 0.5) {
     wt.push(i.toFixed(1)); // Convert to string with one decimal place
   }
 
