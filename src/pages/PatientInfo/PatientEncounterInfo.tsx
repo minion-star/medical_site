@@ -2923,6 +2923,11 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               <TextField fullWidth sx={{ m: 1 }} id="standard-basic"  variant="standard" />
                             </Grid>                   
                           </div> 
+                          <div className="Assessment / Diagnosis" style={styles.container}>
+                            <h2>Assessment / Diagnosis</h2>
+                            {/* Ongoing Problems */}
+                            {/* New Assessments */}
+                          </div>
                           <div className="order-requistion" style={styles.container}>
                             <h2>Order / Requistion</h2>
                             <Orders_Requisitions
