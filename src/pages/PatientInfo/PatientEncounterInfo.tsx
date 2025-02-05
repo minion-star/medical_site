@@ -1583,13 +1583,11 @@ function Addable_Ongoing({
 }
 type OngoingProps = {
   ongoings: { id: number; code: string; onset: string; status: string; desc: string; note: string }[];
-  onAddOngoing: () => void;
   onDeleteOngoing: (id: number) => void;
 };
 
 const Ongoing: React.FC<OngoingProps> = ({
   ongoings,
-  onAddOngoing,
   onDeleteOngoing,
 }) => {
   return (
@@ -1604,9 +1602,6 @@ const Ongoing: React.FC<OngoingProps> = ({
           ongoing={ongoing}
         />
       ))}
-      <IconButton onClick={onAddOngoing} color="success">
-        <AddIcon />
-      </IconButton>
     </Grid>
   );
 };
@@ -2024,11 +2019,6 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
     if (assessments.length > 1) {
       setAssessments(assessments.filter((med) => med.id !== id));
     }
-  };
-
-  const handleAddOngoing = () => {
-    const nextId = ongoings.length ? Math.max(...ongoings.map(m => m.id)) + 1 : 1;
-    setOngoings([...ongoings, { id: nextId, code: '', onset: '', status: '', desc: '', note: '' }]);
   };
 
   const handleDeleteOngoing = (id: number) => {
@@ -3271,7 +3261,6 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                             <Grid container spacing={1}>
                               <Ongoing 
                                 ongoings={ongoings}
-                                onAddOngoing={handleAddOngoing}
                                 onDeleteOngoing={handleDeleteOngoing}
                               />
                             </Grid>
