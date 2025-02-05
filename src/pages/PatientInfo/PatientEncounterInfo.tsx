@@ -919,7 +919,7 @@ type Addable_Medication_RxProps = {
   disableDelete: boolean;
   place: number;
   medication: {
-    order: string;
+    unit: string;
     qty: string;
     refills: string;
     sig: string;
@@ -937,7 +937,7 @@ function Addable_Medication_Rx({
   onFieldChange,
 }: Addable_Medication_RxProps) {
   const handleChange = (event: SelectChangeEvent) => {
-    onFieldChange(id, 'order', event.target.value);
+    onFieldChange(id, 'unit', event.target.value);
   };
 
   const handleQtyChange = (event: SelectChangeEvent) => {
@@ -979,7 +979,7 @@ function Addable_Medication_Rx({
               <Select
                 labelId={`medication-rx-unit-select-${id}`}
                 id={`medication-rx-unit-select-${id}`}
-                value={medication.order}
+                value={medication.unit}
                 onChange={handleChange}
                 label="unit"
               >
@@ -1022,7 +1022,7 @@ function Addable_Medication_Rx({
 }
 
 type Medications_RxProps = {
-  medications: { id: number; order: string; qty: string; refills: string; sig: string; rx: string }[];
+  medications: { id: number; unit: string; qty: string; refills: string; sig: string; rx: string }[];
   onAddMedication: () => void;
   onDeleteMedication: (id: number) => void;
   onFieldChange: (id: number, field: string, value: string | number) => void;
@@ -1306,7 +1306,119 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   );
 };
 
+// Add Assessment
+type Addable_AssessmentProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  assessment: {
+    code: string;
+    onset: string;
+    nature: string;
+    desc: string;
+    note: string;
+  };
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
 
+function Addable_Assessment({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  assessment,
+  onFieldChange,
+}: Addable_AssessmentProps) {
+  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'code', event.target.value);
+  };
+
+  const handleOnsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'onset', event.target.value);
+  };
+
+  const handleNatureChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'nature', event.target.value);
+  };
+
+  const handleDescChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'desc', event.target.value);
+  };
+
+  const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'note', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-${id}`}
+                multiline
+                value={assessment.code}
+                onChange={handleCodeChange}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-onset-select-${id}`}
+                multiline
+                value={assessment.onset}
+                onChange={handleOnsetChange}
+                startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-desc-${id}`}
+                multiline
+                value={assessment.desc}
+                onChange={handleDescChange}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-note-${id}`}
+                multiline
+                value={assessment.note}
+                onChange={handleDescChange}
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
 
 
 const PatientEncounterInfo:React.FC = () => {
@@ -1358,8 +1470,8 @@ const PatientEncounterInfo:React.FC = () => {
     const [open, setOpen] = useState<Record<string, boolean>>({});  
     const [presentIllness, setPresentIllness] = useState<string>("");
     
-    const [medications, setMedications] = useState<{ id: number; order: string; qty: string; refills:string; sig: string; rx: string }[]>([
-      { id: 1, order: '', qty: '', refills: '', sig: '', rx: '' },
+    const [medications, setMedications] = useState<{ id: number; unit: string; qty: string; refills:string; sig: string; rx: string }[]>([
+      { id: 1, unit: '', qty: '', refills: '', sig: '', rx: '' },
     ]);
     const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
       { id: 1, order: '', requisition: '' },
@@ -1644,7 +1756,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
 
   const handleAddMedication = () => {
     const nextId = medications.length ? Math.max(...medications.map(m => m.id)) + 1 : 1;
-    setMedications([...medications, { id: nextId, order: '', qty: '', refills: '', sig: '', rx: '' }]);
+    setMedications([...medications, { id: nextId, unit: '', qty: '', refills: '', sig: '', rx: '' }]);
   };
 
   const handleDeleteMedication = (id: number) => {
@@ -2926,7 +3038,28 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                           <div className="Assessment / Diagnosis" style={styles.container}>
                             <h2>Assessment / Diagnosis</h2>
                             {/* Ongoing Problems */}
+                            <Grid container spacing={1}>
+                              <Grid item xs={4}>
+                                <TextField/>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <TextField/>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <TextField/>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField/>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField/>
+                              </Grid>
+                            </Grid>
+                            <Divider sx={{mt:2}}/>
                             {/* New Assessments */}
+                            <Grid container spacing={1}>
+                            
+                            </Grid>
                           </div>
                           <div className="order-requistion" style={styles.container}>
                             <h2>Order / Requistion</h2>
