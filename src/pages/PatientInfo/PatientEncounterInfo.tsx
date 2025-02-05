@@ -1714,6 +1714,7 @@ const PatientEncounterInfo:React.FC = () => {
         setMeeting(JSON.parse(data.meeting || '{}'));
         setOpen(JSON.parse(data.open || '{}'));
         setPresentIllness(JSON.parse(data.presentIllness || ""));
+          // 
         if (data.medications && data.medications.length > 0) {
           // Update medications state with the fetched data
           setMedications(data.medications.map((med:any) => ({
@@ -1722,18 +1723,18 @@ const PatientEncounterInfo:React.FC = () => {
         }
 
         // Set orders data if available
-      if (data.orders && data.orders.length > 0) {
-        setOrders(data.orders.map((order:any) => ({
-          id: order.id, order: order.order_type, requisition: order.requisition
-        })));
-      }
+        if (data.orders && data.orders.length > 0) {
+          setOrders(data.orders.map((order:any) => ({
+            id: order.id, order: order.order_type, requisition: order.requisition
+          })));
+        }
 
-      // Set procedures data if available
-      if (data.procedures && data.procedures.length > 0) {
-        setProcedures(data.procedures.map((procedure:any) => ({
-          id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
-        })));
-      }
+        // Set procedures data if available
+        if (data.procedures && data.procedures.length > 0) {
+          setProcedures(data.procedures.map((procedure:any) => ({
+            id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
+          })));
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -1743,8 +1744,8 @@ const PatientEncounterInfo:React.FC = () => {
 
 const handleSubmit = async () => {
   try {
-    // Adding a delay of 2 seconds (2000ms) before sending the request
-    await new Promise(resolve => setTimeout(resolve, 2000)); 
+    // Adding a delay of 1 seconds (1000ms) before sending the request
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
 
     const response = await axios.post(
       'http://localhost:5000/api/encounter', 
@@ -1771,7 +1772,6 @@ const handleSubmit = async () => {
     );
     
     alert(response.data.message);
-    console.log("physicalExamination state:", physicalExamination);
   } catch (error) {
     console.error('Error saving data:', error); // Log the error for debugging
     alert('Error saving data');
