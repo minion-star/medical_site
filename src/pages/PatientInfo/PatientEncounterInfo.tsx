@@ -1360,7 +1360,7 @@ function Addable_Assessment({
           <Grid item xs={4}>
             <FormControl fullWidth variant="standard">
               <Input
-                id={`assessment-${id}`}
+                id={`assessment-code-${id}`}
                 multiline
                 value={assessment.code}
                 onChange={handleCodeChange}
@@ -1371,7 +1371,7 @@ function Addable_Assessment({
           <Grid item xs={4}>
             <FormControl fullWidth variant="standard">
               <Input
-                id={`assessment-onset-select-${id}`}
+                id={`assessment-onset-${id}`}
                 multiline
                 value={assessment.onset}
                 onChange={handleOnsetChange}
@@ -1380,7 +1380,29 @@ function Addable_Assessment({
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`assessment-nature-select-${id}`}>Nature</InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={assessment.nature}
+                onChange={handleNatureChange}
+                label="Nature"
+                name="nature"
+              >
+                <MenuItem value="Minor">Minor</MenuItem>
+                <MenuItem value="Self Limited">Self Limited</MenuItem>
+                <MenuItem value="Time Limited">Time Limited</MenuItem>
+                <MenuItem value="Acute">Acute</MenuItem>
+                <MenuItem value="Chronic">Chronic</MenuItem>
+                <MenuItem value="Intermittent">Intermittent</MenuItem>
+                <MenuItem value="Recurrent">Recurrent</MenuItem>
+                <MenuItem value="Condition">Condition</MenuItem>
+                <MenuItem value="Symptom">Symptom</MenuItem>
+                <MenuItem value="Finding">Finding</MenuItem>
+                <MenuItem value="Limitation">Limitation</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
             <FormControl fullWidth variant="standard">
@@ -1399,7 +1421,7 @@ function Addable_Assessment({
                 id={`assessment-note-${id}`}
                 multiline
                 value={assessment.note}
-                onChange={handleDescChange}
+                onChange={handleNoteChange}
                 startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
               />
             </FormControl>
@@ -1419,6 +1441,39 @@ function Addable_Assessment({
     </Box>
   );
 }
+type AssessmentProps = {
+  assessments: { id: number; code: string; onset: string; nature: string; desc: string; note: string }[];
+  onAddAssessment: () => void;
+  onDeleteAssessment: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+const Assessment: React.FC<AssessmentProps> = ({
+  assessments,
+  onAddAssessment,
+  onDeleteAssessment,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {assessments.map((assessment, index) => (
+        <Addable_Assessment
+          key={assessment.id}
+          id={assessment.id}
+          onDelete={onDeleteAssessment}
+          place={index + 1}
+          disableDelete={assessments.length === 1} // Disable delete if only one item remains
+          assessment={assessment}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddAssessment} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
+
 
 
 const PatientEncounterInfo:React.FC = () => {
@@ -1475,6 +1530,9 @@ const PatientEncounterInfo:React.FC = () => {
     ]);
     const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
       { id: 1, order: '', requisition: '' },
+    ]);
+    const [assessments, setAssessments] = useState<{id: number; code: string; onset: string; nature:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', nature: '', desc: '', note: ''}
     ]);
     const [procedures, setProcedures] = useState<{ id: number; code: string; description: string; note: string }[]>([
       { id: 1, code: '', description: '', note: '' },
@@ -1755,8 +1813,8 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   };
 
   const handleAddMedication = () => {
-    const nextId = medications.length ? Math.max(...medications.map(m => m.id)) + 1 : 1;
-    setMedications([...medications, { id: nextId, unit: '', qty: '', refills: '', sig: '', rx: '' }]);
+    const nextId = assessments.length ? Math.max(...assessments.map(m => m.id)) + 1 : 1;
+    setAssessments([...assessments, { id: nextId, code: '', onset: '', nature: '', desc: '', note: '' }]);
   };
 
   const handleDeleteMedication = (id: number) => {
@@ -1770,7 +1828,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
     field: string,
     value: string | number
   ) => {
-    setMedications(medications.map((med) =>
+    setAssessments(assessments.map((med) =>
       med.id === id ? { ...med, [field]: value } : med
     ));
   };
@@ -1815,6 +1873,27 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   ) => {
     setProcedures(procedures.map((procedure) =>
       procedure.id === id ? { ...procedure, [field]: value } : procedure
+    ));
+  };
+
+  const handleAddAssessment = () => {
+    const nextId = assessments.length ? Math.max(...assessments.map(m => m.id)) + 1 : 1;
+    setAssessments([...assessments, { id: nextId, code: '', onset: '', nature: '', desc: '', note: '' }]);
+  };
+
+  const handleDeleteAssessment = (id: number) => {
+    if (assessments.length > 1) {
+      setAssessments(assessments.filter((med) => med.id !== id));
+    }
+  };
+
+  const handleChangeAssessmentField = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
+    setMedications(medications.map((med) =>
+      med.id === id ? { ...med, [field]: value } : med
     ));
   };
 
@@ -3058,7 +3137,12 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                             <Divider sx={{mt:2}}/>
                             {/* New Assessments */}
                             <Grid container spacing={1}>
-                            
+                              <Assessment
+                                assessments={assessments}
+                                onAddAssessment={handleAddAssessment}
+                                onDeleteAssessment={handleDeleteAssessment}
+                                onFieldChange={handleChangeAssessmentField}
+                              />
                             </Grid>
                           </div>
                           <div className="order-requistion" style={styles.container}>
