@@ -1951,7 +1951,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                 <h2>Vital Signs</h2> 
                               </Grid>                
                               <Grid item xs={1} sx={{mb:2}}>
-                                <VitalSignsModal csn={id}/>
+                                <VitalSignsModal csn={id} height={vitalSigns.height} weight={vitalSigns.weight}/>
                               </Grid>           
                               <Grid item container  xs={3}  sx={{display:"flex", alignItems:'end'}}>
                                 <Grid item xs={5} >
