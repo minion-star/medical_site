@@ -1735,6 +1735,13 @@ const PatientEncounterInfo:React.FC = () => {
             id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
           })));
         }
+
+        // Set assess,emts data of available
+        if (data.assessments && data.assessments.length > 0) {
+          setAssessments(data.assessments.map((assessment:any) => ({
+            id: assessment.id, code: assessment.mastercode, desc: assessment.description, note: assessment.note, onset:assessment.onset, nature:assessment.nature
+          })));
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -1763,6 +1770,7 @@ const handleSubmit = async () => {
         medications,
         orders,
         procedures,
+        assessments,
       },
       {
         headers: {
@@ -2033,7 +2041,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
     field: string,
     value: string | number
   ) => {
-    setMedications(medications.map((med) =>
+    setAssessments(assessments.map((med) =>
       med.id === id ? { ...med, [field]: value } : med
     ));
   };
