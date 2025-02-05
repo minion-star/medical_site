@@ -1,17 +1,19 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import PrintIcon from "@mui/icons-material/Print";
 import Badge from "@mui/material/Badge";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Avatar from "@mui/material/Avatar";
+import {Avatar,SpeedDial, SpeedDialAction, SpeedDialIcon} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AppBar, Drawer } from "../styles";
 import { settings } from "../constant";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -19,21 +21,51 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import { mainListItems, secondaryListItems } from "./listItems";
+import AddIcon from "@mui/icons-material/Add";
+
 
 export default function Appbar_Patient(props: { appBarTitle: string; id: string|undefined }) {
   const location = useLocation(); // Get current route
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-  const [open, setOpen] = React.useState(false);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const [showSpeedDial, setShowSpeedDial] = useState(true);
+  const navigate = useNavigate();
+  const [encounters, setEncounters] = useState<string[]>(() => {
+    const savedEncounters = localStorage.getItem(`encounters_${props.id}`);
+    return savedEncounters ? JSON.parse(savedEncounters) : ["1"];
+  });
 
+  useEffect(() => {
+    localStorage.setItem(`encounters_${props.id}`, JSON.stringify(encounters));
+  }, [encounters, props.id]);
+
+
+  useEffect(() => {
+    if (props.appBarTitle.includes("ENCOUNTER")) {
+      setShowSpeedDial(false);
+    } else {
+      setShowSpeedDial(true);
+    }
+  }, [props.appBarTitle]);
   // Define tab paths
   const tabs = [
     { label: "GENERAL", path: `/patient-info/${props.id}` },
     { label: "HISTORY", path: `/patient-info-history/${props.id}` },
-    { label: "ENCOUNTER", path: `/patient-info-encounter/${props.id}` },
+    ...encounters.map((id) => ({
+      label: `ENCOUNTER ${id}`,
+      path: `/patient-info-encounter/${props.id}/${id}`
+    }))
   ];
 
   // Determine the currently active tab based on the route
   const currentTab = tabs.findIndex((tab) => tab.path === location.pathname);
+
+  const addEncounter = () => {
+    const newId = (encounters.length + 1).toString(); // Generate a unique ID
+    setEncounters([...encounters, newId]);
+    navigate(`/patient-info-encounter/${props.id}/${newId}`);
+    console.log(encounters);
+  };
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -47,8 +79,30 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
     setAnchorElUser(null);
   };
 
+
   return (
     <Box sx={{ display: "flex" }}>
+      {showSpeedDial&&(<SpeedDial
+        
+        ariaLabel="encounter-tool"
+        icon={<SpeedDialIcon />}
+        sx={{ position: "absolute", bottom: 4, right: 4 }}
+        FabProps={{ color: "success" }}
+      >
+        {/* <SpeedDialAction key="Delete" icon={<DeleteIcon />} tooltipTitle="Delete" /> */}
+        <SpeedDialAction
+          key="Print"
+          icon={<PrintIcon />}
+          tooltipTitle="Print"
+        />
+        <SpeedDialAction
+          key="Add" icon={<AddIcon />} tooltipTitle="Add"
+          onClick={addEncounter}
+        />
+        {/* <SpeedDialAction key="Lock" icon={<LockIcon />} tooltipTitle="Lock" /> */}
+        {/* <SpeedDialAction key="Add" icon={<AddIcon />} tooltipTitle="Add" /> */}
+      </SpeedDial>)}
+      
       <AppBar position="absolute" open={open}>
         <Toolbar sx={{ height: "64px", pr: "24px" }}>
           <IconButton
@@ -70,7 +124,7 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
               textColor="inherit"
               indicatorColor="secondary"
               sx={{height:"100%",minHeight: "64px"}}
-              
+              variant="scrollable"
             >
               {tabs.map((tab, index) => (
                 <Tab
