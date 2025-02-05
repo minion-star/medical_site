@@ -415,8 +415,8 @@ app.post('/api/history', async (req, res) => {
             VALUES (?, ?, ?, ?, ?)
           `;
           for (let mastermedicationlist of masterMedicationLists) {
-            const { rx, select, state, sig } = mastermedicationlist;
-            const insertMasterMedicationListParams = [rx, select, sig, state, newCSN];
+            const { rx, unit, state, sig } = mastermedicationlist;
+            const insertMasterMedicationListParams = [rx, unit, sig, state, newCSN];
             await db.query(insertMasterMedicationListQuery, insertMasterMedicationListParams);
           }
         }
@@ -465,6 +465,10 @@ app.get('/api/encounter/:id', async (req, res) => {
       const proceduresQuery = 'SELECT * FROM procedures WHERE CSN = ?';
       const [procedures] = await db.query(proceduresQuery, [id]);
 
+      // Fetch assessments related to the encounter
+      const assessmentsQuery = 'SELECT * FROM assessments WHERE CSN = ?';
+      const [assessments] = await db.query(assessmentsQuery, [id]);
+
       // If record exists, send the data back in the response
       res.json({
         head: record[0].HEAD,
@@ -479,6 +483,7 @@ app.get('/api/encounter/:id', async (req, res) => {
         medications: medications, // Return medications for the encounter
         orders: orders,           // Return orders for the encounter
         procedures: procedures,   // Return procedures for the encounter
+        assessments: assessments,
       });
     } else {
       res.status(404).json({ message: 'Data not found' });
@@ -503,8 +508,9 @@ app.post('/api/encounter', async (req, res) => {
     open,
     presentIllness,
     medications,
-    orders,       // Adding orders to the request body
-    procedures    // Adding procedures to the request body
+    orders,      
+    procedures,
+    assessments,
   } = req.body;
 
   try {
@@ -588,6 +594,22 @@ app.post('/api/encounter', async (req, res) => {
             await db.query(insertProcedureQuery, insertProcedureParams);
           }
         }
+        // Delete existing assessments before inserting new ones
+        const deleteAssessmentsQuery = 'DELETE FROM assessments WHERE CSN = ?';
+        await db.query(deleteAssessmentsQuery, [CSN]);
+
+        // Insert the assessments into the database
+        if (assessments && assessments.length > 0) {
+          const insertAssessmentQuery = `
+            INSERT INTO assessments (mastercode, onset, nature, description, note, CSN)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          for (let assessment of assessments) {
+            const {onset, mastercode, nature, description, note } = assessment;
+            const insertAssessmentParams = [onset, mastercode, nature, description, note, CSN];
+            await db.query(insertAssessmentQuery, insertAssessmentParams);
+          }
+        }
 
         return res.json({ message: "Data updated successfully" });
       } else {
@@ -640,6 +662,20 @@ app.post('/api/encounter', async (req, res) => {
             await db.query(insertProcedureQuery, insertProcedureParams);
           }
         }
+
+        // Insert the assessments into the database
+        if (assessments && assessments.length > 0) {
+          const insertAssessmentQuery = `
+            INSERT INTO assessments (mastercode, onset, nature, description, note, CSN)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          for (let assessment of assessments) {
+            const {onset, mastercode, nature, description, note } = assessment;
+            const insertAssessmentParams = [onset, mastercode, nature, description, note, CSN];
+            await db.query(insertAssessmentQuery, insertAssessmentParams);
+          }
+        }
+
 
         return res.json({ message: "Data inserted successfully" });
       }
