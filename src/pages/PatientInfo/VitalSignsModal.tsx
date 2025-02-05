@@ -167,26 +167,14 @@ interface vitalSignsModalProps {
   csn:string | undefined,
   height:string,
   weight:string ,
+  encounterid:string | undefined,
 }
 
-const VitalSignsModal = ({csn, height, weight}:vitalSignsModalProps) => {
+const VitalSignsModal = ({csn, encounterid, height, weight}:vitalSignsModalProps) => {
 
 
 
-    const [vitalSigns, setVitalSigns] = useState<VitalSigns>({systolic:"", diastolic:"", temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"",})
-  
-    useEffect(()=>{
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(`http://localhost:5000/api/encounter/${csn}`);
-          const data = response.data;
-          setVitalSigns(JSON.parse(data.vitalSigns || '{}'));
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-      fetchData();
-    },[]);
+    
           
     // Generate height for each weight based on BMI
     const generateHeightData = (bmi: number) => {
