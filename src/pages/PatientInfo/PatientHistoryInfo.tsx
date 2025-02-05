@@ -488,11 +488,11 @@ type Addable_MasterProblemListProps = {
   disableDelete: boolean;
   place: number;
   masterProblemList: {
-    code: string;
+    mastercode: string;
     onset: string;
     nature: string;
     description: string;
-    status: string;
+    masterstatus: string;
   };
   onFieldChange: (id: number, field: string, value: string | number) => void;
 };
@@ -506,7 +506,7 @@ function Addable_MasterProblemList({
   onFieldChange,
 }: Addable_MasterProblemListProps) {
   const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onFieldChange(id, 'code', event.target.value);
+    onFieldChange(id, 'mastercode', event.target.value);
   };
 
   const handleOnsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -522,7 +522,7 @@ function Addable_MasterProblemList({
   };
 
   const handleStatusChange = (event: SelectChangeEvent) => {
-    onFieldChange(id, 'status', event.target.value);
+    onFieldChange(id, 'masterstatus', event.target.value);
   };
 
   return (
@@ -537,7 +537,7 @@ function Addable_MasterProblemList({
               <Input
                 id={`masterproblemlist-code-${id}`}
                 multiline
-                value={masterProblemList.code}
+                value={masterProblemList.mastercode}
                 onChange={handleCodeChange}
                 startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
               />
@@ -596,10 +596,10 @@ function Addable_MasterProblemList({
               <Select
                 labelId="masterproblemlist-status"
                 id={`masterproblemlist-status-select-${id}`}
-                value={masterProblemList.status}
+                value={masterProblemList.masterstatus}
                 onChange={handleStatusChange}
                 label="Status"
-                name="status"
+                name="masterstatus"
               >
                 <MenuItem value="Improving">Improving</MenuItem>
                 <MenuItem value="Stable">Stable</MenuItem>
@@ -629,7 +629,7 @@ function Addable_MasterProblemList({
   );
 }
 type MasterProblemListProps = {
-  masterProblemLists: { id: number; code: string; onset: string; nature: string; description: string; status: string }[];
+  masterProblemLists: { id: number; mastercode: string; onset: string; nature: string; description: string; masterstatus: string }[];
   onAddMasterProblemList: () => void;
   onDeleteMasterProblemList: (id: number) => void;
   onFieldChange: (id: number, field: string, value: string | number) => void;
@@ -833,8 +833,8 @@ const PatientHistoryInfo:React.FC = () => {
     colorectalScreening:{date:"", sts:"", next:"", note:"",}, prostateScreening:{date:"", sts:"", next:"", note:"",}, screeningMammogram:{date:"", sts:"", next:"", note:"",}, screeningPapSmear:{date:"", sts:"", next:"", note:"",},});
   const [familyHistory, setFamilyHistory] = useState<FamilyHistory>({diabetes:{check:false, textfield:""}, stroke:{check:false, textfield:""},  hypertension:{check:false, textfield:""},  heartDisease:{check:false, textfield:""},  cancer:{check:false, textfield:""},   asthma:{check:false, textfield:""},  hayFever:{check:false, textfield:""},  arthritis:{check:false, textfield:""},  osteoporosis:{check:false, textfield:""}, anemia:{check:false, textfield:""}, migraine:{check:false, textfield:""}, alzheimers:{check:false, textfield:""},  epilepsy:{check:false, textfield:""},  glaucoma:{check:false, textfield:""},});
   const [socialHistory, setSocialHistory] = useState<SocialHistory>({alcoholUse:{check:false, textfield:""},  caffeineUse:{check:false, textfield:""},  tobaccoUse:{check:false, textfield:""},  drugsUse:{check:false, textfield:""},  chmExposure:{check:false, textfield:""},  tbExposure:{check:false, textfield:""},  hivExposure:{check:false, textfield:""},  sexRelations:{check:false, textfield:""},  exercise:{check:false, textfield:""}, sleepHabits:{check:false, textfield:""},});
-  const [masterProblemLists, setMasterProblemLists] = useState<{ id: number; code: string; onset: string; description:string; nature: string; status: string; }[]>([
-      { id: 1, code: '', onset: '', description: '', nature: '', status:'' },
+  const [masterProblemLists, setMasterProblemLists] = useState<{ id: number; mastercode: string; onset: string; description:string; nature: string; masterstatus: string; }[]>([
+      { id: 1, mastercode: '', onset: '', description: '', nature: '', masterstatus:'' },
     ]);
   const [masterMedicationLists, setMasterMedicationLists] = useState<{ id: number; rx: string; sig: string; select:string; status: string; }[]>([
       { id: 1, sig: '', rx: '', select: '', status:'' },
@@ -879,16 +879,14 @@ const PatientHistoryInfo:React.FC = () => {
         setSocialHistory(JSON.parse(data.SOCIAL_HISTORY || '{}'));
         if (data.masterProblemLists && data.masterProblemLists.length > 0) {
           setMasterProblemLists(data.masterProblemLists.map((med:any) => ({
-            id: med.id, status: med.status, code: med.code, onset: med.onset, description: med.description, nature: med.nature
+            id: med.id, masterstatus: med.masterstatus, mastercode: med.mastercode, onset: med.onset, description: med.description, nature: med.nature
           })));
         }
         if (data.masterMedicationLists && data.masterMedicationLists.length > 0) {
           setMasterMedicationLists(data.masterMedicationLists.map((med:any) => ({
-            id: med.id, status: med.status, sig: med.sig, select: med.select, rx:med.rx
+            id: med.id, status: med.state, sig: med.sig, select: med.unit, rx:med.rx
           })));
         }
-    
-        console.log("Health Maintenance:", healthMaintenance);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -932,7 +930,7 @@ const PatientHistoryInfo:React.FC = () => {
 
   const handleAddMasterProblemList = () => {
     const nextId = masterProblemLists.length ? Math.max(...masterProblemLists.map(m => m.id)) + 1 : 1;
-    setMasterProblemLists([...masterProblemLists, { id: nextId, code: '', onset: '', nature: '', description: '', status: '' }]);
+    setMasterProblemLists([...masterProblemLists, { id: nextId, mastercode: '', onset: '', nature: '', description: '', masterstatus: '' }]);
   };
 
   const handleDeleteMasterProblemList = (id: number) => {
@@ -1022,6 +1020,7 @@ const handleSubmit = async () => {
     }
   );
     alert(response.data.message);
+    console.log(masterMedicationLists);
   } catch (error) {
     console.error("Error submitting data:", error);
   }
