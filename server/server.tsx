@@ -373,7 +373,7 @@ app.post('/api/history', async (req, res) => {
           `;
           for (let mastermedicationlist of masterMedicationLists) {
             const { rx, unit, state, sig } = mastermedicationlist;
-            const insertMasterMedicationListParams = [unit, state, sig, rx, CSN];
+            const insertMasterMedicationListParams = [rx, unit, state, sig, CSN];
             await db.query(insertMasterMedicationListsQuery, insertMasterMedicationListParams);
           }
         }
@@ -390,7 +390,7 @@ app.post('/api/history', async (req, res) => {
           `;
           for (let masterproblemlist of masterProblemLists) {
             const { mastercode, onset, masterstatus, nature, description } = masterproblemlist;
-            const insertMasterProblemListParams = [mastercode, masterstatus, onset, nature, description, CSN];
+            const insertMasterProblemListParams = [mastercode, onset, masterstatus, nature, description, CSN];
             await db.query(insertMasterProblemListsQuery, insertMasterProblemListParams);
           }
         }
@@ -416,7 +416,7 @@ app.post('/api/history', async (req, res) => {
           `;
           for (let mastermedicationlist of masterMedicationLists) {
             const { rx, unit, state, sig } = mastermedicationlist;
-            const insertMasterMedicationListParams = [rx, unit, sig, state, newCSN];
+            const insertMasterMedicationListParams = [rx, unit, state, sig, newCSN];
             await db.query(insertMasterMedicationListQuery, insertMasterMedicationListParams);
           }
         }
