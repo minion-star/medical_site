@@ -22,7 +22,7 @@ import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import { mainListItems, secondaryListItems } from "./listItems";
 import AddIcon from "@mui/icons-material/Add";
-
+import axios from "axios";
 
 export default function Appbar_Patient(props: { appBarTitle: string; id: string|undefined }) {
   const location = useLocation(); // Get current route
@@ -30,14 +30,33 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
   const [open, setOpen] = useState<boolean>(false);
   const [showSpeedDial, setShowSpeedDial] = useState(true);
   const navigate = useNavigate();
-  const [encounters, setEncounters] = useState<string[]>(() => {
-    const savedEncounters = localStorage.getItem(`encounters_${props.id}`);
-    return savedEncounters ? JSON.parse(savedEncounters) : ["1"];
-  });
+  const [encounters, setEncounters] = useState<string[]>(["1"]);
+
+  
 
   useEffect(() => {
-    localStorage.setItem(`encounters_${props.id}`, JSON.stringify(encounters));
-  }, [encounters, props.id]);
+    const fetchPatient = async () => {
+      try {
+        const response = await axios.post(`http://localhost:5000/api/get_encounter_id`, {
+          CSN: props.id, // Send the ID as an object with key CSN
+        });
+  
+        const idData = response.data;  // Assuming API returns { encounterIDs: [...] }
+        if (Array.isArray(idData) && idData.length > 0) {
+          setEncounters(idData.map((item: any) => item.encounterID));
+        } else {
+          console.warn("No encounters found.");
+          setEncounters([]);
+        }
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
+      }
+    };
+  
+    if (props.id) {
+      fetchPatient();  // Ensure we only fetch if props.id exists
+    }
+  }, [props.id]);
 
 
   useEffect(() => {
