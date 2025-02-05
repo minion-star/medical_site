@@ -280,97 +280,163 @@ app.get("/api/general/:csn", async (req, res) => {
   
 
 
-app.get("/api/history/:csn", async (req, res) => {
-    const { csn } = req.params;
-  
-    try {
-      const [rows] = await db.query("SELECT * FROM history WHERE CSN = ?", [csn]);
-      if (rows.length === 0) {
-        return res.status(404).send("Patient not found");
-      }
-      
-      // Parse the `INFORMATION` column back into an object
-      const patient = {
-        ...rows[0],
-        KNOWN_ALLERGIES: JSON.parse(rows[0].KNOWN_ALLERGIES), 
-        HEALTH_MAINTENANCE: JSON.parse(rows[0].HEALTH_MAINTENANCE), 
-        FAMILY_HISTORY: JSON.parse(rows[0].FAMILY_HISTORY), 
-        SOCIAL_HISTORY: JSON.parse(rows[0].SOCIAL_HISTORY), 
-        MASTER_PROBLEM_LIST: JSON.parse(rows[0].MASTER_PROBLEM_LIST), 
-        MASTER_MEDICATION_LIST: JSON.parse(rows[0].MASTER_MEDICATION_LIST)
-      };
-      res.json(patient);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Server error");
+app.get("/api/history/:id", async (req, res) => {
+  const { id } = req.params;  // CSN (encounter ID)
+
+  try {
+    // SQL query to fetch encounter data by CSN
+    const query = 'SELECT * FROM history WHERE CSN = ?';
+    const [record] = await db.query(query, [id]);
+    console.log(record.length);
+    if (record.length > 0) {
+      // Fetch masterproblemlists related to the encounter
+      const masterproblemlistQuery = 'SELECT * FROM masterproblemlist WHERE CSN = ?';
+      const [masterProblemLists] = await db.query(masterproblemlistQuery, [id]);
+
+      // Fetch mastermedicationlist related to the encounter
+      const mastermedicationlistQuery = 'SELECT * FROM mastermedicationlist WHERE CSN = ?';
+      const [masterMedicationLists] = await db.query(mastermedicationlistQuery, [id]);
+      // If record exists, send the data back in the response
+      res.json({
+        PAST_MEDICAL_HISTORY: record[0].PAST_MEDICAL_HISTORY,
+        PAST_SURGICAL_HISTORY: record[0].PAST_SURGICAL_HISTORY,
+        KNOWN_ALLERGIES: record[0].KNOWN_ALLERGIES,
+        HEALTH_MAINTENANCE: record[0].HEALTH_MAINTENANCE,
+        FAMILY_HISTORY: record[0].FAMILY_HISTORY,
+        SOCIAL_HISTORY: record[0].SOCIAL_HISTORY,
+        masterProblemLists: masterProblemLists,
+        masterMedicationLists: masterMedicationLists,          
+      });
+    } else {
+      res.status(404).json({ message: 'Data not found' });
     }
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 });
 
 
 app.post('/api/history', async (req, res) => {
-  const data = req.body;  // Incoming data from the frontend
-  const { CSN } = data;
-  console.log("Received CSN:", CSN);
+  const {
+    CSN,
+    pastMedicalHistory,
+    pastSurgicalHistory,
+    knownAllergies,
+    healthMaintenance,
+    familyHistory,
+    socialHistory,
+    masterProblemLists,
+    masterMedicationLists,
+  } = req.body;
 
   try {
-    const checkQuery = `SELECT * FROM history WHERE CSN = ?`;
-    const [existingRecord] = await db.query(checkQuery, [CSN]);
+    // Adding a delay of 2 seconds before processing the request
+    setTimeout(async () => {
+      // Serialize fields into JSON strings
+      const pastMedicalHistoryJson = JSON.stringify(pastMedicalHistory);
+      const pastSurgicalHistoryJson = JSON.stringify(pastSurgicalHistory);
+      const knownAllergiesJson = JSON.stringify(knownAllergies);
+      const healthMaintenanceJson = JSON.stringify(healthMaintenance);
+      const familyHistoryJson = JSON.stringify(familyHistory);
+      const socialHistoryJson = JSON.stringify(socialHistory);      
+      // SQL query to check if the CSN exists
+      const checkCSNQuery = 'SELECT * FROM history WHERE CSN = ?';
+      const [existingRecord] = await db.query(checkCSNQuery, [CSN]);
 
-    if (existingRecord.length > 0) {
-      // CSN exists, perform an UPDATE query
-      const updateQuery = `
-        UPDATE history SET 
-          PAST_MEDICAL_HISTORY = ?, 
+      if (existingRecord.length > 0) {
+        // CSN exists, perform an UPDATE query
+        const updateQuery = `
+          UPDATE history 
+          SET PAST_MEDICAL_HISTORY = ?, 
           PAST_SURGICAL_HISTORY = ?, 
           KNOWN_ALLERGIES = ?, 
           HEALTH_MAINTENANCE = ?, 
           FAMILY_HISTORY = ?, 
-          SOCIAL_HISTORY = ?, 
-          MASTER_PROBLEM_LIST = ?, 
-          MASTER_MEDICATION_LIST = ? 
-        WHERE CSN = ?`;
+          SOCIAL_HISTORY = ?
+        WHERE CSN = ?
+        `;
+        const updateParams = [
+          pastMedicalHistoryJson, pastSurgicalHistoryJson, knownAllergiesJson, healthMaintenanceJson, familyHistoryJson, socialHistoryJson, CSN,
+        ];
+        await db.query(updateQuery, updateParams);
 
-      await db.query(updateQuery, [
-        data.PAST_MEDICAL_HISTORY || "",
-        data.PAST_SURGICAL_HISTORY || "",
-        JSON.stringify(data.KNOWN_ALLERGIES || {}),
-        JSON.stringify(data.HEALTH_MAINTENANCE || {}),
-        JSON.stringify(data.FAMILY_HISTORY || {}),
-        JSON.stringify(data.SOCIAL_HISTORY || {}),
-        JSON.stringify(data.MASTER_PROBLEM_LIST || {}),
-        JSON.stringify(data.MASTER_MEDICATION_LIST || {}),
-        CSN,
-      ]);
-      return res.json({ message: "Record updated successfully" });
-    } else {
-      // CSN doesn't exist, perform an INSERT query
-      const insertQuery = `
-        INSERT INTO history (
-          CSN, 
-          PAST_MEDICAL_HISTORY, 
-          PAST_SURGICAL_HISTORY, 
-          KNOWN_ALLERGIES, 
-          HEALTH_MAINTENANCE, 
-          FAMILY_HISTORY, 
-          SOCIAL_HISTORY, 
-          MASTER_PROBLEM_LIST, 
-          MASTER_MEDICATION_LIST
-        ) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        // Optionally delete existing medications before inserting new ones
+        const deleteMasterMedicationListsQuery = 'DELETE FROM mastermedicationlist WHERE CSN = ?';
+        await db.query(deleteMasterMedicationListsQuery, [CSN]);
 
-      await db.query(insertQuery, [
-        CSN,
-        data.PAST_MEDICAL_HISTORY || "",
-        data.PAST_SURGICAL_HISTORY || "",
-        JSON.stringify(data.KNOWN_ALLERGIES || {}),
-        JSON.stringify(data.HEALTH_MAINTENANCE || {}),
-        JSON.stringify(data.FAMILY_HISTORY || {}),
-        JSON.stringify(data.SOCIAL_HISTORY || {}),
-        JSON.stringify(data.MASTER_PROBLEM_LIST || {}),
-        JSON.stringify(data.MASTER_MEDICATION_LIST || {}),
-      ]);
-      return res.json({ message: "New record added successfully" });
-    }
+        // Insert the medications into the database
+        if (masterMedicationLists && masterMedicationLists.length > 0) {
+          const insertMasterMedicationListsQuery = `
+            INSERT INTO mastermedicationlist (rx, unit, state, sig, CSN)
+            VALUES (?, ?, ?, ?, ?)
+          `;
+          for (let mastermedicationlist of masterMedicationLists) {
+            const { rx, unit, state, sig } = mastermedicationlist;
+            const insertMasterMedicationListParams = [unit, state, sig, rx, CSN];
+            await db.query(insertMasterMedicationListsQuery, insertMasterMedicationListParams);
+          }
+        }
+
+
+        const deleteMasterProblemListsQuery = 'DELETE FROM masterproblemlist WHERE CSN = ?';
+        await db.query(deleteMasterProblemListsQuery, [CSN]);
+
+        // Insert the masterproblemlist into the database
+        if (masterProblemLists && masterProblemLists.length > 0) {
+          const insertMasterProblemListsQuery = `
+            INSERT INTO masterproblemlist (mastercode, onset, masterstatus, nature, description, CSN)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          for (let masterproblemlist of masterProblemLists) {
+            const { mastercode, onset, masterstatus, nature, description } = masterproblemlist;
+            const insertMasterProblemListParams = [mastercode, masterstatus, onset, nature, description, CSN];
+            await db.query(insertMasterProblemListsQuery, insertMasterProblemListParams);
+          }
+        }
+
+        return res.json({ message: "Data updated successfully" });
+      } else {
+        // CSN does not exist, perform an INSERT query
+        const insertQuery = `
+          INSERT INTO history (CSN, PAST_MEDICAL_HISTORY, PAST_SURGICAL_HISTORY, KNOWN_ALLERGIES, HEALTH_MAINTENANCE, FAMILY_HISTORY, SOCIAL_HISTORY)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        const insertParams = [
+          CSN, pastMedicalHistoryJson, pastSurgicalHistoryJson, knownAllergiesJson, healthMaintenanceJson, familyHistoryJson, socialHistoryJson
+        ];
+        const result = await db.query(insertQuery, insertParams);
+        const newCSN = result.insertId; // Get the new encounter ID (CSN)
+
+        // Insert mastermedicationlist into the database
+        if (masterMedicationLists && masterMedicationLists.length > 0) {
+          const insertMasterMedicationListQuery = `
+            INSERT INTO mastermedicationlist (rx, unit, state, sig, CSN)
+            VALUES (?, ?, ?, ?, ?)
+          `;
+          for (let mastermedicationlist of masterMedicationLists) {
+            const { rx, select, state, sig } = mastermedicationlist;
+            const insertMasterMedicationListParams = [rx, select, sig, state, newCSN];
+            await db.query(insertMasterMedicationListQuery, insertMasterMedicationListParams);
+          }
+        }
+
+        // Insert masterproblemlist into the database
+        if (masterProblemLists && masterProblemLists.length > 0) {
+          const insertMasterProblemListQuery = `
+            INSERT INTO masterproblemlist (mastercode, onset, masterstatus, nature, description, CSN)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          for (let masterproblemlist of masterMedicationLists) {
+            const { mastercode, onset, masterstatus, nature, description } = masterproblemlist;
+            const insertMasterProblemListParams = [mastercode, onset, masterstatus, nature, description, newCSN];
+            await db.query(insertMasterProblemListQuery, insertMasterProblemListParams);
+          }
+        }
+
+        return res.json({ message: "Data inserted successfully" });
+      }
+    }, 1000); // Delay of 2 seconds
   } catch (err) {
     console.error("Error during database operation:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
@@ -577,7 +643,7 @@ app.post('/api/encounter', async (req, res) => {
 
         return res.json({ message: "Data inserted successfully" });
       }
-    }, 2000); // Delay of 2 seconds
+    }, 1000); // Delay of 2 seconds
   } catch (err) {
     console.error("Error during database operation:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
