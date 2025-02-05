@@ -1474,6 +1474,142 @@ const Assessment: React.FC<AssessmentProps> = ({
   );
 };
 
+// Add Ongoing Problems
+type Addable_OngoingProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  ongoing: {
+    code: string;
+    onset: string;
+    status: string;
+    desc: string;
+    note: string;
+  };
+};
+
+function Addable_Ongoing({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  ongoing,
+}: Addable_OngoingProps) {
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-code-${id}`}
+                multiline
+                value={ongoing.code}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-onset-${id}`}
+                multiline
+                value={ongoing.onset}
+                startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`ongoin-status-select-${id}`}>Status</InputLabel>
+              <Select
+                labelId={`ongoing-status-${id}`}
+                id={`ongoing-status-${id}`}
+                value={ongoing.status}
+                label="Status"
+                name="status"
+              >
+                <MenuItem value="Improving">Improving</MenuItem>
+                <MenuItem value="Stable">Stable</MenuItem>
+                <MenuItem value="Controlled">Controlled</MenuItem>
+                <MenuItem value="Worsening">Worsening</MenuItem>
+                <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
+                <MenuItem value="Resolved">Resolved</MenuItem>
+                <MenuItem value="Ruled Out">Ruled Out</MenuItem>
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>                      
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-desc-${id}`}
+                multiline
+                value={ongoing.desc}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-note-${id}`}
+                multiline
+                value={ongoing.note}
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+type OngoingProps = {
+  ongoings: { id: number; code: string; onset: string; status: string; desc: string; note: string }[];
+  onAddOngoing: () => void;
+  onDeleteOngoing: (id: number) => void;
+};
+
+const Ongoing: React.FC<OngoingProps> = ({
+  ongoings,
+  onAddOngoing,
+  onDeleteOngoing,
+}) => {
+  return (
+    <Grid>
+      {ongoings.map((ongoing, index) => (
+        <Addable_Ongoing
+          key={ongoing.id}
+          id={ongoing.id}
+          onDelete={onDeleteOngoing}
+          place={index + 1}
+          disableDelete={ongoings.length === 1} // Disable delete if only one item remains
+          ongoing={ongoing}
+        />
+      ))}
+      <IconButton onClick={onAddOngoing} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
 
 
 const PatientEncounterInfo:React.FC = () => {
@@ -1536,6 +1672,9 @@ const PatientEncounterInfo:React.FC = () => {
     ]);
     const [procedures, setProcedures] = useState<{ id: number; code: string; description: string; note: string }[]>([
       { id: 1, code: '', description: '', note: '' },
+    ]);
+    const [ongoings, setOngoings] = useState<{id: number; code: string; onset: string; status:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', status: '', desc: '', note: ''}
     ]);
     const [meeting, setMeeting] = useState<Meeting>({emcode:"", emcodeEdit:"", codeBasis:"", codeBasisEdit:"", calculation:"", period:"", time:"",})
     const cleanString = (str:string) => {
@@ -1886,6 +2025,18 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
       setAssessments(assessments.filter((med) => med.id !== id));
     }
   };
+
+  const handleAddOngoing = () => {
+    const nextId = ongoings.length ? Math.max(...ongoings.map(m => m.id)) + 1 : 1;
+    setOngoings([...ongoings, { id: nextId, code: '', onset: '', status: '', desc: '', note: '' }]);
+  };
+
+  const handleDeleteOngoing = (id: number) => {
+    if (ongoings.length > 1) {
+      setOngoings(ongoings.filter((med) => med.id !== id));
+    }
+  };
+
 
   const handleChangeAssessmentField = (
     id: number,
@@ -3118,21 +3269,11 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                             <h2>Assessment / Diagnosis</h2>
                             {/* Ongoing Problems */}
                             <Grid container spacing={1}>
-                              <Grid item xs={4}>
-                                <TextField/>
-                              </Grid>
-                              <Grid item xs={4}>
-                                <TextField/>
-                              </Grid>
-                              <Grid item xs={4}>
-                                <TextField/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <TextField/>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <TextField/>
-                              </Grid>
+                              <Ongoing 
+                                ongoings={ongoings}
+                                onAddOngoing={handleAddOngoing}
+                                onDeleteOngoing={handleDeleteOngoing}
+                              />
                             </Grid>
                             <Divider sx={{mt:2}}/>
                             {/* New Assessments */}
