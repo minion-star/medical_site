@@ -58,6 +58,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import LockIcon from '@mui/icons-material/Lock';
 import VitalSignsModal from "./VitalSignsModal";
 import StickySpeedDial from "./StickySpeedDial"
+import { useLocation } from 'react-router-dom';
 
 
 
@@ -1608,8 +1609,7 @@ const Ongoing: React.FC<OngoingProps> = ({
 
 
 const PatientEncounterInfo:React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-
+  const { id, encounterID } = useParams<{ id: string; encounterID:string; }>();
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [age, setAge] = useState<string>("");
@@ -1702,7 +1702,7 @@ const PatientEncounterInfo:React.FC = () => {
   useEffect(()=>{
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/encounter/${id}`);
+        const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
         const data = response.data;
 
         setHead(JSON.parse(data.head || '{}'));
@@ -1747,7 +1747,28 @@ const PatientEncounterInfo:React.FC = () => {
       }
     }
     fetchData();
-  },[id]);
+  },[id, encounterID]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/history/${id}`);
+        const data = response.data;
+        if (data.masterProblemLists && data.masterProblemLists.length > 0) {
+          setOngoings(data.masterProblemLists.map((med:any) => ({
+            id: med.id, status: med.masterstatus, code: med.mastercode, onset: med.onset, desc: med.description,
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [id]);
+
+
+
 
 const handleSubmit = async () => {
   try {
@@ -1758,6 +1779,7 @@ const handleSubmit = async () => {
       'http://localhost:5000/api/encounter', 
       {
         CSN:id,
+        encounterID,
         head,
         reviewOfSystems,
         chief,
@@ -2164,7 +2186,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               <Grid item xs={1}>
                                 <TextField
                                   id="outlined-multiline-static"
-                                  label="1"
+                                  label={encounterID}
                                   multiline
                                   variant="standard"
                                   disabled
@@ -2291,7 +2313,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                 <h2>Vital Signs</h2> 
                               </Grid>                
                               <Grid item xs={1} sx={{mb:2}}>
-                                <VitalSignsModal csn={id} height={vitalSigns.height} weight={vitalSigns.weight}/>
+                                <VitalSignsModal csn={id} height={vitalSigns.height} weight={vitalSigns.weight} encounterid={encounterID}/>
                               </Grid>           
                               <Grid item container  xs={3}  sx={{display:"flex", alignItems:'end'}}>
                                 <Grid item xs={5} >
@@ -3415,7 +3437,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                 </Grid>
           </Paper>
         </Container>
-        <StickySpeedDial/>
+
         
       </Box>
       
