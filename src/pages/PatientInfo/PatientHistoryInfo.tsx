@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import '../../styles.css'
 import {
+  InputAdornment,
   TextField,
   InputLabel,
   Select,
@@ -32,14 +33,15 @@ import { SelectChangeEvent } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Appbar from "../../components/Appbar";
 import { Link, useParams } from "react-router-dom";
-import { DisplaySettings } from "@mui/icons-material";
+import { DisplaySettings, Nature } from "@mui/icons-material";
 import { experimentalStyled as styled } from '@mui/material/styles';
 import { MenuProps } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoItem } from "@mui/x-date-pickers/internals/demo";
-
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from "@mui/icons-material/Add";
 
 // name
 
@@ -129,20 +131,6 @@ interface SocialHistory {
 }
 
 
-interface MasterProblemList {
-  code:string,
-  onset:string,
-  nature:string,
-  desc:string,
-  status:string,
-}
-
-interface MasterMedicationList {
-  rx:string,
-  sig:string,
-  select:string,
-  status:string,
-}
 
 interface StsProps {
   value:string;
@@ -493,7 +481,341 @@ function History({
   );
 }
 
+// Add MasterProblemList
+type Addable_MasterProblemListProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  masterProblemList: {
+    code: string;
+    onset: string;
+    nature: string;
+    description: string;
+    status: string;
+  };
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
 
+function Addable_MasterProblemList({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  masterProblemList,
+  onFieldChange,
+}: Addable_MasterProblemListProps) {
+  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'code', event.target.value);
+  };
+
+  const handleOnsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'onset', event.target.value);
+  };
+
+  const handleNatureChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'nature', event.target.value);
+  };
+
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'description', event.target.value);
+  };
+
+  const handleStatusChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'status', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`masterproblemlist-code-${id}`}
+                multiline
+                value={masterProblemList.code}
+                onChange={handleCodeChange}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`masterproblemlist-onset-${id}`}
+                multiline
+                value={masterProblemList.onset}
+                onChange={handleOnsetChange}
+                startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`masterproblemlist-nature-select-${id}`}>Nature</InputLabel>
+              <Select
+                labelId="masterproblemlist-nature"
+                id={`masterproblemlist-nature-select-${id}`}
+                value={masterProblemList.nature}
+                onChange={handleNatureChange}
+                label="Nature"
+                name="nature"
+              >
+                <MenuItem value="Minor">Minor</MenuItem>
+                <MenuItem value="Self Limited">Self Limited</MenuItem>
+                <MenuItem value="Time Limited">Time Limited</MenuItem>
+                <MenuItem value="Acute">Acute</MenuItem>
+                <MenuItem value="Chronic">Chronic</MenuItem>
+                <MenuItem value="Intermittent">Intermittent</MenuItem>
+                <MenuItem value="Recurrent">Recurrent</MenuItem>
+                <MenuItem value="Condition">Condition</MenuItem>
+                <MenuItem value="Symptom">Symptom</MenuItem>
+                <MenuItem value="Finding">Finding</MenuItem>
+                <MenuItem value="Limitation">Limitation</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`masterproblemlist-description-${id}`}
+                multiline
+                value={masterProblemList.description}
+                onChange={handleDescriptionChange}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`masterproblemlist-status-select-${id}`}>Status</InputLabel>
+              <Select
+                labelId="masterproblemlist-status"
+                id={`masterproblemlist-status-select-${id}`}
+                value={masterProblemList.status}
+                onChange={handleStatusChange}
+                label="Status"
+                name="status"
+              >
+                <MenuItem value="Improving">Improving</MenuItem>
+                <MenuItem value="Stable">Stable</MenuItem>
+                <MenuItem value="Controlled">Controlled</MenuItem>
+                <MenuItem value="Worsening">Worsening</MenuItem>
+                <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
+                <MenuItem value="Resolved">Resolved</MenuItem>
+                <MenuItem value="Ruled Out">Ruled Out</MenuItem>
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+type MasterProblemListProps = {
+  masterProblemLists: { id: number; code: string; onset: string; nature: string; description: string; status: string }[];
+  onAddMasterProblemList: () => void;
+  onDeleteMasterProblemList: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+const MasterProblemList: React.FC<MasterProblemListProps> = ({
+  masterProblemLists,
+  onAddMasterProblemList,
+  onDeleteMasterProblemList,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {masterProblemLists.map((masterProblemList, index) => (
+        <Addable_MasterProblemList
+          key={masterProblemList.id}
+          id={masterProblemList.id}
+          onDelete={onDeleteMasterProblemList}
+          place={index + 1}
+          disableDelete={masterProblemLists.length === 1} // Disable delete if only one item remains
+          masterProblemList={masterProblemList}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddMasterProblemList} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
+
+// Add MasterMedicationList
+
+type Addable_MasterMedicationListProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  masterMedicationList: {
+    rx: string;
+    sig: string;
+    select: string;
+    status: string;
+  };
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+function Addable_MasterMedicationList({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  masterMedicationList,
+  onFieldChange,
+}: Addable_MasterMedicationListProps) {
+  const handleRxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'rx', event.target.value);
+  };
+
+  const handleSigChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'sig', event.target.value);
+  };
+
+  const handleSelectChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'select', event.target.value);
+  };
+
+  const handleStatusChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'status', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={10}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`masterproblemlist-rx-${id}`}
+                multiline
+                value={masterMedicationList.rx}
+                onChange={handleRxChange}
+                startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={2}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`masterproblemlist-nature-select-${id}`}></InputLabel>
+              <Select
+                labelId="masterproblemlist-select"
+                id={`masterproblemlist-select-${id}`}
+                value={masterMedicationList.select}
+                onChange={handleSelectChange}
+                label=""
+                name="select"
+              >
+                <MenuItem value="GEQ">GEQ</MenuItem>
+                <MenuItem value="DAW">DAW</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`masterproblemlist-sig-${id}`}
+                multiline
+                value={masterMedicationList.sig}
+                onChange={handleSigChange}
+                startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`masterproblemlist-status-select-${id}`}>Status</InputLabel>
+              <Select
+                labelId="masterproblemlist-status"
+                id={`masterproblemlist-status-select-${id}`}
+                value={masterMedicationList.status}
+                onChange={handleStatusChange}
+                label="Status"
+                name="status"
+              >
+                <MenuItem value="Improving">Improving</MenuItem>
+                <MenuItem value="Stable">Stable</MenuItem>
+                <MenuItem value="Controlled">Controlled</MenuItem>
+                <MenuItem value="Worsening">Worsening</MenuItem>
+                <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
+                <MenuItem value="Resolved">Resolved</MenuItem>
+                <MenuItem value="Ruled Out">Ruled Out</MenuItem>
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+type MasterMedicationListProps = {
+  masterMedicationLists: { id: number; rx: string; select: string; sig: string; status: string }[];
+  onAddMasterMedicationList: () => void;
+  onDeleteMasterMedicationList: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+const MasterMedicationList: React.FC<MasterMedicationListProps> = ({
+  masterMedicationLists,
+  onAddMasterMedicationList,
+  onDeleteMasterMedicationList,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {masterMedicationLists.map((masterMedicationList, index) => (
+        <Addable_MasterMedicationList
+          key={masterMedicationList.id}
+          id={masterMedicationList.id}
+          onDelete={onDeleteMasterMedicationList}
+          place={index + 1}
+          disableDelete={masterMedicationLists.length === 1} // Disable delete if only one item remains
+          masterMedicationList={masterMedicationList}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddMasterMedicationList} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
 
 
 
@@ -511,9 +833,13 @@ const PatientHistoryInfo:React.FC = () => {
     colorectalScreening:{date:"", sts:"", next:"", note:"",}, prostateScreening:{date:"", sts:"", next:"", note:"",}, screeningMammogram:{date:"", sts:"", next:"", note:"",}, screeningPapSmear:{date:"", sts:"", next:"", note:"",},});
   const [familyHistory, setFamilyHistory] = useState<FamilyHistory>({diabetes:{check:false, textfield:""}, stroke:{check:false, textfield:""},  hypertension:{check:false, textfield:""},  heartDisease:{check:false, textfield:""},  cancer:{check:false, textfield:""},   asthma:{check:false, textfield:""},  hayFever:{check:false, textfield:""},  arthritis:{check:false, textfield:""},  osteoporosis:{check:false, textfield:""}, anemia:{check:false, textfield:""}, migraine:{check:false, textfield:""}, alzheimers:{check:false, textfield:""},  epilepsy:{check:false, textfield:""},  glaucoma:{check:false, textfield:""},});
   const [socialHistory, setSocialHistory] = useState<SocialHistory>({alcoholUse:{check:false, textfield:""},  caffeineUse:{check:false, textfield:""},  tobaccoUse:{check:false, textfield:""},  drugsUse:{check:false, textfield:""},  chmExposure:{check:false, textfield:""},  tbExposure:{check:false, textfield:""},  hivExposure:{check:false, textfield:""},  sexRelations:{check:false, textfield:""},  exercise:{check:false, textfield:""}, sleepHabits:{check:false, textfield:""},});
-  const [masterProblemList, setMasterProblemList] = useState<MasterProblemList>({code:"", onset:"", nature:"", desc:"", status:"",});
-  const [masterMedicationList, setMasterMedicationList] = useState<MasterMedicationList>({rx:"", sig:"", select:"", status:"",});
-
+  const [masterProblemLists, setMasterProblemLists] = useState<{ id: number; code: string; onset: string; description:string; nature: string; status: string; }[]>([
+      { id: 1, code: '', onset: '', description: '', nature: '', status:'' },
+    ]);
+  const [masterMedicationLists, setMasterMedicationLists] = useState<{ id: number; rx: string; sig: string; select:string; status: string; }[]>([
+      { id: 1, sig: '', rx: '', select: '', status:'' },
+    ]);  
+  
   useEffect(() => {
     const fetchPatient = async () => {
       try {
@@ -545,14 +871,22 @@ const PatientHistoryInfo:React.FC = () => {
         const data = response.data;
   
         // Assuming your data comes in the correct format
-        setPastMedicalHistory(data.PAST_MEDICAL_HISTORY || "");
-        setPastSurgicalHistory(data.PAST_SURGICAL_HISTORY || "");
+        setPastMedicalHistory(JSON.parse(data.PAST_MEDICAL_HISTORY || ""));
+        setPastSurgicalHistory(JSON.parse(data.PAST_SURGICAL_HISTORY || ""));
         setKnownAllergies(JSON.parse(data.KNOWN_ALLERGIES || '{}'));
         setHealthMaintenance(JSON.parse(data.HEALTH_MAINTENANCE || '{}'));
         setFamilyHistory(JSON.parse(data.FAMILY_HISTORY || '{}'));
         setSocialHistory(JSON.parse(data.SOCIAL_HISTORY || '{}'));
-        setMasterProblemList(JSON.parse(data.MASTER_PROBLEM_LIST || '{}'));
-        setMasterMedicationList(JSON.parse(data.MASTER_MEDICATION_LIST || '{}'));
+        if (data.masterProblemLists && data.masterProblemLists.length > 0) {
+          setMasterProblemLists(data.masterProblemLists.map((med:any) => ({
+            id: med.id, status: med.status, code: med.code, onset: med.onset, description: med.description, nature: med.nature
+          })));
+        }
+        if (data.masterMedicationLists && data.masterMedicationLists.length > 0) {
+          setMasterMedicationLists(data.masterMedicationLists.map((med:any) => ({
+            id: med.id, status: med.status, sig: med.sig, select: med.select, rx:med.rx
+          })));
+        }
     
         console.log("Health Maintenance:", healthMaintenance);
       } catch (error) {
@@ -596,21 +930,47 @@ const PatientHistoryInfo:React.FC = () => {
   };
 
 
-const handleMasterProblemListChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
-    const { name, value } = e.target;
-    setMasterProblemList((prev) => ({
-      ...prev,
-      [name as keyof MasterProblemList]: value as string
-    }));
-};
+  const handleAddMasterProblemList = () => {
+    const nextId = masterProblemLists.length ? Math.max(...masterProblemLists.map(m => m.id)) + 1 : 1;
+    setMasterProblemLists([...masterProblemLists, { id: nextId, code: '', onset: '', nature: '', description: '', status: '' }]);
+  };
 
-const handleMasterMedicationListChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
-  const { name, value } = e.target;
-  setMasterMedicationList((prev) => ({
-    ...prev,
-    [name as keyof MasterMedicationList]: value as string
-  }));
-};
+  const handleDeleteMasterProblemList = (id: number) => {
+    if (masterProblemLists.length > 1) {
+      setMasterProblemLists(masterProblemLists.filter((med) => med.id !== id));
+    }
+  };
+
+  const handleChangeMasterProblemListField = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
+    setMasterProblemLists(masterProblemLists.map((med) =>
+      med.id === id ? { ...med, [field]: value } : med
+    ));
+  };
+
+  const handleAddMasterMedicationList = () => {
+    const nextId = masterMedicationLists.length ? Math.max(...masterMedicationLists.map(m => m.id)) + 1 : 1;
+    setMasterMedicationLists([...masterMedicationLists, { id: nextId, rx: '', sig: '', select: '', status: '' }]);
+  };
+
+  const handleDeleteMasterMedicationList = (id: number) => {
+    if (masterMedicationLists.length > 1) {
+      setMasterMedicationLists(masterMedicationLists.filter((med) => med.id !== id));
+    }
+  };
+
+  const handleChangeMasterMedicationListField = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
+    setMasterMedicationLists(masterMedicationLists.map((med) =>
+      med.id === id ? { ...med, [field]: value } : med
+    ));
+  };
 
 const handleFamilyHistoryChange = (
   key: keyof FamilyHistory, // The specific condition (e.g., "diabetes", "stroke")
@@ -642,21 +1002,26 @@ const handleSocialHistoryChange = (
 
 
 const handleSubmit = async () => {
-  const data = {
-    CSN: id,  // This is your CSN (id)
-    PAST_MEDICAL_HISTORY: pastMedicalHistory,
-    PAST_SURGICAL_HISTORY: pastSurgicalHistory,
-    KNOWN_ALLERGIES: JSON.stringify(knownAllergies),
-    HEALTH_MAINTENANCE: JSON.stringify(healthMaintenance),
-    FAMILY_HISTORY: JSON.stringify(familyHistory),
-    SOCIAL_HISTORY: JSON.stringify(socialHistory),
-    MASTER_PROBLEM_LIST: JSON.stringify(masterProblemList),
-    MASTER_MEDICATION_LIST: JSON.stringify(masterMedicationList),
-  };
-
   try {
-    const response = await axios.post('http://localhost:5000/api/history', data);
-    console.log(response.data.message);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const response = await axios.post('http://localhost:5000/api/history', {
+      CSN: id,
+      pastMedicalHistory,
+      pastSurgicalHistory,
+      knownAllergies,
+      healthMaintenance,
+      familyHistory,
+      socialHistory,
+      masterProblemLists,
+      masterMedicationLists,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json', // Set the correct content-type
+      },
+    }
+  );
+    alert(response.data.message);
   } catch (error) {
     console.error("Error submitting data:", error);
   }
@@ -1367,156 +1732,24 @@ const handleSubmit = async () => {
                           </div>
                           <div className="master-problem-list" style={styles.container}>
                               <h2>Master Problem List</h2>
-                              <Grid container rowSpacing={1} columnSpacing={1}>
-                                <Grid item xs={4}>
-                                  <TextField
-                                      id="outlined-multiline-static"
-                                      label="Code"
-                                      multiline
-                                      variant="standard"
-                                      fullWidth
-                                      value={masterProblemList.code}
-                                      onChange={handleMasterProblemListChange}
-                                      name="code"
-                                    />
-                                </Grid>
-                                <Grid item xs={4}>
-                                  <TextField
-                                      id="outlined-multiline-static"
-                                      label="Onset"
-                                      multiline
-                                      variant="standard"
-                                      fullWidth
-                                      value={masterProblemList.onset}
-                                      onChange={handleMasterProblemListChange}
-                                      name="onset"
-                                    />
-                                </Grid>
-                                <Grid item xs={4}>
-                                  <FormControl variant="standard" fullWidth>
-                                    <InputLabel id="demo-simple-select-standard-label">Nature</InputLabel>
-                                    <Select
-                                      labelId="demo-simple-select-standard-label"
-                                      id="demo-simple-select-standard"
-                                      value={masterProblemList.nature}
-                                      onChange={handleMasterProblemListChange}
-                                      label="Nature"
-                                      name="nature"
-                                    >
-                                      <MenuItem value="Minor">Minor</MenuItem>
-                                      <MenuItem value="Self Limited">Self Limited</MenuItem>
-                                      <MenuItem value="Time Limited">Time Limited</MenuItem>
-                                      <MenuItem value="Acute">Acute</MenuItem>
-                                      <MenuItem value="Chronic">Chronic</MenuItem>
-                                      <MenuItem value="Intermittent">Intermittent</MenuItem>
-                                      <MenuItem value="Recurrent">Recurrent</MenuItem>
-                                      <MenuItem value="Condition">Condition</MenuItem>
-                                      <MenuItem value="Symptom">Symptom</MenuItem>
-                                      <MenuItem value="Finding">Finding</MenuItem>
-                                      <MenuItem value="Limitation">Limitation</MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={8}>
-                                  <TextField
-                                      id="outlined-multiline-static"
-                                      label="Desc"
-                                      multiline
-                                      variant="standard"
-                                      fullWidth
-                                      onChange={handleMasterProblemListChange}
-                                      value={masterProblemList.desc}
-                                      name="desc"
-                                    />
-                                </Grid>
-                                <Grid item xs={4}>
-                                  <FormControl variant="standard" fullWidth>
-                                    <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
-                                    <Select
-                                      labelId="demo-simple-select-standard-label"
-                                      id="demo-simple-select-standard"
-                                      value={masterProblemList.status}
-                                      onChange={handleMasterProblemListChange}
-                                      label="Status"
-                                      name="status"
-                                    >
-                                      <MenuItem value="Improving">Improving</MenuItem>
-                                      <MenuItem value="Stable">Stable</MenuItem>
-                                      <MenuItem value="Controlled">Controlled</MenuItem>
-                                      <MenuItem value="Worsening">Worsening</MenuItem>
-                                      <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
-                                      <MenuItem value="Resolved">Resolved</MenuItem>
-                                      <MenuItem value="Ruled Out">Ruled Out</MenuItem>
-                                      <MenuItem value="Active">Active</MenuItem>
-                                      <MenuItem value="Inactive">Inactive</MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                </Grid>
+                              <Grid container spacing={1}>
+                                <MasterProblemList
+                                  masterProblemLists={masterProblemLists}
+                                  onAddMasterProblemList={handleAddMasterProblemList}
+                                  onDeleteMasterProblemList={handleDeleteMasterProblemList}
+                                  onFieldChange={handleChangeMasterProblemListField}
+                                  />
                               </Grid>
                           </div>
                           <div className="master-medication-list" style={styles.container}>
                               <h2>Master Medication List</h2>
-                              <Grid container rowSpacing={1} columnSpacing={1} sx={{alignItems:"end"}}>
-                                <Grid item xs={10}>
-                                  <TextField
-                                      id="outlined-multiline-static"
-                                      label="Rx"
-                                      multiline
-                                      variant="standard"
-                                      fullWidth
-                                      onChange={handleMasterMedicationListChange}
-                                      value={masterMedicationList.rx}
-                                      name="rx"
-                                    />
-                                </Grid>
-                                <Grid item xs={2}>
-                                  <FormControl variant="standard" fullWidth>
-          
-                                    <Select
-                                      labelId="demo-simple-select-standard-label"
-                                      id="demo-simple-select-standard"
-                                      value={masterMedicationList.select}
-                                      onChange={handleMasterMedicationListChange}
-                                      label="Unit"
-                                      name="select"
-                                    >
-                                      <MenuItem value="GEQ">GEQ</MenuItem>
-                                      <MenuItem value="DAW">DAW</MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                </Grid>
-                                <Grid item xs={8}>
-                                  <TextField
-                                      id="outlined-multiline-static"
-                                      label="Sig"
-                                      multiline
-                                      variant="standard"
-                                      fullWidth
-                                      onChange={handleMasterMedicationListChange}
-                                      value={masterMedicationList.sig}
-                                      name="sig"
-                                    />
-                                </Grid>
-                                <Grid item xs={4}>
-                                  <FormControl variant="standard" fullWidth>
-                                    <InputLabel id="demo-simple-select-standard-label">Status</InputLabel>
-                                    <Select
-                                      labelId="demo-simple-select-standard-label"
-                                      id="demo-simple-select-standard"
-                                      value={masterMedicationList.status}
-                                      onChange={handleMasterMedicationListChange}
-                                      label="Status"
-                                      name="status"
-                                    >
-                                      <MenuItem value="Active">Active</MenuItem>
-                                      <MenuItem value="Inactive">Inactive</MenuItem>
-                                      <MenuItem value="Completed">Completed</MenuItem>
-                                      <MenuItem value="Discontinued">Discontinued</MenuItem>
-                                      <MenuItem value="Erroneous">Erroneous</MenuItem>
-                                      <MenuItem value="Not Covered">Not Covered</MenuItem>
-                                    </Select>
-                                  </FormControl>
-                                </Grid>
+                              <Grid container spacing={1}>
+                                <MasterMedicationList
+                                  masterMedicationLists={masterMedicationLists}
+                                  onAddMasterMedicationList={handleAddMasterMedicationList}
+                                  onDeleteMasterMedicationList={handleDeleteMasterMedicationList}
+                                  onFieldChange={handleChangeMasterMedicationListField}
+                                  />
                               </Grid>
                           </div>                        
                         </Grid>                      
