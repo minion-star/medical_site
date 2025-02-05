@@ -163,8 +163,13 @@ const TabPanel: React.FC<TabPanelProps> = ({ value, index, children }) => {
   return value === index ? <Box>{children}</Box> : null;
 };
 
+interface vitalSignsModalProps {
+  csn:string | undefined,
+  height:string,
+  weight:string ,
+}
 
-const VitalSignsModal: React.FC<{csn: string|undefined }> = ({csn}) => {
+const VitalSignsModal = ({csn, height, weight}:vitalSignsModalProps) => {
 
 
 
@@ -223,7 +228,7 @@ const VitalSignsModal: React.FC<{csn: string|undefined }> = ({csn}) => {
         },
         {
             label: "Record",
-            data: vitalSignsData.map((entry) => ({ x: entry.weight, y: entry.height })), // Scatter points
+            data: [{x: parseFloat(weight), y: parseFloat(height)}], // Scatter points
             borderColor: "blue", // Color for the dots
             backgroundColor: "blue",
             pointRadius: 5, // Size of the dots
