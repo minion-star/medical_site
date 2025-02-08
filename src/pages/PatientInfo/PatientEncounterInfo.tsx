@@ -969,7 +969,7 @@ function Addable_Medication_Rx({
               <Input
                 id={`medication-rx-${id}`}
                 multiline
-                value={medication.rx}
+                value={medication.rx||""}
                 onChange={handleRxChange}
                 startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
               />
@@ -980,7 +980,7 @@ function Addable_Medication_Rx({
               <Select
                 labelId={`medication-rx-unit-select-${id}`}
                 id={`medication-rx-unit-select-${id}`}
-                value={medication.unit}
+                value={medication.unit||""}
                 onChange={handleChange}
                 label="unit"
               >
@@ -994,7 +994,7 @@ function Addable_Medication_Rx({
               <Input
                 id={`medication-sig-${id}`}
                 multiline
-                value={medication.sig}
+                value={medication.sig||""}
                 onChange={handleSigChange}
                 startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
               />
@@ -1363,7 +1363,7 @@ function Addable_Assessment({
               <Input
                 id={`assessment-code-${id}`}
                 multiline
-                value={assessment.code}
+                value={assessment.code||""}
                 onChange={handleCodeChange}
                 startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
               />
@@ -1374,7 +1374,7 @@ function Addable_Assessment({
               <Input
                 id={`assessment-onset-${id}`}
                 multiline
-                value={assessment.onset}
+                value={assessment.onset||""}
                 onChange={handleOnsetChange}
                 startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
               />
@@ -1386,7 +1386,7 @@ function Addable_Assessment({
               <Select
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
-                value={assessment.nature}
+                value={assessment.nature||""}
                 onChange={handleNatureChange}
                 label="Nature"
                 name="nature"
@@ -1410,7 +1410,7 @@ function Addable_Assessment({
               <Input
                 id={`assessment-desc-${id}`}
                 multiline
-                value={assessment.desc}
+                value={assessment.desc||""}
                 onChange={handleDescChange}
                 startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
               />
@@ -1421,7 +1421,7 @@ function Addable_Assessment({
               <Input
                 id={`assessment-note-${id}`}
                 multiline
-                value={assessment.note}
+                value={assessment.note||""}
                 onChange={handleNoteChange}
                 startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
               />
@@ -1922,6 +1922,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   for (let i = 34.4; i <= 41.7; i += 0.1) {
     tp.push(i.toFixed(1)); // Convert to string with one decimal place
   }
+
   const pr = Array.from({ length: 161  }, (_, index) => index + 40);
   const rr = Array.from({ length: 64  }, (_, index) => index + 2);
   const sp02 = Array.from({ length: 91  }, (_, index) => index + 10);
@@ -1977,8 +1978,8 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   };
 
   const handleAddMedication = () => {
-    const nextId = assessments.length ? Math.max(...assessments.map(m => m.id)) + 1 : 1;
-    setAssessments([...assessments, { id: nextId, code: '', onset: '', nature: '', desc: '', note: '' }]);
+    const nextId = medications.length ? Math.max(...medications.map(m => m.id)) + 1 : 1;
+    setMedications([...medications, { id: nextId, unit: '', qty: '', refills: '', sig: '', rx: '' }]);
   };
 
   const handleDeleteMedication = (id: number) => {
@@ -1992,12 +1993,12 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
     field: string,
     value: string | number
   ) => {
-    setAssessments(assessments.map((med) =>
+    setMedications(medications.map((med) =>
       med.id === id ? { ...med, [field]: value } : med
     ));
   };
 
-
+// Order
   const handleAddOrder = () => {
     const nextId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1;
     setOrders([...orders, { id: nextId, order: '', requisition: '' }]);
@@ -2018,7 +2019,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
       order.id === id ? { ...order, [field]: value } : order
     ));
   };
-
+// Procedure
   const handleAddProcedure = () => {
     const nextId = procedures.length ? Math.max(...procedures.map(p => p.id)) + 1 : 1;
     setProcedures([...procedures, { id: nextId, code: '', description: '', note: '' }]);
@@ -2039,7 +2040,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
       procedure.id === id ? { ...procedure, [field]: value } : procedure
     ));
   };
-
+// Assessment
   const handleAddAssessment = () => {
     const nextId = assessments.length ? Math.max(...assessments.map(m => m.id)) + 1 : 1;
     setAssessments([...assessments, { id: nextId, code: '', onset: '', nature: '', desc: '', note: '' }]);
@@ -2051,13 +2052,6 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
     }
   };
 
-  const handleDeleteOngoing = (id: number) => {
-    if (ongoings.length > 1) {
-      setOngoings(ongoings.filter((med) => med.id !== id));
-    }
-  };
-
-
   const handleChangeAssessmentField = (
     id: number,
     field: string,
@@ -2067,6 +2061,16 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
       med.id === id ? { ...med, [field]: value } : med
     ));
   };
+
+  // ongoing
+  const handleDeleteOngoing = (id: number) => {
+    if (ongoings.length > 1) {
+      setOngoings(ongoings.filter((med) => med.id !== id));
+    }
+  };
+
+
+
 
   const handleInputChange = (field: string, value: string) => {
     setMeeting((prev) => ({
