@@ -1512,26 +1512,7 @@ function Addable_Ongoing({
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <FormControl variant="standard" fullWidth>
-              <InputLabel id={`ongoin-status-select-${id}`}>Status</InputLabel>
-              <Select
-                labelId={`ongoing-status-${id}`}
-                id={`ongoing-status-${id}`}
-                value={ongoing.status}
-                label="Status"
-                name="status"
-              >
-                <MenuItem value="Improving">Improving</MenuItem>
-                <MenuItem value="Stable">Stable</MenuItem>
-                <MenuItem value="Controlled">Controlled</MenuItem>
-                <MenuItem value="Worsening">Worsening</MenuItem>
-                <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
-                <MenuItem value="Resolved">Resolved</MenuItem>
-                <MenuItem value="Ruled Out">Ruled Out</MenuItem>
-                <MenuItem value="Active">Active</MenuItem>
-                <MenuItem value="Inactive">Inactive</MenuItem>                      
-              </Select>
-            </FormControl>
+
           </Grid>
           <Grid item xs={12}>
             <FormControl fullWidth variant="standard">
