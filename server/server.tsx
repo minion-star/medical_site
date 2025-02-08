@@ -287,7 +287,6 @@ app.get("/api/history/:id", async (req, res) => {
     // SQL query to fetch encounter data by CSN
     const query = 'SELECT * FROM history WHERE CSN = ?';
     const [record] = await db.query(query, [id]);
-    console.log(record.length);
     if (record.length > 0) {
       // Fetch masterproblemlists related to the encounter
       const masterproblemlistQuery = 'SELECT * FROM masterproblemlist WHERE CSN = ?';
@@ -444,30 +443,30 @@ app.post('/api/history', async (req, res) => {
 });
 
 
-app.get('/api/encounter/:id', async (req, res) => {
-  const { id } = req.params;  // CSN (encounter ID)
+app.get('/api/encounter/:id/:encounterID', async (req, res) => {
+  const { id, encounterID} = req.params;  
 
   try {
     // SQL query to fetch encounter data by CSN
-    const query = 'SELECT * FROM encounter WHERE CSN = ?';
-    const [record] = await db.query(query, [id]);
+    const query = 'SELECT * FROM encounter WHERE CSN = ? AND encounterID = ?';
+    const [record] = await db.query(query, [id, encounterID]);
 
     if (record.length > 0) {
       // Fetch medications related to the encounter
-      const medicationsQuery = 'SELECT * FROM medications WHERE CSN = ?';
-      const [medications] = await db.query(medicationsQuery, [id]);
+      const medicationsQuery = 'SELECT * FROM medications WHERE CSN = ? AND encounterID = ?';
+      const [medications] = await db.query(medicationsQuery, [id, encounterID]);
 
       // Fetch orders related to the encounter
-      const ordersQuery = 'SELECT * FROM orders WHERE CSN = ?';
-      const [orders] = await db.query(ordersQuery, [id]);
+      const ordersQuery = 'SELECT * FROM orders WHERE CSN = ? AND encounterID = ?';
+      const [orders] = await db.query(ordersQuery, [id, encounterID]);
 
       // Fetch procedures related to the encounter
-      const proceduresQuery = 'SELECT * FROM procedures WHERE CSN = ?';
-      const [procedures] = await db.query(proceduresQuery, [id]);
+      const proceduresQuery = 'SELECT * FROM procedures WHERE CSN = ? AND encounterID = ?';
+      const [procedures] = await db.query(proceduresQuery, [id, encounterID]);
 
       // Fetch assessments related to the encounter
-      const assessmentsQuery = 'SELECT * FROM assessments WHERE CSN = ?';
-      const [assessments] = await db.query(assessmentsQuery, [id]);
+      const assessmentsQuery = 'SELECT * FROM assessments WHERE CSN = ? AND encounterID = ?';
+      const [assessments] = await db.query(assessmentsQuery, [id, encounterID]);
 
       // If record exists, send the data back in the response
       res.json({
@@ -498,6 +497,7 @@ app.get('/api/encounter/:id', async (req, res) => {
 app.post('/api/encounter', async (req, res) => {
   const {
     CSN,
+    encounterID,
     head,
     reviewOfSystems,
     chief,
@@ -529,84 +529,84 @@ app.post('/api/encounter', async (req, res) => {
 
       
       // SQL query to check if the CSN exists
-      const checkCSNQuery = 'SELECT * FROM encounter WHERE CSN = ?';
-      const [existingRecord] = await db.query(checkCSNQuery, [CSN]);
+      const checkCSNQuery = 'SELECT * FROM encounter WHERE CSN = ? AND encounterID = ?';
+      const [existingRecord] = await db.query(checkCSNQuery, [CSN, encounterID]);
 
       if (existingRecord.length > 0) {
         // CSN exists, perform an UPDATE query
         const updateQuery = `
           UPDATE encounter 
           SET HEAD = ?, REVIEW = ?, CHIEF = ?, HISTORY = ?, VITAL = ?, PHYSICAL = ?, MEETING = ?, OPEN = ?, PRESENTILLNESS = ?
-          WHERE CSN = ?
+          WHERE CSN = ? AND encounterID = ?
         `;
         const updateParams = [
-          headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson, CSN,
+          headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson, CSN, encounterID
         ];
         await db.query(updateQuery, updateParams);
 
         // Optionally delete existing medications before inserting new ones
-        const deleteMedicationsQuery = 'DELETE FROM medications WHERE CSN = ?';
-        await db.query(deleteMedicationsQuery, [CSN]);
+        const deleteMedicationsQuery = 'DELETE FROM medications WHERE CSN = ? AND encounterID = ?';
+        await db.query(deleteMedicationsQuery, [CSN, encounterID]);
 
         // Insert the medications into the database
         if (medications && medications.length > 0) {
           const insertMedicationQuery = `
-            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN, encounterID)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
           `;
           for (let medication of medications) {
             const { order, qty, refills, sig, rx } = medication;
-            const insertMedicationParams = [order, qty, refills, sig, rx, CSN];
+            const insertMedicationParams = [order, qty, refills, sig, rx, CSN, encounterID];
             await db.query(insertMedicationQuery, insertMedicationParams);
           }
         }
 
         // Delete existing orders before inserting new ones
-        const deleteOrdersQuery = 'DELETE FROM orders WHERE CSN = ?';
-        await db.query(deleteOrdersQuery, [CSN]);
+        const deleteOrdersQuery = 'DELETE FROM orders WHERE CSN = ? AND encounterID = ?';
+        await db.query(deleteOrdersQuery, [CSN, encounterID]);
 
         // Insert the orders into the database
         if (orders && orders.length > 0) {
           const insertOrderQuery = `
-            INSERT INTO orders (order_type, requisition, CSN)
-            VALUES (?, ?, ?)
+            INSERT INTO orders (order_type, requisition, CSN, encounterID)
+            VALUES (?, ?, ?, ?)
           `;
           for (let order of orders) {
-            const { order: orderType, requisition } = order;
-            const insertOrderParams = [orderType, requisition, CSN];
+            const { orderType, requisition } = order;
+            const insertOrderParams = [orderType, requisition, CSN, encounterID];
             await db.query(insertOrderQuery, insertOrderParams);
           }
         }
 
         // Delete existing procedures before inserting new ones
-        const deleteProceduresQuery = 'DELETE FROM procedures WHERE CSN = ?';
-        await db.query(deleteProceduresQuery, [CSN]);
+        const deleteProceduresQuery = 'DELETE FROM procedures WHERE CSN = ? AND encounterID = ?';
+        await db.query(deleteProceduresQuery, [CSN, encounterID]);
 
         // Insert the procedures into the database
         if (procedures && procedures.length > 0) {
           const insertProcedureQuery = `
-            INSERT INTO procedures (code, description, note, CSN)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO procedures (code, description, note, CSN, encounterID)
+            VALUES (?, ?, ?, ?, ?)
           `;
           for (let procedure of procedures) {
             const { code, description, note } = procedure;
-            const insertProcedureParams = [code, description, note, CSN];
+            const insertProcedureParams = [code, description, note, CSN, encounterID];
             await db.query(insertProcedureQuery, insertProcedureParams);
           }
         }
         // Delete existing assessments before inserting new ones
-        const deleteAssessmentsQuery = 'DELETE FROM assessments WHERE CSN = ?';
-        await db.query(deleteAssessmentsQuery, [CSN]);
+        const deleteAssessmentsQuery = 'DELETE FROM assessments WHERE CSN = ? AND encounterID = ?';
+        await db.query(deleteAssessmentsQuery, [CSN, encounterID]);
 
         // Insert the assessments into the database
         if (assessments && assessments.length > 0) {
           const insertAssessmentQuery = `
-            INSERT INTO assessments (mastercode, onset, nature, description, note, CSN)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO assessments (mastercode, onset, nature, description, note, CSN, encounterID)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
           `;
           for (let assessment of assessments) {
             const {onset, mastercode, nature, description, note } = assessment;
-            const insertAssessmentParams = [onset, mastercode, nature, description, note, CSN];
+            const insertAssessmentParams = [onset, mastercode, nature, description, note, CSN, encounterID];
             await db.query(insertAssessmentQuery, insertAssessmentParams);
           }
         }
@@ -615,24 +615,24 @@ app.post('/api/encounter', async (req, res) => {
       } else {
         // CSN does not exist, perform an INSERT query
         const insertQuery = `
-          INSERT INTO encounter (CSN, HEAD, REVIEW, CHIEF, HISTORY, VITAL, PHYSICAL, MEETING, OPEN, PRESENTILLNESS)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO encounter (CSN, encounterID, HEAD, REVIEW, CHIEF, HISTORY, VITAL, PHYSICAL, MEETING, OPEN, PRESENTILLNESS)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const insertParams = [
-          CSN, headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson
+          CSN, encounterID, headJson, reviewJson, chiefJson, historyJson, vitalJson, physicalJson, meetingJson, openJson, presentIllnessJson
         ];
         const result = await db.query(insertQuery, insertParams);
-        const newCSN = result.insertId; // Get the new encounter ID (CSN)
+        const newCSN = result.insertId; 
 
         // Insert medications into the database
         if (medications && medications.length > 0) {
           const insertMedicationQuery = `
-            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN, encounterID)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
           `;
           for (let medication of medications) {
             const { order, qty, refills, sig, rx } = medication;
-            const insertMedicationParams = [order, qty, refills, sig, rx, newCSN];
+            const insertMedicationParams = [order, qty, refills, sig, rx, newCSN, encounterID];
             await db.query(insertMedicationQuery, insertMedicationParams);
           }
         }
@@ -640,12 +640,12 @@ app.post('/api/encounter', async (req, res) => {
         // Insert orders into the database
         if (orders && orders.length > 0) {
           const insertOrderQuery = `
-            INSERT INTO orders (order_type, requisition, CSN)
-            VALUES (?, ?, ?)
+            INSERT INTO orders (order_type, requisition, CSN, encounterID)
+            VALUES (?, ?, ?, ?)
           `;
           for (let order of orders) {
-            const { order: orderType, requisition } = order;
-            const insertOrderParams = [orderType, requisition, newCSN];
+            const { orderType, requisition } = order;
+            const insertOrderParams = [orderType, requisition, newCSN, encounterID];
             await db.query(insertOrderQuery, insertOrderParams);
           }
         }
@@ -653,12 +653,12 @@ app.post('/api/encounter', async (req, res) => {
         // Insert procedures into the database
         if (procedures && procedures.length > 0) {
           const insertProcedureQuery = `
-            INSERT INTO procedures (code, description, note, CSN)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO procedures (code, description, note, CSN, encounterID)
+            VALUES (?, ?, ?, ?, ?)
           `;
           for (let procedure of procedures) {
             const { code, description, note } = procedure;
-            const insertProcedureParams = [code, description, note, newCSN];
+            const insertProcedureParams = [code, description, note, newCSN, encounterID];
             await db.query(insertProcedureQuery, insertProcedureParams);
           }
         }
@@ -666,12 +666,12 @@ app.post('/api/encounter', async (req, res) => {
         // Insert the assessments into the database
         if (assessments && assessments.length > 0) {
           const insertAssessmentQuery = `
-            INSERT INTO assessments (mastercode, onset, nature, description, note, CSN)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO assessments (mastercode, onset, nature, description, note, CSN, encounterID)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
           `;
           for (let assessment of assessments) {
             const {onset, mastercode, nature, description, note } = assessment;
-            const insertAssessmentParams = [onset, mastercode, nature, description, note, CSN];
+            const insertAssessmentParams = [onset, mastercode, nature, description, note, CSN, encounterID];
             await db.query(insertAssessmentQuery, insertAssessmentParams);
           }
         }
@@ -685,7 +685,23 @@ app.post('/api/encounter', async (req, res) => {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+app.post('/api/get_encounter_id', async (req, res) => {
+  const { CSN } = req.body;
 
+  if (!CSN) {
+    return res.status(400).json({ error: 'CSN is required' });
+  }
+
+  try {
+
+    const findIDQuery = 'SELECT encounterID FROM encounter WHERE CSN = ?';
+    const [encounterIDs] = await db.query(findIDQuery, [CSN,]);
+    res.json(encounterIDs);
+  } catch (error) {
+    console.error('Error fetching encounterIDs:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 // API Endpoint to Save Clinic Data
 app.post('/api/clinic', async(req, res) => {
   const {
