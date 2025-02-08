@@ -37,8 +37,8 @@ import { useParams } from "react-router-dom";
 
 
 interface VitalSigns {
-  systolic: number,
-  diastolic: number,
+  systolic: string,
+  diastolic: string,
   temperature: string,
   weight: string,
   height: string,
@@ -175,7 +175,7 @@ const VitalSignsModal = ({csn, encounterid, height, weight}:vitalSignsModalProps
 
     const {id} = useParams<{id: string}>();
 
-    const [vitalSigns, setVitalSigns] = useState<VitalSigns[]>([{systolic:0, diastolic:0, temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"", date:""}])
+    const [vitalSigns, setVitalSigns] = useState<VitalSigns[]>([{systolic:"", diastolic:"", temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"", date:""}])
   
     useEffect(()=>{
       const fetchData = async () => {
@@ -323,9 +323,9 @@ const VitalSignsModal = ({csn, encounterid, height, weight}:vitalSignsModalProps
           {
             label: 'Systolic Blood Pressure',
             data: vitalSigns.map((entry) => entry.systolic),
-            borderColor: vitalSigns.map((entry) => getSystolicLineColor(entry.systolic)),
+            borderColor: vitalSigns.map((entry) => getSystolicLineColor(parseFloat(entry.systolic))),
             borderWidth: 2,
-            pointBackgroundColor: vitalSigns.map((entry) => getSystolicLineColor(entry.systolic)),
+            pointBackgroundColor: vitalSigns.map((entry) => getSystolicLineColor(parseFloat(entry.systolic))),
             tension: 0.4, // Smoothing effect
           },
         ],
@@ -337,9 +337,9 @@ const VitalSignsModal = ({csn, encounterid, height, weight}:vitalSignsModalProps
           {
             label: 'Diastolic Blood Pressure',
             data: vitalSigns.map((entry) => entry.diastolic),
-            borderColor: vitalSigns.map((entry) => getDiastolicLineColor(entry.diastolic)),
+            borderColor: vitalSigns.map((entry) => getDiastolicLineColor(parseFloat(entry.diastolic))),
             borderWidth: 2,
-            pointBackgroundColor: vitalSigns.map((entry) => getDiastolicLineColor(entry.diastolic)),
+            pointBackgroundColor: vitalSigns.map((entry) => getDiastolicLineColor(parseFloat(entry.diastolic))),
             tension: 0.4, // Smoothing effect
           },
         ],
