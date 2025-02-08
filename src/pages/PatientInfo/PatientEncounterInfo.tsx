@@ -942,21 +942,6 @@ function Addable_Medication_Rx({
     onFieldChange(id, 'unit', event.target.value);
   };
 
-  const handleQtyChange = (event: SelectChangeEvent) => {
-    onFieldChange(id, 'qty', event.target.value);
-  };
-
-  const handleRefillsChange = (event: SelectChangeEvent) => {
-    onFieldChange(id, 'refills', event.target.value);
-  };
-
-  const handleSigChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onFieldChange(id, 'sig', event.target.value);
-  };
-
-  const handleRxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onFieldChange(id, 'rx', event.target.value);
-  };
 
   return (
     <Box style={{ padding: 4, margin: 8 }}>
