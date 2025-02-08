@@ -713,8 +713,18 @@ app.get('/api/vitalsigns/:CSN', async (req, res) => {
 
     if (rows.length > 0) {
       // Return all vital signs data for the provided CSN
-      const vitalSignsData = rows.map(row => JSON.parse(row.VITAL)); // Assuming VITAL is stored as JSON string
-      res.json({ vitalSigns: vitalSignsData });
+      const vitalSignsData = rows.map((row) => ({
+        date: row.created_at,
+        systolic: JSON.parse(row.VITAL).systolic,
+        diastolic: JSON.parse(row.VITAL).diastolic,
+        temperature: JSON.parse(row.VITAL).temperature,
+        weight: JSON.parse(row.VITAL).weight,
+        height: JSON.parse(row.VITAL).height,
+        respiration: JSON.parse(row.VITAL).respiration,
+        pulse: JSON.parse(row.VITAL).pulse,
+        spO2: JSON.parse(row.VITAL).spO2
+      }));
+      res.json(  vitalSignsData);
     } else {
       res.status(404).json({ message: 'No vital signs found for the provided CSN' });
     }
