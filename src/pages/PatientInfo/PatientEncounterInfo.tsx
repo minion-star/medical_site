@@ -844,9 +844,9 @@ function Addable_Order_Requisition({
                 onChange={handleOrderChange}
                 label="Order"
               >
-                <MenuItem value={10}>Lab</MenuItem>
-                <MenuItem value={20}>Rad</MenuItem>
-                <MenuItem value={30}>Gen</MenuItem>
+                <MenuItem value="Lab">Lab</MenuItem>
+                <MenuItem value="Rad">Rad</MenuItem>
+                <MenuItem value="Gen">Gen</MenuItem>
               </Select>
             </FormControl>
           </Grid>
