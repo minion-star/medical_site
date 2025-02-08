@@ -708,23 +708,27 @@ app.get('/api/vitalsigns/:CSN', async (req, res) => {
 
   try {
     // Query to fetch all rows where CSN matches
-    const query = 'SELECT VITAL FROM encounter WHERE CSN = ?';
+    const query = 'SELECT VITAL, created_at FROM encounter WHERE CSN = ?';
     const [rows] = await db.query(query, [CSN]);
 
     if (rows.length > 0) {
       // Return all vital signs data for the provided CSN
-      const vitalSignsData = rows.map((row) => ({
-        date: row.created_at,
-        systolic: JSON.parse(row.VITAL).systolic,
-        diastolic: JSON.parse(row.VITAL).diastolic,
-        temperature: JSON.parse(row.VITAL).temperature,
-        weight: JSON.parse(row.VITAL).weight,
-        height: JSON.parse(row.VITAL).height,
-        respiration: JSON.parse(row.VITAL).respiration,
-        pulse: JSON.parse(row.VITAL).pulse,
-        spO2: JSON.parse(row.VITAL).spO2
-      }));
-      res.json(  vitalSignsData);
+      const vitalSignsData = rows.map((row) => {
+        const createdAt = row.created_at ? row.created_at.toISOString().split('T')[0] : null; // Move this line here
+
+        return {
+          date: createdAt,
+          systolic: JSON.parse(row.VITAL).systolic,
+          diastolic: JSON.parse(row.VITAL).diastolic,
+          temperature: JSON.parse(row.VITAL).temperature,
+          weight: JSON.parse(row.VITAL).weight,
+          height: JSON.parse(row.VITAL).height,
+          respiration: JSON.parse(row.VITAL).respiration,
+          pulse: JSON.parse(row.VITAL).pulse,
+          spO2: JSON.parse(row.VITAL).spO2,
+        };
+      });
+      res.json(vitalSignsData);
     } else {
       res.status(404).json({ message: 'No vital signs found for the provided CSN' });
     }
