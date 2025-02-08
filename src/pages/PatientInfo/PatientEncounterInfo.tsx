@@ -578,3 +578,1832 @@ function Select_Checkbox_Switch({
         />
       </Grid>
 
+
+      {/* Label */}
+      <Grid item xs={3} sx={{ mt: 1.2 }}>
+        <label>{label}</label>
+      </Grid>
+
+      {/* Conditional rendering of New_Select_Checkbox */}
+      <Grid item xs={9}>
+        {frontCheck ? (
+          <New_Select_Checkbox
+            names={names}
+            backCheck={backCheck}
+            onBackCheckChange={onBackCheckChange}
+            textfield={textfield}
+            onTextFieldChange={onTextFieldChange}
+          />
+        ) : (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Grid item xs={1}>
+              <Checkbox color="success" disabled />
+            </Grid>
+            <Grid item xs={10}>
+              <FormControl variant="standard" fullWidth>
+                <Select multiple disabled={true} />
+              </FormControl>
+            </Grid>
+          </Box>
+        )}
+      </Grid>
+    </Box>
+  );
+}
+
+// history of illness checkbox
+function Select_History_Checkbox({
+  names,
+  label,
+  value,
+  onValueChange,
+}: {
+  names: string[] | string[][];
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
+}) {
+  const [dropdownValue, setDropdownValue] = useState<string[]>([]);
+
+  const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    const latestSelection = selectedValues[selectedValues.length - 1];
+
+    if (latestSelection.trim() !== "") {
+      onValueChange(value.trim() === "" ? latestSelection : `${value} | ${latestSelection}`);
+    }
+    setDropdownValue([]); // Reset dropdown value to prevent display of selected items
+  };
+
+  const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onValueChange(event.target.value);
+  };
+
+  const normalizedNames: string[][] = Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+  const processedNames = normalizedNames.flat();
+
+  return (
+    <Box sx={{ display: "flex", gap: 2 }}>
+      <Grid container alignItems={"end"}>
+        {/* Label */}
+        <Grid item xs={2}>
+          <label>{label}</label>
+        </Grid>
+        {/* TextField */}
+        <Grid item xs={9}>
+          <TextField fullWidth variant="standard" multiline value={value} onChange={handleTextFieldChange} />
+        </Grid>
+        {/* Select Dropdown */}
+        <Grid item xs={1}>
+          <FormControl variant="standard">
+            <Select multiple value={dropdownValue} onChange={handleSelectChange} renderValue={() => null} displayEmpty>
+              {processedNames.map((name, index) =>
+                name === "" ? (
+                  <MenuItem key={`separator-${index}`} disabled>
+                    <Typography variant="body2" sx={{ color: "gray" }}>
+                      <>&nbsp;</>
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                )
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+}
+
+
+// Adding Procedures / Services
+
+{/* Addable Component props */}
+
+type AddableComponentProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  procedure: { code: string; description: string; note: string };
+  onFieldChange: (id: number, field: string, value: string) => void;
+};
+
+function Addable_Procedure_Service({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  procedure,
+  onFieldChange,
+}: AddableComponentProps) {
+
+  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'code', event.target.value);
+  };
+
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'description', event.target.value);
+  };
+
+  const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'note', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container >
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid item xs={10} container spacing={1} alignItems="center">
+          <Grid item xs={2}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-code-${id}`}
+                value={procedure.code}
+                onChange={handleCodeChange}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={10}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-desc-${id}`}
+                value={procedure.description}
+                onChange={handleDescriptionChange}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-note-${id}`}
+                value={procedure.note}
+                onChange={handleNoteChange}
+                multiline
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+
+type Procedures_ServicesProps = {
+  procedures: { id: number; code: string; description: string; note: string }[];
+  onAddProcedure: () => void;
+  onDeleteProcedure: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string) => void;
+};
+
+const Procedures_Services: React.FC<Procedures_ServicesProps> = ({
+  procedures,
+  onAddProcedure,
+  onDeleteProcedure,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {procedures.map((procedure, index) => (
+        <Addable_Procedure_Service
+          key={procedure.id}
+          id={procedure.id}
+          place={index + 1} // Pass the order number (index + 1)
+          onDelete={onDeleteProcedure}
+          disableDelete={procedures.length === 1} // Disable delete if only one item remains
+          procedure={procedure}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddProcedure} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
+
+
+// Add Order / Requistion
+
+type Addable_Order_RequisitionProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  order: { order: string; requisition: string };
+  onFieldChange: (id: number, field: string, value: string) => void;
+};
+
+function Addable_Order_Requisition({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  order,
+  onFieldChange,
+}: Addable_Order_RequisitionProps) {
+  const handleOrderChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'order', event.target.value);
+  };
+
+  const handleRequisitionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'requisition', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container alignItems={"end"}>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid item xs={10} container spacing={1} alignItems={'end'}>
+          <Grid item xs={2}>
+            <FormControl fullWidth variant="standard">
+              <InputLabel id={`orders-requisition-order-${id}`}>Order</InputLabel>
+              <Select
+                labelId={`orders-requisition-order-select-${id}`}
+                id={`orders-requisition-order-select-${id}`}
+                value={order.order}
+                onChange={handleOrderChange}
+                label="Order"
+              >
+                <MenuItem value={10}>Lab</MenuItem>
+                <MenuItem value={20}>Rad</MenuItem>
+                <MenuItem value={30}>Gen</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={10}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-desc-${id}`}
+                value={order.requisition}
+                onChange={handleRequisitionChange}
+                multiline
+                startAdornment={<InputAdornment position="start">Requisition:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+
+
+type Orders_RequisitionsProps = {
+  orders: { id: number; order: string; requisition: string }[];
+  onAddOrder: () => void;
+  onDeleteOrder: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string) => void;
+};
+
+const Orders_Requisitions: React.FC<Orders_RequisitionsProps> = ({
+  orders,
+  onAddOrder,
+  onDeleteOrder,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {orders.map((order, index) => (
+        <Addable_Order_Requisition
+          key={order.id}
+          id={order.id}
+          onDelete={onDeleteOrder}
+          place={index + 1}
+          disableDelete={orders.length === 1} // Disable delete if only one item remains
+          order={order}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddOrder} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
+
+// Add Medications / Rx  
+
+
+type Addable_Medication_RxProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  medication: {
+    unit: string;
+    qty: string;
+    refills: string;
+    sig: string;
+    rx: string;
+  };
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+function Addable_Medication_Rx({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  medication,
+  onFieldChange,
+}: Addable_Medication_RxProps) {
+  const handleChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'unit', event.target.value);
+  };
+
+  const handleQtyChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'qty', event.target.value);
+  };
+
+  const handleRefillsChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'refills', event.target.value);
+  };
+
+  const handleSigChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'sig', event.target.value);
+  };
+
+  const handleRxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'rx', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={9}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`medication-rx-${id}`}
+                multiline
+                value={medication.rx||""}
+                onChange={handleRxChange}
+                startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth variant="standard">
+              <Select
+                labelId={`medication-rx-unit-select-${id}`}
+                id={`medication-rx-unit-select-${id}`}
+                value={medication.unit||""}
+                onChange={handleChange}
+                label="unit"
+              >
+                <MenuItem value="GEQ">GEQ</MenuItem>
+                <MenuItem value="DAW">DAW</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`medication-sig-${id}`}
+                multiline
+                value={medication.sig||""}
+                onChange={handleSigChange}
+                startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={2}>
+            <SelectQty qty={medication.qty} onChange={handleQtyChange} />
+          </Grid>
+          <Grid item xs={2}>
+            <SelectRefills refills={medication.refills} onChange={handleRefillsChange} />
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+
+type Medications_RxProps = {
+  medications: { id: number; unit: string; qty: string; refills: string; sig: string; rx: string }[];
+  onAddMedication: () => void;
+  onDeleteMedication: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+const Medications_Rx: React.FC<Medications_RxProps> = ({
+  medications,
+  onAddMedication,
+  onDeleteMedication,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {medications.map((medication, index) => (
+        <Addable_Medication_Rx
+          key={medication.id}
+          id={medication.id}
+          onDelete={onDeleteMedication}
+          place={index + 1}
+          disableDelete={medications.length === 1} // Disable delete if only one item remains
+          medication={medication}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddMedication} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
+
+
+type SelectQtyProps = {
+  qty: string;
+  onChange: (event: SelectChangeEvent) => void;
+};
+
+function SelectQty({ qty, onChange }: SelectQtyProps) {
+  const options = [
+    ...Array.from({ length: 120 }, (_, i) => i + 1),
+    125, 130, 135, 140, 145, 150, 160, 180, 220, 270, 360, 450, 540,
+    "1MO", "2MO", "3MO",
+  ];
+
+  return (
+    <div>
+      <FormControl variant="standard" fullWidth>
+        <InputLabel id="demo-simple-select-standard-label">Qty</InputLabel>
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={qty}
+          onChange={onChange}
+          label="Qty"
+        >
+          {options.map((option, index) => (
+            <MenuItem key={index} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+  );
+}
+
+type SelectRefillsProps = {
+  refills: string;
+  onChange: (event: SelectChangeEvent) => void;
+};
+
+function SelectRefills({ refills, onChange }: SelectRefillsProps) {
+  const options = [...Array.from({ length: 12 }, (_, i) => i + 1)];
+
+  return (
+    <div>
+      <FormControl variant="standard" fullWidth>
+        <InputLabel id="demo-simple-select-standard-label">Refills</InputLabel>
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={refills}
+          onChange={onChange}
+          label="Refills"
+        >
+          {options.map((option, index) => (
+            <MenuItem key={index} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+  );
+}
+
+
+// Select E/M Code:
+
+function Select_Code({ emcode, onChange }: { emcode: string; onChange: (value: string) => void }) {
+  return (
+    <FormControl fullWidth variant="standard">
+      <InputLabel id="demo-simple-select-standard-label">E/M Code:</InputLabel>
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={emcode}
+        onChange={(e) => onChange(e.target.value)}
+        label="Code"
+      >
+        <MenuItem value={10}>90791 - Psychiatric diagnostic eval, no medical services</MenuItem>
+        <MenuItem value={20}>90792 - Psychiatric diagnostic eval, w/medical services</MenuItem>
+        <MenuItem value={30}>90832 - Psychotherapy, 30 min(actual time 16-37min)</MenuItem>
+        <MenuItem value={40}>90834 - Psychotherapy, 45 min(actual time 38-52min)</MenuItem>
+      </Select>
+    </FormControl>
+  );
+}
+
+// Select Code Basis
+
+function Select_Code_Basis({ codeBasis, onChange }: { codeBasis: string; onChange: (value: string) => void }) {
+  return (
+    <FormControl fullWidth variant="standard">
+      <InputLabel id="demo-simple-select-standard-label">Code Basis:</InputLabel>
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={codeBasis}
+        onChange={(e) => onChange(e.target.value)}
+        label="Code Basis"
+      >
+        <MenuItem value={10}>Service</MenuItem>
+        <MenuItem value={20}>Time</MenuItem>
+      </Select>
+    </FormControl>
+  );
+}
+
+// Select Period
+
+function Select_Period({ period, onChange }: { period: string; onChange: (value: string) => void }) {
+  return (
+    <FormControl fullWidth variant="standard">
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={period}
+        onChange={(e) => onChange(e.target.value)}
+        label="Follow-up Visit"
+      >
+        <MenuItem value={10}>PRN</MenuItem>
+          <MenuItem value={20}>48 to 72 hours</MenuItem>
+          <MenuItem value={30}>Tomorrow</MenuItem>
+          <MenuItem value={40}>in 2 days</MenuItem>
+          <MenuItem value={50}>after 2 days</MenuItem>
+          <MenuItem value={60}>after 3 days</MenuItem>
+          <MenuItem value={70}>after 4 days</MenuItem>
+          <MenuItem value={80}>after 5 days</MenuItem>
+          <MenuItem value={90}>after 6 days</MenuItem>
+          <MenuItem value={100}>after 8 days</MenuItem>
+          <MenuItem value={110}>after 10 days</MenuItem>
+          <MenuItem value={120}>after 1 week</MenuItem>
+          <MenuItem value={130}>after 2 weeks</MenuItem>
+          <MenuItem value={140}>after 3 weeks</MenuItem>
+          <MenuItem value={150}>after 6 weeks</MenuItem>
+          <MenuItem value={160}>after 10 weeks</MenuItem>
+          <MenuItem value={170}>after 1 month</MenuItem>
+          <MenuItem value={180}>after 2 months</MenuItem>
+          <MenuItem value={190}>after 3 months</MenuItem>
+          <MenuItem value={200}>after 4 months</MenuItem>
+          <MenuItem value={210}>after 6 months</MenuItem>
+          <MenuItem value={220}>after 1 year</MenuItem>
+          <MenuItem value={230}>if not improved</MenuItem>
+          <MenuItem value={240}>if symptoms do not improve</MenuItem>
+          <MenuItem value={250}>after testing</MenuItem>
+          <MenuItem value={260}>after lab / xray</MenuItem>
+          <MenuItem value={270}>by telephone</MenuItem>
+          <MenuItem value={280}>call if not better</MenuItem>
+          <MenuItem value={290}>no further followup needed</MenuItem>
+          <MenuItem value={300}>as scheduled earlier</MenuItem>
+        {/* Add other MenuItems */}
+      </Select>
+    </FormControl>
+  );
+}
+
+// Select Time
+function Select_Time({ time, onChange }: { time: string; onChange: (value: string) => void }) {
+  return (
+    <FormControl fullWidth variant="standard">
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-standard"
+        value={time}
+        onChange={(e) => onChange(e.target.value)}
+        label="Join Work-School"
+      >
+         <MenuItem value={10}>after 2 days</MenuItem>
+          <MenuItem value={20}>after 3 days</MenuItem>
+          <MenuItem value={30}>after 4 days</MenuItem>
+          <MenuItem value={40}>after 5 days</MenuItem>
+          <MenuItem value={50}>after 6 days</MenuItem>
+          <MenuItem value={60}>after 10 days</MenuItem>
+          <MenuItem value={70}>after 1 week</MenuItem>
+          <MenuItem value={80}>after 2 weeks</MenuItem>
+          <MenuItem value={90}>after 3 weeks</MenuItem>
+          <MenuItem value={100}>after 1 month</MenuItem>
+          <MenuItem value={110}>after 2 months</MenuItem>
+          <MenuItem value={120}>after 3 months</MenuItem>
+        {/* Add other MenuItems */}
+      </Select>
+    </FormControl>
+  );
+}
+
+// Review of Systems
+interface CheckboxGroupProps {
+  label: string; // Label for the group
+  name: string[]; // Array of checkbox names (child checkboxes)
+  isParentChecked: boolean; // State for parent checkbox
+  childCheckedState: boolean[]; // State for child checkboxes
+  onParentChange: (checked: boolean) => void; // Callback for parent checkbox toggle
+  onChildChange: (index: number, checked: boolean) => void; // Callback for child checkbox toggle
+}
+
+const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
+  label,
+  name,
+  isParentChecked,
+  childCheckedState,
+  onParentChange,
+  onChildChange,
+}) => {
+
+  const handleParentChange = (checked: boolean) => {
+    onParentChange(checked);
+    if (!checked) {
+      // Reset all child checkboxes when parent is unchecked
+      name.forEach((_, index) => {
+        onChildChange(index, false);
+      });
+    }
+  };
+
+  return (
+    <Box sx={{ mb: 2 }}>
+      <FormGroup>
+        {/* Parent Checkbox */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isParentChecked}
+              onChange={(e) => handleParentChange(e.target.checked)}
+            />
+          }
+          label={<Typography variant="h6">{label}</Typography>}
+        />
+        {/* Conditionally Render Child Checkboxes */}
+        {isParentChecked && (
+          <Box sx={{ pl: 4 }}>
+            <Grid container rowSpacing={2}>
+              {name.map((childLabel, index) => (
+                <Grid item xs={6} key={index}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={childCheckedState[index]}
+                        onChange={(e) => onChildChange(index, e.target.checked)}
+                      />
+                    }
+                    label={childLabel}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+      </FormGroup>
+    </Box>
+  );
+};
+
+// Add Assessment
+type Addable_AssessmentProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  assessment: {
+    code: string;
+    onset: string;
+    nature: string;
+    desc: string;
+    note: string;
+  };
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+function Addable_Assessment({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  assessment,
+  onFieldChange,
+}: Addable_AssessmentProps) {
+  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'code', event.target.value);
+  };
+
+  const handleOnsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'onset', event.target.value);
+  };
+
+  const handleNatureChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'nature', event.target.value);
+  };
+
+  const handleDescChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'desc', event.target.value);
+  };
+
+  const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'note', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-code-${id}`}
+                multiline
+                value={assessment.code||""}
+                onChange={handleCodeChange}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-onset-${id}`}
+                multiline
+                value={assessment.onset||""}
+                onChange={handleOnsetChange}
+                startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`assessment-nature-select-${id}`}>Nature</InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={assessment.nature||""}
+                onChange={handleNatureChange}
+                label="Nature"
+                name="nature"
+              >
+                <MenuItem value="Minor">Minor</MenuItem>
+                <MenuItem value="Self Limited">Self Limited</MenuItem>
+                <MenuItem value="Time Limited">Time Limited</MenuItem>
+                <MenuItem value="Acute">Acute</MenuItem>
+                <MenuItem value="Chronic">Chronic</MenuItem>
+                <MenuItem value="Intermittent">Intermittent</MenuItem>
+                <MenuItem value="Recurrent">Recurrent</MenuItem>
+                <MenuItem value="Condition">Condition</MenuItem>
+                <MenuItem value="Symptom">Symptom</MenuItem>
+                <MenuItem value="Finding">Finding</MenuItem>
+                <MenuItem value="Limitation">Limitation</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-desc-${id}`}
+                multiline
+                value={assessment.desc||""}
+                onChange={handleDescChange}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-note-${id}`}
+                multiline
+                value={assessment.note||""}
+                onChange={handleNoteChange}
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+type AssessmentProps = {
+  assessments: { id: number; code: string; onset: string; nature: string; desc: string; note: string }[];
+  onAddAssessment: () => void;
+  onDeleteAssessment: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+const Assessment: React.FC<AssessmentProps> = ({
+  assessments,
+  onAddAssessment,
+  onDeleteAssessment,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {assessments.map((assessment, index) => (
+        <Addable_Assessment
+          key={assessment.id}
+          id={assessment.id}
+          onDelete={onDeleteAssessment}
+          place={index + 1}
+          disableDelete={assessments.length === 1} // Disable delete if only one item remains
+          assessment={assessment}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddAssessment} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
+
+// Add Ongoing Problems
+type Addable_OngoingProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  ongoing: {
+    code: string;
+    onset: string;
+    status: string;
+    desc: string;
+    note: string;
+  };
+};
+
+function Addable_Ongoing({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  ongoing,
+}: Addable_OngoingProps) {
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-code-${id}`}
+                multiline
+                value={ongoing.code}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-onset-${id}`}
+                multiline
+                value={ongoing.onset}
+                startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`ongoin-status-select-${id}`}>Status</InputLabel>
+              <Select
+                labelId={`ongoing-status-${id}`}
+                id={`ongoing-status-${id}`}
+                value={ongoing.status}
+                label="Status"
+                name="status"
+              >
+                <MenuItem value="Improving">Improving</MenuItem>
+                <MenuItem value="Stable">Stable</MenuItem>
+                <MenuItem value="Controlled">Controlled</MenuItem>
+                <MenuItem value="Worsening">Worsening</MenuItem>
+                <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
+                <MenuItem value="Resolved">Resolved</MenuItem>
+                <MenuItem value="Ruled Out">Ruled Out</MenuItem>
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>                      
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-desc-${id}`}
+                multiline
+                value={ongoing.desc}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-note-${id}`}
+                multiline
+                value={ongoing.note}
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+type OngoingProps = {
+  ongoings: { id: number; code: string; onset: string; status: string; desc: string; note: string }[];
+  onDeleteOngoing: (id: number) => void;
+};
+
+const Ongoing: React.FC<OngoingProps> = ({
+  ongoings,
+  onDeleteOngoing,
+}) => {
+  return (
+    <Grid>
+      {ongoings.map((ongoing, index) => (
+        <Addable_Ongoing
+          key={ongoing.id}
+          id={ongoing.id}
+          onDelete={onDeleteOngoing}
+          place={index + 1}
+          disableDelete={ongoings.length === 1} // Disable delete if only one item remains
+          ongoing={ongoing}
+        />
+      ))}
+    </Grid>
+  );
+};
+
+
+const PatientEncounterInfo:React.FC = () => {
+  const { id, encounterID } = useParams<{ id: string; encounterID:string; }>();
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [age, setAge] = useState<string>("");
+  const [avatarSrc, setAvatarSrc] = useState<string>("");
+
+
+  const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
+  const [reviewOfSystems, setReviewOfSystems] = useState<ReviewOfSystems>({
+    general: {fevers: false, sweats: false, weightLoss: false, Chills: false, appetiteLoss: false, fatigue: false },
+    eyes: {visionLoss: false, doubleVision: false, blurredVision: false, eyeIrritation: false, eyePain: false, lightSensitivity: false },
+    eNMT: {earache: false, earDischarge: false, ringingInTheEars: false, decreasedHearing: false, frequentColds: false, nasalCongestion: false, nosebleeds: false, bleedingGums: false, difficultySwallowing: false, hoarseness: false, soreThroat: false },
+    cardiovascular: {difficultyBreathingAtNight: false, chestPainOrDiscomfort: false, irregularHeartBeats: false, fatigue: false, lightheadedness: false, shortnessOfBreathWithExertion: false, palpitations: false, swellingOfHandsOrFeet: false, difficultyBreathingWhileLyingDown: false, legCrampsWithExertion: false, discolorationOfLipsOrNails: false, recentWeightGain: false },
+    respiratory: {sleepDisturbancesDueToBreathing: false, cough: false, coughingUpBlood: false, shortnessOfBreath: false, chestDiscomfort: false, wheezing: false, excessiveSputum: false, excessiveSnoring: false },
+    gastrointestinal: {changeInAppetite: false, indigestion: false, heartburn: false, nausea: false, vomiting: false, excessiveGas: false, abdominalPain: false, abdominalBloating: false, hemorrhoids: false, diarrhea: false, changeInBowelHabits: false, constipation: false, blackOrTarryStools: false, bloodyStools: false },
+    genitourinaryMale: {frequentUrination: false, bloodInUrine: false, foulUrinaryDischarge: false, kidneyPain: false, urinaryUrgency: false, troubleStartingUrinaryStream: false, inabilityToEmptyBladder: false, burningOrPainOnUrination: false, genitalRashesOrSores: false, testicularPainOrMasses: false },
+    genitourinaryFemale: {inabilityToControlBladder: false, unusualUrinaryColor: false, missedPeriods: false, excessivelyHeavyPeriods: false, lumpsOrSores: false, pelvicPain: false },
+    musculoskeletal: {jointPain: false, jointStiffnessOrSwelling: false, muscleCramps: false, muscleAches: false, lossOfStrength: false, backOrNeckPain: false, muscleWeakness: false },
+    skin: {suspiciousLesions: false, excessivePerspiration: false, dryness: false, rash: false, changesInHairOrNails: false, nightSweats: false, poorWoundHealing: false, itching: false, flushing: false, changesInColorOfSkin: false },
+    neurologic: {headaches: false, weaknessOrNumbness: false, tingling: false, faintsOrBlackouts: false, tremors: false, memoryLoss: false, poorBalance: false, difficultyWithSpeaking: false, difficultyWithConcentration: false, disturbancesInCoordination: false, briefParalysis: false, visualDisturbances: false, seizures: false, sensationOfRoomSpinning: false, excessiveDaytimeSleeping: false },
+    psychiatric: {Anxiety: false, Depression: false, Nervousness: false, memoryChange: false, frighteningVisionsOrSounds: false, thoughtsOfSuicideOrViolence: false },
+    endocrine: {heatOrColdIntolerance: false, weightChange: false, excessiveThirstOrHunger: false, excessiveSweatingOrUrination: false },
+    hematologicLymphatic: {skinDiscoloration: false, enlargedLymphNodes: false, bleeding: false, fevers: false, abnormalBruising: false },
+    allergicImmunologic: {seasonalAllergies: false, persistentInfections: false, hivesOrRash: false, hIVExposure: false },
+    checkReview:{checkGeneral:false, checkEyes:false, checkENMT:false, checkCardiovascular:false, checkRespiratory:false, checkGastrointestinal:false, checkGenitourinaryMale:false, checkGenitourinaryFemale:false, checkMusculoskeletal:false, checkSkin:false, checkNeurologic:false, checkPsychiatric:false, checkEndocrine:false, checkHematologicLymphatic:false, checkAllergicImmunologic:false,},
+  });
+  const [chief, setChief] = useState<string>("");
+  const [historyOfIllness, setHistoryOfIllness] = useState<HistoryOfIllness>({Location:"", Quality:"", Severity:"", Duration:"", OnsetTiming:"", Context:"", ModifyingFactors:"", SignsSymptoms:"",})
+  const [vitalSigns, setVitalSigns] = useState<VitalSigns>({systolic:"", diastolic:"", temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"",})
+  const [physicalExamination, setPhysicalExamination] = useState<PhysicalExamination>({constitutional_1:{ frontCheck: false, backCheck: false, textfield: "" },
+    eyes_1:{ frontCheck: false, backCheck: false, textfield: "" }, eyes_2:{ frontCheck: false, backCheck: false, textfield: "" }, eyes_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    enmt_1:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_2:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_3:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_4:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_5:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_6:{ frontCheck: false, backCheck: false, textfield: "" },
+    neck_1:{ frontCheck: false, backCheck: false, textfield: "" }, neck_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    respiratory_1:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_2:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_3:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_4:{ frontCheck: false, backCheck: false, textfield: "" },
+    cardiovascular_1:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_2:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_3:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_4:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_5:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_6:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_7:{ frontCheck: false, backCheck: false, textfield: "" },
+    breasts_1:{ frontCheck: false, backCheck: false, textfield: "" }, breasts_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    gastrointestinal_1:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_2:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_3:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_4:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_5:{ frontCheck: false, backCheck: false, textfield: "" },
+    genitourinaryFemale_1:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_2:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_3:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_4:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_5:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_6:{ frontCheck: false, backCheck: false, textfield: "" },
+    genitourinaryMale_1:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryMale_2:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryMale_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    lymphatic_1:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_2:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_3:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_4:{ frontCheck: false, backCheck: false, textfield: "" },
+    musculoskeletal_1:{ frontCheck: false, backCheck: false, textfield: "" }, musculoskeletal_2:{ frontCheck: false, backCheck: false, textfield: "" }, musculoskeletal_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    skin_1:{ frontCheck: false, backCheck: false, textfield: "" }, skin_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    neurologic_1:{ frontCheck: false, backCheck: false, textfield: "" }, neurologic_2:{ frontCheck: false, backCheck: false, textfield: "" }, neurologic_3:{ frontCheck: false, backCheck: false, textfield: "" }, 
+    psychiatric_1:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_2:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_3:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_4:{ frontCheck: false, backCheck: false, textfield: "" },});
+    const [open, setOpen] = useState<Record<string, boolean>>({});  
+    const [presentIllness, setPresentIllness] = useState<string>("");
+    
+    const [medications, setMedications] = useState<{ id: number; unit: string; qty: string; refills:string; sig: string; rx: string }[]>([
+      { id: 1, unit: '', qty: '', refills: '', sig: '', rx: '' },
+    ]);
+    const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
+      { id: 1, order: '', requisition: '' },
+    ]);
+    const [assessments, setAssessments] = useState<{id: number; code: string; onset: string; nature:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', nature: '', desc: '', note: ''}
+    ]);
+    const [procedures, setProcedures] = useState<{ id: number; code: string; description: string; note: string }[]>([
+      { id: 1, code: '', description: '', note: '' },
+    ]);
+    const [ongoings, setOngoings] = useState<{id: number; code: string; onset: string; status:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', status: '', desc: '', note: ''}
+    ]);
+    const [meeting, setMeeting] = useState<Meeting>({emcode:"", emcodeEdit:"", codeBasis:"", codeBasisEdit:"", calculation:"", period:"", time:"",})
+    const cleanString = (str:string) => {
+      return str.replace(/\\{1,}/g, '').replace(/^"|"$/g, '');  // Removes all escape characters
+    };
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/general/${id}`);
+        const patientData = response.data;
+
+        if (patientData.PHOTO) {
+          setAvatarSrc(`http://localhost:5000/${patientData.PHOTO}`);
+      
+        } 
+
+        // Populate states with fetched data
+        setFirstName(patientData.FIRST_NAME || "");
+        setLastName(patientData.LAST_NAME || "");
+        setAge(patientData.AGE || "");
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
+      } 
+
+    };
+
+    fetchPatient();
+  }, [id]);
+
+  useEffect(()=>{
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
+        const data = response.data;
+
+        setHead(JSON.parse(data.head || '{}'));
+        setReviewOfSystems(JSON.parse(data.reviewOfSystems || '{}'));
+        setChief(cleanString(data.chief || ''));
+        setHistoryOfIllness(JSON.parse(data.historyOfIllness || '{}'));
+        setVitalSigns(JSON.parse(data.vitalSigns || '{}'));
+        setPhysicalExamination(JSON.parse(data.physicalExamination || '{}'));
+        setMeeting(JSON.parse(data.meeting || '{}'));
+        setOpen(JSON.parse(data.open || '{}'));
+        setPresentIllness(JSON.parse(data.presentIllness || ""));
+          // 
+        if (data.medications && data.medications.length > 0) {
+          // Update medications state with the fetched data
+          setMedications(data.medications.map((med:any) => ({
+            id: med.id, order: med.order_type, qty: med.qty, refills: med.refills, sig: med.sig, rx: med.rx
+          })));
+        }
+
+        // Set orders data if available
+        if (data.orders && data.orders.length > 0) {
+          setOrders(data.orders.map((order:any) => ({
+            id: order.id, order: order.order_type, requisition: order.requisition
+          })));
+        }
+
+        // Set procedures data if available
+        if (data.procedures && data.procedures.length > 0) {
+          setProcedures(data.procedures.map((procedure:any) => ({
+            id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
+          })));
+        }
+
+        // Set assess,emts data of available
+        if (data.assessments && data.assessments.length > 0) {
+          setAssessments(data.assessments.map((assessment:any) => ({
+            id: assessment.id, code: assessment.mastercode, desc: assessment.description, note: assessment.note, onset:assessment.onset, nature:assessment.nature
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    fetchData();
+  },[id, encounterID]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/history/${id}`);
+        const data = response.data;
+        if (data.masterProblemLists && data.masterProblemLists.length > 0) {
+          setOngoings(data.masterProblemLists.map((med:any) => ({
+            id: med.id, status: med.masterstatus, code: med.mastercode, onset: med.onset, desc: med.description,
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [id]);
+
+
+
+
+const handleSubmit = async () => {
+  try {
+    // Adding a delay of 1 seconds (1000ms) before sending the request
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
+
+    const response = await axios.post(
+      'http://localhost:5000/api/encounter', 
+      {
+        CSN:id,
+        encounterID,
+        head,
+        reviewOfSystems,
+        chief,
+        historyOfIllness,
+        vitalSigns,
+        physicalExamination,
+        meeting,
+        open,
+        presentIllness,
+        medications,
+        orders,
+        procedures,
+        assessments,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json', // Set the correct content-type
+        },
+      }
+    );
+    
+    alert(response.data.message);
+  } catch (error) {
+    console.error('Error saving data:', error); // Log the error for debugging
+    alert('Error saving data');
+  }
+};
+
+const handlePresentIllnessChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  setPresentIllness(e.target.value as string);
+}
+  
+// 
+const handleHeadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+  const { name, value } = e.target;
+  setHead((prev) => ({
+    ...prev,
+    [name as keyof Head]: value as string
+  }));
+};
+
+// Chief Complaint / Encounter Reason
+
+const handleChiefChange = (newValue: string) => {
+  setChief(newValue);
+};
+
+// History of present illness
+
+const handleHistoryOfIllnessChange = (field: keyof HistoryOfIllness, value: string) => {
+  setHistoryOfIllness((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+};
+
+
+// Handle parent checkbox toggle
+
+const handleParentChange = (section: keyof ReviewOfSystems['checkReview'], checked: boolean) => {
+  setReviewOfSystems((prev) => ({
+    ...prev,
+    checkReview: {
+      ...prev.checkReview,
+      [section]: checked,
+    },
+  }));
+};
+
+const handleChildChange = <T extends keyof ReviewOfSystems>(
+  section: T,
+  key: keyof ReviewOfSystems[T],
+  checked: boolean
+) => {
+  setReviewOfSystems((prev) => ({
+    ...prev,
+    [section]: {
+      ...prev[section],
+      [key]: checked,
+    },
+  }));
+};
+
+
+
+  const handleVitalSigns = (e: React.ChangeEvent<HTMLInputElement |  HTMLTextAreaElement> | SelectChangeEvent) => {
+    const { name, value } = e.target;
+    if (name === "systolic") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        systolic: value as string,
+      }));
+    } else if (name === "diastolic") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        diastolic: value as string,
+      }));
+    } else if (name === "temperature") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        temperature: value as string,
+      }));
+    } else if (name === "weight") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        weight: value as string,
+      }));
+    } else if (name === "height") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        height: value as string,
+      }));
+    } else if (name === "respiration") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        respiration: value as string,
+      }));
+    } else if (name === "pulse") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        pulse: value as string,
+      }));
+    } else if (name === "spO2") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        spO2: value as string,
+      }));
+    } else if (name === "waist") {
+      setVitalSigns((prev) => ({
+        ...prev,
+        waist: value as string,
+      }))
+    }
+  };
+
+  const bp1 = Array.from({ length: 221  }, (_, index) => index + 30);
+  const bp2 = Array.from({ length: 131  }, (_, index) => index + 10);
+
+  const tp: string[] = [];
+  for (let i = 34.4; i <= 41.7; i += 0.1) {
+    tp.push(i.toFixed(1)); // Convert to string with one decimal place
+  }
+
+  const pr = Array.from({ length: 161  }, (_, index) => index + 40);
+  const rr = Array.from({ length: 64  }, (_, index) => index + 2);
+  const sp02 = Array.from({ length: 91  }, (_, index) => index + 10);
+
+  const ht: string[] = [];
+  for (let i = 38; i <= 203; i += 1) {
+    ht.push(i.toFixed(1)); // Convert to string with one decimal place
+  }
+
+  const wt: string[] = [];
+  for (let i = 0.5; i <= 182; i += 0.5) {
+    wt.push(i.toFixed(1)); // Convert to string with one decimal place
+  }
+
+  const waist: string[] = [];
+  for (let i = 38; i <= 203; i += 0.5) {
+    waist.push(i.toFixed(1)); // Convert to string with one decimal place
+  }
+
+  const general: string = "General";
+
+  // nest list handle
+
+
+  
+
+  const handleListClick = (section:string) => {
+    setOpen((prevState) => ({
+      ...prevState,
+      [section]: !prevState[section],
+    }));
+  }
+
+  const handleFrontCheckChange = (key: keyof PhysicalExamination, checked: boolean) => {
+    setPhysicalExamination((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], frontCheck: checked },
+    }));
+  };
+
+  const handleBackCheckChange = (key: keyof PhysicalExamination, checked: boolean) => {
+    setPhysicalExamination((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], backCheck: checked },
+    }));
+  };
+
+  const handleTextFieldChange = (key: keyof PhysicalExamination, value: string) => {
+    setPhysicalExamination((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], textfield: value },
+    }));
+  };
+
+  const handleAddMedication = () => {
+    const nextId = medications.length ? Math.max(...medications.map(m => m.id)) + 1 : 1;
+    setMedications([...medications, { id: nextId, unit: '', qty: '', refills: '', sig: '', rx: '' }]);
+  };
+
+  const handleDeleteMedication = (id: number) => {
+    if (medications.length > 1) {
+      setMedications(medications.filter((med) => med.id !== id));
+    }
+  };
+
+  const handleChangeMedicationField = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
+    setMedications(medications.map((med) =>
+      med.id === id ? { ...med, [field]: value } : med
+    ));
+  };
+
+// Order
+  const handleAddOrder = () => {
+    const nextId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+    setOrders([...orders, { id: nextId, order: '', requisition: '' }]);
+  };
+
+  const handleDeleteOrder = (id: number) => {
+    if (orders.length > 1) {
+      setOrders(orders.filter((order) => order.id !== id));
+    }
+  };
+
+  const handleChangeOrderField = (
+    id: number,
+    field: string,
+    value: string
+  ) => {
+    setOrders(orders.map((order) =>
+      order.id === id ? { ...order, [field]: value } : order
+    ));
+  };
+// Procedure
+  const handleAddProcedure = () => {
+    const nextId = procedures.length ? Math.max(...procedures.map(p => p.id)) + 1 : 1;
+    setProcedures([...procedures, { id: nextId, code: '', description: '', note: '' }]);
+  };
+
+  const handleDeleteProcedure = (id: number) => {
+    if (procedures.length > 1) {
+      setProcedures(procedures.filter((procedure) => procedure.id !== id));
+    }
+  };
+
+  const handleChangeProcedureField = (
+    id: number,
+    field: string,
+    value: string
+  ) => {
+    setProcedures(procedures.map((procedure) =>
+      procedure.id === id ? { ...procedure, [field]: value } : procedure
+    ));
+  };
+// Assessment
+  const handleAddAssessment = () => {
+    const nextId = assessments.length ? Math.max(...assessments.map(m => m.id)) + 1 : 1;
+    setAssessments([...assessments, { id: nextId, code: '', onset: '', nature: '', desc: '', note: '' }]);
+  };
+
+  const handleDeleteAssessment = (id: number) => {
+    if (assessments.length > 1) {
+      setAssessments(assessments.filter((med) => med.id !== id));
+    }
+  };
+
+  const handleChangeAssessmentField = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
+    setAssessments(assessments.map((med) =>
+      med.id === id ? { ...med, [field]: value } : med
+    ));
+  };
+
+  // ongoing
+  const handleDeleteOngoing = (id: number) => {
+    if (ongoings.length > 1) {
+      setOngoings(ongoings.filter((med) => med.id !== id));
+    }
+  };
+
+
+
+
+  const handleInputChange = (field: string, value: string) => {
+    setMeeting((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+
+
+
+  return (
+    <Box sx={{ display: "flex" }}>
+      <Appbar_Patient appBarTitle="HISTORY" id={id}/>
+      <Box
+        component="main"
+        sx={{
+          backgroundColor: (theme) =>
+            theme.palette.mode === "light"
+              ? theme.palette.grey[100]
+              : theme.palette.grey[900],
+          flexGrow: 1,
+          height: "100vh",
+          overflow: "auto",
+        }}
+      >
+        <Toolbar />
+        
+        <Container sx={{ mt: 4, mb: 4 }}>
+          <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+            <Grid
+              container
+              spacing={2}
+              sx={{ marginleft: "10px", padding: "20px" }}
+            >           
+                <Grid container item xs={12}>
+                      <Grid item xs={12} sm={12}>
+                        <div className="setside">
+                          <div className="left">
+                            <IconButton component={Link} to="/patient-list" color="inherit">
+                              <ArrowBackIcon />
+                            </IconButton>
+                          </div>                        
+                        </div>
+                      </Grid>  
+                      <Grid container spacing={2} sx={{justifyContent: "space-between",alignItems: "center",}}>
+                        <Grid item xs={12} sm={2}>
+                          <TextField
+                            id="chart"
+                            label="Chart"
+                            multiline
+                            value={id}
+                            variant="standard"
+                            fullWidth
+                            name="chart"
+                          />
+                          
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                          <TextField
+                            id="first-name"
+                            label="First Name"
+                            multiline
+                            value={firstName}
+                            variant="standard"
+                            fullWidth
+                            name="firstName"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                          <TextField
+                            id="last-name"
+                            label="Last Name"
+                            multiline
+                            value={lastName}
+                            variant="standard"
+                            fullWidth
+                            name="lastName"
+                          />
+                        </Grid>                     
+                        <Grid item xs={12} sm={1}>
+                          <TextField
+                            id="age"
+                            label="Age"
+                            multiline
+                            value={age}
+                            variant="standard"
+                            fullWidth
+                            name="age"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={2} style={{textAlign:'right', paddingRight:'0'}}>
+                          <IconButton style={{ padding: "0" }} component="span">
+                            <Avatar
+                              variant="square"
+                              src={avatarSrc}
+                              alt="Avatar"
+                              style={{ width: "100px", height: "100px" }}
+                            />
+                          </IconButton>
+                        </Grid>
+                      </Grid>               
+                      <Grid container spacing={2}>                        
+                        <Grid item xs={6} sm={6}>
+                        <div className="contact-information" style={styles.container}>
+                            <Grid container rowSpacing={1} columnSpacing={1}>
+                              <Grid item xs={3}>
+                                <TextField
+                                  id="outlined-multiline-static"
+                                  label="Encounter"
+                                  multiline
+                                  variant="standard"
+                                  disabled
+                                  fullWidth
+                                />
+                              </Grid>
+                              <Grid item xs={1}>
+                                <TextField
+                                  id="outlined-multiline-static"
+                                  label={encounterID}
+                                  multiline
+                                  variant="standard"
+                                  disabled
+                                  fullWidth
+                                />
+                              </Grid>
+                              <Grid item xs={4}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <DatePicker label="DOB" value={head.date ? dayjs(head.date) : null} // Convert string to Dayjs object
+                                    onChange={(newValue) => {
+                                    setHead((prev) => ({
+                                    ...prev,
+                                    date: newValue ? newValue.format('YYYY-MM-DD') : '', // Format date as string
+                                    }));
+                                    }} slotProps={{ textField: { variant: 'standard', fullWidth: true, name:'date' } }}  />
+                                </LocalizationProvider>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <TextField
+                                  id="outlined-multiline-static"
+                                  label="Type"
+                                  multiline
+                                  variant="standard"
+                                  fullWidth
+                                  onChange={handleHeadChange}
+                                  value={head.type}
+                                  name="type"
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  id="outlined-multiline-static"
+                                  label="Attended by"
+                                  multiline
+                                  variant="standard"
+                                  fullWidth
+                                  onChange={handleHeadChange}
+                                  value={head.attendBy}
+                                  name="attendBy"
+                                /> 
+                              </Grid>                            
+                            </Grid>                       
+                          </div>
+                          <div className="chief-complaint-encounter-reason" style={styles.container} >
+                            <h2>Chief Complaint / Encounter Reason</h2>
+                              <ChiefEncounter names={chiefEncounter} value={chief} onValueChange={handleChiefChange} />
+                          </div>  
+                          <div className="history-of-present-illness" style={styles.container}>
+                            <h2>History of Present Illness</h2>
+                            <Grid container rowSpacing={2}>
+                              <Grid item xs={12} sm={12}>
+                                <TextField 
+                                  id="history-of-present-illness"
+                                  fullWidth
+                                  InputProps={{
+                                    style: {
+                                      borderRadius: "0px",
+                                    }
+                                  }}
+                                  multiline 
+                                  rows={2}
+                                  value={presentIllness}
+                                  name="presentIllness"
+                                  onChange={handlePresentIllnessChange}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12} sx={{mt:3}}>
+                                <Select_History_Checkbox
+                                  label="Location"
+                                  names={location}
+                                  value={historyOfIllness.Location}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Location", value)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12}>
+                                <Select_History_Checkbox
+                                  label="Quality"
+                                  names={quality}
+                                  value={historyOfIllness.Quality}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Quality", value)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12}>
+                                <Select_History_Checkbox label="Severity" names={severity}
+                                  value={historyOfIllness.Severity}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Severity", value)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12}>
+                                <Select_History_Checkbox label="Duration" names={duration}
+                                  value={historyOfIllness.Duration}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Duration", value)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12}>
+                                <Select_History_Checkbox label="Onset - Timing" names={onset}
+                                  value={historyOfIllness.OnsetTiming}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("OnsetTiming", values)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12}>
+                                <Select_History_Checkbox label="Context" names={context}
+                                  value={historyOfIllness.Context}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("Context", values)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12}>
+                                <Select_History_Checkbox label="Modifying Factors" names={modifying}
+                                  value={historyOfIllness.ModifyingFactors}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("ModifyingFactors", values)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={12}>
+                                <Select_History_Checkbox label="Signs - Symptoms" names={signs}
+                                  value={historyOfIllness.SignsSymptoms}
+                                  onValueChange={(values) => handleHistoryOfIllnessChange("SignsSymptoms", values)}
+                                />
+                              </Grid>
+                            </Grid>                            
+                          </div>                         
+                          <div className="vital-signs" style={styles.container}>
+                            <Grid container spacing={1} sx={{display:"flex", alignItems:'end'}}>
+                              <Grid item xs={11}>
+                                <h2>Vital Signs</h2> 
+                              </Grid>                
+                              <Grid item xs={1} sx={{mb:2}}>
+                                <VitalSignsModal csn={id} height={vitalSigns.height} weight={vitalSigns.weight} encounterid={encounterID}/>
+                              </Grid>           
+                              <Grid item container  xs={3}  sx={{display:"flex", alignItems:'end'}}>
+                                <Grid item xs={5} >
+                                  <FormControl variant="standard" fullWidth>
+                                    <InputLabel id="vital-signs-bp-1">BP</InputLabel>
+                                    <Select
+                                        variant="standard"
+                                        id="vital-signs-bp-2"
+                                        IconComponent={() => null} 
+                                        name="systolic"
+                                        value={vitalSigns.systolic}
+                                        onChange={handleVitalSigns}
+                                      >
+                                    
+                                      {bp1.map((name) => (
+                                        <MenuItem key={name} value={name}>                                        
+                                          <ListItemText primary={name} />
+                                        </MenuItem>
+                                      ))}                                    
+                                    </Select>
+                                  </FormControl>
+                                </Grid>
+                                <Grid item xs={1} sx={{mt:2}}>
+                                  <TextField variant="standard" id="vital-signs-bp-3" fullWidth disabled placeholder="/" />
+                                </Grid>
+                                <Grid item xs={5} >
+                                  <FormControl variant="standard" fullWidth>
+                                    <Select                                  
+                                        id="vital-signs-bp-4"
+                                        IconComponent={() => null} 
+                                        name="diastolic"
+                                        value={vitalSigns.diastolic}
+                                        onChange={handleVitalSigns}
+                                    >
+                                        {bp2.map((name) => (
+                                          <MenuItem key={name} value={name}>                                        
+                                            <ListItemText primary={name} />
+                                          </MenuItem>
+                                        ))}                                    
+                                    </Select>
+                                  </FormControl>
+                                </Grid>
+                              </Grid>
+                              <Grid item xs={3} >
+                                <FormControl variant="standard" fullWidth>
+                                  <InputLabel id="vital-signs-tp-1">Tp</InputLabel>
+                                  <Select
+                                    id = 'vital-signs-tp-2'
+                                    IconComponent={() => null} 
+                                    value={vitalSigns.temperature}
+                                    name="temperature"
+                                    onChange={handleVitalSigns}
+                                  >
+                                    {tp.map((name) => (
+                                      <MenuItem key={name} value={name}>                                        
+                                        <ListItemText primary={name} />
+                                      </MenuItem>
+                                    ))}                                    
+                                  </Select>
+                                </FormControl>                   
+                              </Grid>
+                              <Grid item xs={3} >
+                                <FormControl variant="standard" fullWidth>
+                                  <InputLabel id="vital-signs-pr-1">PR</InputLabel>
+                                  <Select
+                                      id="vital-signs-pr-2"
+                                      IconComponent={() => null} 
+                                      value={vitalSigns.pulse}
+                                      name="pulse"
+                                      onChange={handleVitalSigns}
+                                    >
+                                      {pr.map((name) => (
+                                        <MenuItem key={name} value={name}>                                        
+                                          <ListItemText primary={name} />
+                                        </MenuItem>
+                                      ))}                                    
+                                  </Select>
+                                </FormControl>                   
+                              </Grid>     
+                              <Grid item xs={3} >
+                                <FormControl variant="standard" fullWidth>
+                                  <InputLabel id="vital-signs-rr-1">RR</InputLabel>
+                                  <Select
+                                      id="vital-signs-rr-2"
+                                      IconComponent={() => null} 
+                                      value={vitalSigns.respiration}
+                                      name="respiration"
+                                      onChange={handleVitalSigns}
