@@ -161,7 +161,7 @@ app.get("/api/general/:csn", async (req, res) => {
       res.status(500).send("Server error");
     }
   });
-  app.post("/api/addBlankPatient", async (req, res) => {
+app.post("/api/addBlankPatient", async (req, res) => {
     try {
       // Fetch the last CSN from the database
       const [lastCSNResult] = await db.query("SELECT CSN FROM general ORDER BY CSN DESC LIMIT 1");
@@ -275,7 +275,7 @@ app.get("/api/general/:csn", async (req, res) => {
       console.error(err);
       res.status(500).send("Server error");
     }
-  });
+  });  
   
   
 
@@ -702,6 +702,28 @@ app.post('/api/get_encounter_id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.get('/api/vitalsigns/:CSN', async (req, res) => {
+  const { CSN } = req.params;
+
+  try {
+    // Query to fetch all rows where CSN matches
+    const query = 'SELECT VITAL FROM encounter WHERE CSN = ?';
+    const [rows] = await db.query(query, [CSN]);
+
+    if (rows.length > 0) {
+      // Return all vital signs data for the provided CSN
+      const vitalSignsData = rows.map(row => JSON.parse(row.VITAL)); // Assuming VITAL is stored as JSON string
+      res.json({ vitalSigns: vitalSignsData });
+    } else {
+      res.status(404).json({ message: 'No vital signs found for the provided CSN' });
+    }
+  } catch (err) {
+    console.error("Error during database operation:", err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 // API Endpoint to Save Clinic Data
 app.post('/api/clinic', async(req, res) => {
   const {
