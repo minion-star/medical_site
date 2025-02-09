@@ -28,6 +28,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { searchData } from "../../mockData";
 
 const SearchPage: React.FC = () => {
+
+  
   const [searchBy, setSearchBy] = useState<string>('Chart ID');
   const [searchCondition, setSearchCondition] = useState<string>('starts with');
   const [searchText, setSearchText] = useState<string>('');

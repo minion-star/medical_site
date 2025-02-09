@@ -8,6 +8,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import Badge from "@mui/material/Badge";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import {Dialog, DialogContent} from "@mui/material";
 import {Avatar,SpeedDial, SpeedDialAction, SpeedDialIcon} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
@@ -31,6 +32,7 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
   const [showSpeedDial, setShowSpeedDial] = useState(true);
   const navigate = useNavigate();
   const [encounters, setEncounters] = useState<string[]>(["1"]);
+  const [openPrint, setOpenPrint] = useState<boolean>(false);
 
   
 
@@ -96,6 +98,9 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
     setAnchorElUser(null);
   };
 
+  const handleOpenPrint = () => setOpenPrint(true);
+  const handleClosePrint = () => setOpenPrint(false);
+
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -111,13 +116,14 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
           key="Print"
           icon={<PrintIcon />}
           tooltipTitle="Print"
+          onClick={handleOpenPrint}
         />
         <SpeedDialAction
           key="Add" icon={<AddIcon />} tooltipTitle="Add"
           onClick={addEncounter}
         />
         {/* <SpeedDialAction key="Lock" icon={<LockIcon />} tooltipTitle="Lock" /> */}
-        {/* <SpeedDialAction key="Add" icon={<AddIcon />} tooltipTitle="Add" /> */}
+
       </SpeedDial>)}
       
       <AppBar position="absolute" open={open}>

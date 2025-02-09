@@ -17,9 +17,7 @@ interface Patient {
     insurance: Insurance;
   };
   CREATED_DATE: string;
-  CREATED_BY: string;
   LAST_SAVED_DATE: string;
-  LAST_SAVED_BY: string;
 }
 
 interface PersonalInformation {
