@@ -19,6 +19,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
+
+interface Head {
+    date:string,
+    type:string,
+    attendBy:string,
+  }
+
 interface ReviewOfSystems {
     general : {fevers:boolean, sweats:boolean, weightLoss:boolean, Chills:boolean, appetiteLoss:boolean, fatigue:boolean},
     eyes:{visionLoss:boolean, doubleVision:boolean, blurredVision:boolean, eyeIrritation:boolean, eyePain:boolean, lightSensitivity:boolean},
