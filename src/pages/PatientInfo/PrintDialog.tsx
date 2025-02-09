@@ -36,12 +36,7 @@ function PaperComponent(props:any) {
         handle="#draggable-dialog-title"
         cancel={'[class*="MuiDialogContent-root"]'}
       >
-        <Paper {...props} ref={nodeRef} sx={{
-          // Allow content to overflow and the Paper component to grow with the content
-          overflowY: "auto", // Ensure content can scroll vertically
-          height: "auto", // Allow Paper to resize with content
-          maxHeight: "80vh", // Restrict max height of Paper (optional)
-        }}/>
+        <Paper {...props} ref={nodeRef} />
       </Draggable>
     );
   }
@@ -304,7 +299,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
   
   return (
 
-      <Dialog open={props.open} onClose={()=>{}} PaperComponent={PaperComponent} maxWidth="xl"  >
+      <Dialog open={props.open} onClose={()=>{}} PaperComponent={PaperComponent} maxWidth="xl" PaperProps={{style: {overflow: "auto",},}}>
         <Box sx={{display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -337,10 +332,8 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                   : theme.palette.grey[900],
               flexGrow: 1,
               overflow: "auto",
-              height: "70vh",
               padding: "8px",
-              display:"flex",
-
+              display:"flex"
             }}
             
           > 
