@@ -2199,7 +2199,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               </Grid>
                               <Grid item xs={4}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DatePicker label="DOB" value={head.date ? dayjs(head.date) : null} // Convert string to Dayjs object
+                                  <DatePicker label="Date" value={head.date ? dayjs(head.date) : null} // Convert string to Dayjs object
                                     onChange={(newValue) => {
                                     setHead((prev) => ({
                                     ...prev,
