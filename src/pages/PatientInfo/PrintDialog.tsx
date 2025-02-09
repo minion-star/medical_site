@@ -19,7 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import PrintIcon from "@mui/icons-material/Print";
 import CloseIcon from "@mui/icons-material/Close";
 
-const PrintDialog = () => {
+const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   const [openPrint, setOpenPrint] = useState(false);
   const [requisition, setRequisition] = useState("");
   const [tel, setTel] = useState("");

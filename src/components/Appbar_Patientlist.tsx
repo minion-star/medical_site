@@ -218,7 +218,7 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
           {secondaryListItems}
         </List>
       </Drawer>
-      <PrintDialog/>
+      <PrintDialog open={openPrint} handleClose={handleClosePrint}/>
     </Box>
   );
 }
