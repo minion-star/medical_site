@@ -45,8 +45,7 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
         if (Array.isArray(idData) && idData.length > 0) {
           setEncounters(idData.map((item: any) => item.encounterID));
         } else {
-          console.warn("No encounters found.");
-          setEncounters([]);
+          setEncounters(['1']);
         }
       } catch (err) {
         console.error("Error fetching patient data:", err);
@@ -83,7 +82,6 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
     const newId = (encounters.length + 1).toString(); // Generate a unique ID
     setEncounters([...encounters, newId]);
     navigate(`/patient-info-encounter/${props.id}/${newId}`);
-    console.log(encounters);
   };
 
   const toggleDrawer = () => {
