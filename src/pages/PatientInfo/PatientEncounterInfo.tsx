@@ -2084,7 +2084,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar_Patient appBarTitle="HISTORY" id={id}/>
+      <Appbar_Patient appBarTitle="ENCOUNTER" id={id}/>
       <Box
         component="main"
         sx={{
