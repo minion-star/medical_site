@@ -335,7 +335,11 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
             <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width:150}}>
                 <Tab label="Laboratory Order"/>
                 <Tab label="Radiology Order "/>
-
+                <Tab label="General Order" sx={{borderBottom:1, borderColor:"divider"}}/>
+                <Tab label="Referral Letter" />
+                <Tab label="Consultation Note"  sx={{borderBottom:1, borderColor:"divider"}}/>
+                <Tab label="Encounter Form" />
+                <Tab label="Encounter Note"  sx={{borderBottom:1, borderColor:"divider"}}/>
             </Tabs>
             <Container sx={{ mt: 4, mb: 4 }} className="print-container">
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center" }}>
