@@ -74,7 +74,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   
   return (
 
-      <Modal open={props.open} onClose={props.handleClose}>
+      <Modal open={props.open} onClose={()=>{}}>
         <Box
           sx={{
             position: "absolute",
