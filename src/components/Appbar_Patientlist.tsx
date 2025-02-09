@@ -24,6 +24,7 @@ import Divider from "@mui/material/Divider";
 import { mainListItems, secondaryListItems } from "./listItems";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
+import PrintDialog from "../pages/PatientInfo/PrintDialog";
 
 export default function Appbar_Patient(props: { appBarTitle: string; id: string|undefined }) {
   const location = useLocation(); // Get current route
@@ -217,9 +218,7 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
           {secondaryListItems}
         </List>
       </Drawer>
-      <Dialog open={openPrint} onClose={()=>{}}>
-        
-      </Dialog>
+      <PrintDialog/>
     </Box>
   );
 }
