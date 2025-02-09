@@ -15,6 +15,10 @@ import {
   Dialog,
   Tabs,
   Tab,
+  FormControl,
+  Checkbox,
+  FormControlLabel,
+
 } from "@mui/material";
 
 import PrintIcon from "@mui/icons-material/Print";
@@ -22,6 +26,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Draggable from 'react-draggable';
+import { CheckBox } from "@mui/icons-material";
 
 function PaperComponent(props:any) {
     const nodeRef = React.useRef(null);
@@ -31,7 +36,12 @@ function PaperComponent(props:any) {
         handle="#draggable-dialog-title"
         cancel={'[class*="MuiDialogContent-root"]'}
       >
-        <Paper {...props} ref={nodeRef} />
+        <Paper {...props} ref={nodeRef} sx={{
+          // Allow content to overflow and the Paper component to grow with the content
+          overflowY: "auto", // Ensure content can scroll vertically
+          height: "auto", // Allow Paper to resize with content
+          maxHeight: "80vh", // Restrict max height of Paper (optional)
+        }}/>
       </Draggable>
     );
   }
@@ -294,7 +304,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
   
   return (
 
-      <Dialog open={props.open} onClose={()=>{}} PaperComponent={PaperComponent} maxWidth="xl">
+      <Dialog open={props.open} onClose={()=>{}} PaperComponent={PaperComponent} maxWidth="xl"  >
         <Box sx={{display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -317,7 +327,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                     </IconButton>
                 </Box>
         </Box>
-            <Box
+        <Box
             ref={printRef}
             component="main"
             sx={{
@@ -327,8 +337,10 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                   : theme.palette.grey[900],
               flexGrow: 1,
               overflow: "auto",
+              height: "70vh",
               padding: "8px",
-              display:"flex"
+              display:"flex",
+
             }}
             
           > 
@@ -344,7 +356,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                 <Tab label="Excuse Letter" sx={{borderBottom:1, borderColor:"divider"}} /> 
                 <Tab label="Face Sheet" />
                 <Tab label="Face Label" sx={{borderBottom:1, borderColor:"divider"}} />
-
+                <Tab label={<FormControlLabel control={<Checkbox/>} label="Signature Stamp" />} />
             </Tabs>
             <Container sx={{ mt: 4, mb: 4 }} className="print-container">
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center" }}>
