@@ -452,7 +452,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                   <h4>1000, Fairwaywoods Dr. Chester ST 223344</h4>
                   <h4>Tel: (804)123-4567 Fax: (804)123-4569</h4>
                 </Grid>
-                <Grid container sx={{ gap: 1, display: "flex" }}>
+                <Grid container sx={{ gap: 1, display: "flex" , alignItems:"end"}}>
                   <Grid item xs={12}>
                     <Box sx={{ display: "flex", alignItems: "flex-end", mb: 4 }}>
                       <label>REQUISITION</label>
@@ -521,7 +521,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
-                        id="fax"
+                        id="dob"
                         label="DOB"
                         multiline
                         variant="standard"
