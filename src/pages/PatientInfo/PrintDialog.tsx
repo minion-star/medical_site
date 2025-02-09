@@ -41,6 +41,74 @@ function PaperComponent(props:any) {
     );
   }
 
+  interface Patient {
+    CSN: string;
+    FIRST_NAME: string;
+    LAST_NAME: string;
+    PHOTO: string;
+    AGE: string;
+    INFORMATION: {
+      personalInformation: PersonalInformation;
+      contactInformation: ContactInformation;
+      workInformation: WorkInformation;
+      insurance: Insurance;
+    };
+  }
+  
+  interface PersonalInformation {
+    id: string,
+    mrn: string,
+    dob: string,
+    gender: string,
+    marriage: string,
+    siblings: string,
+    race: string,
+    pharamacy: string,
+    other: string
+  }
+  
+  interface ContactInformation {
+    address: string,
+    city: string,
+    postcode: string,
+    country: string,
+    state: string,
+    homeph: string,
+    cellph: string,
+    email: string,
+    emergency: string
+  }
+  
+  interface WorkInformation {
+    status: string,
+    workph: string,
+    employer: string
+  }
+  
+  interface Insurance {
+    carrier: string,
+    address: string,
+    city: string,
+    postcode: string,
+    country: string,
+    state: string,
+    phone: string,
+    facsimile: string,
+    plan: string,
+    expiry: string,
+    idno: string,
+    groupno: string,
+    copay: string,
+    authno: string,
+    remarks: string,
+    relation: string,
+    homeph: string,
+    lastname: string,
+    firstname: string,
+    mi: string,
+    dob: string,
+    gender: string
+  }
 
 interface Head {
     date:string,
@@ -134,15 +202,19 @@ interface ReviewOfSystems {
 const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   const {id, encounterID} = useParams<{id:string; encounterID:string}>();
 
-  const [requisition, setRequisition] = useState("");
-  const [tel, setTel] = useState("");
-  const [fax, setFax] = useState("");
-  const printRef = useRef<HTMLDivElement>(null);
+    const [requisition, setRequisition] = useState("");
+    const [tel, setTel] = useState("");
+    const [fax, setFax] = useState("");
+    const printRef = useRef<HTMLDivElement>(null);
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
+    const [personalInformation, setPersonalInformation] = useState<PersonalInformation>({id:"", mrn:"", dob:"", gender:"", marriage:"", siblings:"", race:"", pharamacy:"", other:""});
+    const [contactInformation, setContactInformation] = useState<ContactInformation>({address: "",city: "",postcode: "",country: "",state: "",homeph: "",cellph: "",email: "",emergency: ""});
+    const [insurance, setInsurance] = useState<Insurance>({carrier: "",address: "",city: "",postcode: "", country: "",state: "",phone: "",facsimile: "",plan: "",expiry: "",idno: "",groupno: "",copay: "",authno: "",remarks: "",relation: "",homeph: "",lastname: "",firstname: "",mi: "",dob: "",gender: ""});
+    const [workInformation, setWorkInformation] = useState<WorkInformation>({status:"", workph:"",employer:""});
 
-const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
-  const [reviewOfSystems, setReviewOfSystems] = useState<ReviewOfSystems>({
+    const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
+    const [reviewOfSystems, setReviewOfSystems] = useState<ReviewOfSystems>({
     general: {fevers: false, sweats: false, weightLoss: false, Chills: false, appetiteLoss: false, fatigue: false },
     eyes: {visionLoss: false, doubleVision: false, blurredVision: false, eyeIrritation: false, eyePain: false, lightSensitivity: false },
     eNMT: {earache: false, earDischarge: false, ringingInTheEars: false, decreasedHearing: false, frequentColds: false, nasalCongestion: false, nosebleeds: false, bleedingGums: false, difficultySwallowing: false, hoarseness: false, soreThroat: false },
@@ -423,7 +495,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                       />
                     </Grid>
                     <Typography><h4>This is a request for laboratory services for:</h4></Typography>
-                    <Grid item xs={6}>
+                    <Grid item xs={3}>
                       <TextField
                         id="fax"
                         label="Fax"
@@ -433,7 +505,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                         value={lastName}
                       />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={3}>
                       <TextField
                         id="fax"
                         label="Fax"
@@ -441,6 +513,16 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                         variant="standard"
                         fullWidth
                         value={firstName}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="fax"
+                        label="DOB"
+                        multiline
+                        variant="standard"
+                        fullWidth
+                        value={personali}
                       />
                     </Grid>
                   </Grid>
