@@ -60,9 +60,9 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: string|
 
   useEffect(() => {
     if (props.appBarTitle.includes("ENCOUNTER")) {
-      setShowSpeedDial(false);
-    } else {
       setShowSpeedDial(true);
+    } else {
+      setShowSpeedDial(false);
     }
   }, [props.appBarTitle]);
   // Define tab paths
