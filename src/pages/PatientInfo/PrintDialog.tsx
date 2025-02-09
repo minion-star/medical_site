@@ -332,6 +332,10 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
 
             setFirstName(patientData.FIRST_NAME || "");
             setLastName(patientData.LAST_NAME || "");
+            setPersonalInformation(patientData.INFORMATION.personalInformation || {});
+            setContactInformation(patientData.INFORMATION.contactInformation || {});
+            setInsurance(patientData.INFORMATION.insurance || {});
+            setWorkInformation(patientData.INFORMATION.workInformation || {});
 
           } catch (err) {
             console.error("Error fetching patient data:", err);
@@ -522,7 +526,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                         multiline
                         variant="standard"
                         fullWidth
-                        value={personali}
+                        value={personalInformation.dob}
                       />
                     </Grid>
                   </Grid>
