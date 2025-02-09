@@ -179,14 +179,54 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
 
 
     useEffect(()=>{
-        const fetchData = () => {
-            
+        const fetchData = async () => {
+          try {
+            const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
+            const data = response.data;
+    
+            setHead(JSON.parse(data.head || '{}'));
+            setReviewOfSystems(JSON.parse(data.reviewOfSystems || '{}'));
+            setChief(cleanString(data.chief || ''));
+            setHistoryOfIllness(JSON.parse(data.historyOfIllness || '{}'));
+            setVitalSigns(JSON.parse(data.vitalSigns || '{}'));
+            setPhysicalExamination(JSON.parse(data.physicalExamination || '{}'));
+            setMeeting(JSON.parse(data.meeting || '{}'));
+            setOpen(JSON.parse(data.open || '{}'));
+            setPresentIllness(JSON.parse(data.presentIllness || ""));
+              // 
+            if (data.medications && data.medications.length > 0) {
+              // Update medications state with the fetched data
+              setMedications(data.medications.map((med:any) => ({
+                id: med.id, order: med.order_type, qty: med.qty, refills: med.refills, sig: med.sig, rx: med.rx
+              })));
+            }
+    
+            // Set orders data if available
+            if (data.orders && data.orders.length > 0) {
+              setOrders(data.orders.map((order:any) => ({
+                id: order.id, order: order.order_type, requisition: order.requisition
+              })));
+            }
+    
+            // Set procedures data if available
+            if (data.procedures && data.procedures.length > 0) {
+              setProcedures(data.procedures.map((procedure:any) => ({
+                id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
+              })));
+            }
+    
+            // Set assess,emts data of available
+            if (data.assessments && data.assessments.length > 0) {
+              setAssessments(data.assessments.map((assessment:any) => ({
+                id: assessment.id, code: assessment.mastercode, desc: assessment.description, note: assessment.note, onset:assessment.onset, nature:assessment.nature
+              })));
+            }
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
         }
-
-
-
-    },[])
-
+        fetchData();
+      },[id, encounterID]);
 
 
   const handlePrint = () => {
