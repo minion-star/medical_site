@@ -330,7 +330,6 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
               padding: "8px",
               display:"flex"
             }}
-            justifyContent={"space-between"},
             
           > 
             <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width:150}}>
