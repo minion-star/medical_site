@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   SpeedDial,
   SpeedDialAction,
@@ -13,17 +13,29 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
+
 import PrintIcon from "@mui/icons-material/Print";
 import CloseIcon from "@mui/icons-material/Close";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
+  const {id, encounterID} = useParams<{id:string; encounterID:string}>();
+
   const [requisition, setRequisition] = useState("");
   const [tel, setTel] = useState("");
   const [fax, setFax] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
+
+    useEffect(()=>{
+        const fetchData = () => {
+            
+        }
+
+
+
+    },[])
+
 
 
   const handlePrint = () => {
