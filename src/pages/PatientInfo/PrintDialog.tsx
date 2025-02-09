@@ -18,6 +18,8 @@ import {
   FormControl,
   Checkbox,
   FormControlLabel,
+  Input,
+  InputAdornment,
 
 } from "@mui/material";
 
@@ -520,13 +522,12 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                       />
                     </Grid>
                     <Grid item xs={6}>
-                      <TextField
+                      <Input
                         id="dob"
-                        label="DOB"
                         multiline
-                        variant="standard"
                         fullWidth
                         value={personalInformation.dob}
+                        startAdornment={<InputAdornment position="start">DOB:</InputAdornment>}
                       />
                     </Grid>
                   </Grid>
