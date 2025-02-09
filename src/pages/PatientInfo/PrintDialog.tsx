@@ -13,6 +13,8 @@ import {
   Grid,
   TextField,
   Dialog,
+  Tabs,
+  Tab,
 } from "@mui/material";
 
 import PrintIcon from "@mui/icons-material/Print";
@@ -292,22 +294,8 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
   
   return (
 
-      <Dialog open={props.open} onClose={()=>{}} PaperComponent={PaperComponent}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "white",
-            boxShadow: 24,
-            width: "800px",
-            height: "600px",
-            borderRadius: "8px",
-            padding: "0px",
-          }}
-        >
-            <Box sx={{display: "flex",
+      <Dialog open={props.open} onClose={()=>{}} PaperComponent={PaperComponent} maxWidth="xl">
+        <Box sx={{display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             backgroundColor: "green",
@@ -318,7 +306,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
             cursor:"move"
             }}
             id="draggable-dialog-title"
-            >
+        >
                 <Typography variant="h6">Print / Fax Encounter Related Document</Typography>
                 <Box>
                     <IconButton aria-label="close" color="inherit" onClick={handlePrint}>
@@ -328,8 +316,8 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                         <CloseIcon />
                     </IconButton>
                 </Box>
-            </Box>
-          <Box
+        </Box>
+            <Box
             ref={printRef}
             component="main"
             sx={{
@@ -340,8 +328,16 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
               flexGrow: 1,
               overflow: "auto",
               padding: "8px",
+              display:"flex"
             }}
-          >
+            justifyContent={"space-between"},
+            
+          > 
+            <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width:150}}>
+                <Tab label="Laboratory Order"/>
+                <Tab label="Radiology Order "/>
+
+            </Tabs>
             <Container sx={{ mt: 4, mb: 4 }} className="print-container">
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center" }}>
                 <Grid>
@@ -352,7 +348,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                 <Grid container sx={{ gap: 1, display: "flex" }}>
                   <Grid item xs={12}>
                     <Box sx={{ display: "flex", alignItems: "flex-end", mb: 4 }}>
-                      <label>REQUISITION__________________________________________________________________</label>
+                      <label>REQUISITION____________________________________________</label>
                     </Box>
                   </Grid>
                   <Grid item xs={12}>
@@ -393,7 +389,6 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
               </Paper>
             </Container>
           </Box>
-        </Box>
       </Dialog>
   );
 };
