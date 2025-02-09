@@ -498,11 +498,11 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                         onChange={(e) => setFax(e.target.value)}
                       />
                     </Grid>
-                    <Typography><h4>This is a request for laboratory services for:</h4></Typography>
+                    <Grid item xs={12}><Typography><h4>This is a request for laboratory services for:</h4></Typography></Grid>
                     <Grid item xs={3}>
                       <TextField
-                        id="fax"
-                        label="Fax"
+                        id="lastname"
+                        label=""
                         multiline
                         variant="standard"
                         fullWidth
@@ -511,8 +511,8 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                     </Grid>
                     <Grid item xs={3}>
                       <TextField
-                        id="fax"
-                        label="Fax"
+                        id="firstname"
+                        label=""
                         multiline
                         variant="standard"
                         fullWidth
