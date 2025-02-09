@@ -342,6 +342,8 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                 <Tab label="Encounter Note"  sx={{borderBottom:1, borderColor:"divider"}}/>
                 <Tab label="Patient Invoice"/>
                 <Tab label="Excuse Letter" sx={{borderBottom:1, borderColor:"divider"}} /> 
+                <Tab label="Face Sheet" />
+                <Tab label="Face Label" sx={{borderBottom:1, borderColor:"divider"}} />
 
             </Tabs>
             <Container sx={{ mt: 4, mb: 4 }} className="print-container">
