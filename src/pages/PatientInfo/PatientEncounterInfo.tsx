@@ -3411,7 +3411,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                         </Grid>                      
                       </Grid>                     
                       <br />
-                      <Grid container justifyContent="flex-end">
+                      <Grid container justifyContent="flex-end" sx={{p: 5}}>
                         <Grid item xs={2} sm={1}>
                           <Button
                             component={Link}
