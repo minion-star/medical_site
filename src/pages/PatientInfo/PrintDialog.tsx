@@ -36,7 +36,7 @@ function PaperComponent(props:any) {
         handle="#draggable-dialog-title"
         cancel={'[class*="MuiDialogContent-root"]'}
       >
-        <Paper {...props} ref={nodeRef} />
+        <Box {...props} ref={nodeRef} />
       </Draggable>
     );
   }
@@ -138,6 +138,8 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   const [tel, setTel] = useState("");
   const [fax, setFax] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
+    const [firstName, setFirstName] = useState<string>("");
+    const [lastName, setLastName] = useState<string>("");
 
 const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
   const [reviewOfSystems, setReviewOfSystems] = useState<ReviewOfSystems>({
@@ -250,6 +252,22 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
         fetchData();
       },[id, encounterID]);
 
+      useEffect(() => {
+        const fetchPatient = async () => {
+          try {
+            const response = await axios.get(`http://localhost:5000/api/general/${id}`);
+            const patientData = response.data;
+
+            setFirstName(patientData.FIRST_NAME || "");
+            setLastName(patientData.LAST_NAME || "");
+
+          } catch (err) {
+            console.error("Error fetching patient data:", err);
+          } 
+    
+        };
+        fetchPatient();
+  }, [id]);
 
   const handlePrint = () => {
     if (printRef.current) {
@@ -331,13 +349,13 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                   ? theme.palette.grey[100]
                   : theme.palette.grey[900],
               flexGrow: 1,
-              overflow: "auto",
+              overflow: "scroll",
               padding: "8px",
               display:"flex"
             }}
             
           > 
-            <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width:150}}>
+            <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width: 210}} variant="scrollable">
                 <Tab label="Laboratory Order"/>
                 <Tab label="Radiology Order "/>
                 <Tab label="General Order" sx={{borderBottom:1, borderColor:"divider"}}/>
@@ -349,10 +367,10 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                 <Tab label="Excuse Letter" sx={{borderBottom:1, borderColor:"divider"}} /> 
                 <Tab label="Face Sheet" />
                 <Tab label="Face Label" sx={{borderBottom:1, borderColor:"divider"}} />
-                <Tab label={<FormControlLabel control={<Checkbox/>} label="Signature Stamp" />} />
+            {/* <Tab label={<FormControlLabel control={<Checkbox/>} label="Signature Stamp" />} /> */}
             </Tabs>
-            <Container sx={{ mt: 4, mb: 4 }} className="print-container">
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center" }}>
+            <Container sx={{ mt: 4, mb: 4 }} className="print-container" >
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600 }}>
                 <Grid>
                   <h2>Clinique Sante Pour Tous</h2>
                   <h4>1000, Fairwaywoods Dr. Chester ST 223344</h4>
@@ -361,8 +379,15 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                 <Grid container sx={{ gap: 1, display: "flex" }}>
                   <Grid item xs={12}>
                     <Box sx={{ display: "flex", alignItems: "flex-end", mb: 4 }}>
-                      <label>REQUISITION____________________________________________</label>
+                      <label>REQUISITION</label>
+                      <TextField variant="standard" fullWidth value=""/>
                     </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField variant="standard" fullWidth />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField  variant="standard" fullWidth />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
@@ -395,6 +420,27 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
                         fullWidth
                         value={fax}
                         onChange={(e) => setFax(e.target.value)}
+                      />
+                    </Grid>
+                    <Typography><h4>This is a request for laboratory services for:</h4></Typography>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="fax"
+                        label="Fax"
+                        multiline
+                        variant="standard"
+                        fullWidth
+                        value={lastName}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="fax"
+                        label="Fax"
+                        multiline
+                        variant="standard"
+                        fullWidth
+                        value={firstName}
                       />
                     </Grid>
                   </Grid>
