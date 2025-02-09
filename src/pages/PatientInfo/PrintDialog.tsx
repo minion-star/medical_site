@@ -110,6 +110,67 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   const [fax, setFax] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
 
+const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
+  const [reviewOfSystems, setReviewOfSystems] = useState<ReviewOfSystems>({
+    general: {fevers: false, sweats: false, weightLoss: false, Chills: false, appetiteLoss: false, fatigue: false },
+    eyes: {visionLoss: false, doubleVision: false, blurredVision: false, eyeIrritation: false, eyePain: false, lightSensitivity: false },
+    eNMT: {earache: false, earDischarge: false, ringingInTheEars: false, decreasedHearing: false, frequentColds: false, nasalCongestion: false, nosebleeds: false, bleedingGums: false, difficultySwallowing: false, hoarseness: false, soreThroat: false },
+    cardiovascular: {difficultyBreathingAtNight: false, chestPainOrDiscomfort: false, irregularHeartBeats: false, fatigue: false, lightheadedness: false, shortnessOfBreathWithExertion: false, palpitations: false, swellingOfHandsOrFeet: false, difficultyBreathingWhileLyingDown: false, legCrampsWithExertion: false, discolorationOfLipsOrNails: false, recentWeightGain: false },
+    respiratory: {sleepDisturbancesDueToBreathing: false, cough: false, coughingUpBlood: false, shortnessOfBreath: false, chestDiscomfort: false, wheezing: false, excessiveSputum: false, excessiveSnoring: false },
+    gastrointestinal: {changeInAppetite: false, indigestion: false, heartburn: false, nausea: false, vomiting: false, excessiveGas: false, abdominalPain: false, abdominalBloating: false, hemorrhoids: false, diarrhea: false, changeInBowelHabits: false, constipation: false, blackOrTarryStools: false, bloodyStools: false },
+    genitourinaryMale: {frequentUrination: false, bloodInUrine: false, foulUrinaryDischarge: false, kidneyPain: false, urinaryUrgency: false, troubleStartingUrinaryStream: false, inabilityToEmptyBladder: false, burningOrPainOnUrination: false, genitalRashesOrSores: false, testicularPainOrMasses: false },
+    genitourinaryFemale: {inabilityToControlBladder: false, unusualUrinaryColor: false, missedPeriods: false, excessivelyHeavyPeriods: false, lumpsOrSores: false, pelvicPain: false },
+    musculoskeletal: {jointPain: false, jointStiffnessOrSwelling: false, muscleCramps: false, muscleAches: false, lossOfStrength: false, backOrNeckPain: false, muscleWeakness: false },
+    skin: {suspiciousLesions: false, excessivePerspiration: false, dryness: false, rash: false, changesInHairOrNails: false, nightSweats: false, poorWoundHealing: false, itching: false, flushing: false, changesInColorOfSkin: false },
+    neurologic: {headaches: false, weaknessOrNumbness: false, tingling: false, faintsOrBlackouts: false, tremors: false, memoryLoss: false, poorBalance: false, difficultyWithSpeaking: false, difficultyWithConcentration: false, disturbancesInCoordination: false, briefParalysis: false, visualDisturbances: false, seizures: false, sensationOfRoomSpinning: false, excessiveDaytimeSleeping: false },
+    psychiatric: {Anxiety: false, Depression: false, Nervousness: false, memoryChange: false, frighteningVisionsOrSounds: false, thoughtsOfSuicideOrViolence: false },
+    endocrine: {heatOrColdIntolerance: false, weightChange: false, excessiveThirstOrHunger: false, excessiveSweatingOrUrination: false },
+    hematologicLymphatic: {skinDiscoloration: false, enlargedLymphNodes: false, bleeding: false, fevers: false, abnormalBruising: false },
+    allergicImmunologic: {seasonalAllergies: false, persistentInfections: false, hivesOrRash: false, hIVExposure: false },
+    checkReview:{checkGeneral:false, checkEyes:false, checkENMT:false, checkCardiovascular:false, checkRespiratory:false, checkGastrointestinal:false, checkGenitourinaryMale:false, checkGenitourinaryFemale:false, checkMusculoskeletal:false, checkSkin:false, checkNeurologic:false, checkPsychiatric:false, checkEndocrine:false, checkHematologicLymphatic:false, checkAllergicImmunologic:false,},
+  });
+  const [chief, setChief] = useState<string>("");
+  const [historyOfIllness, setHistoryOfIllness] = useState<HistoryOfIllness>({Location:"", Quality:"", Severity:"", Duration:"", OnsetTiming:"", Context:"", ModifyingFactors:"", SignsSymptoms:"",})
+  const [vitalSigns, setVitalSigns] = useState<VitalSigns>({systolic:"", diastolic:"", temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"",})
+  const [physicalExamination, setPhysicalExamination] = useState<PhysicalExamination>({constitutional_1:{ frontCheck: false, backCheck: false, textfield: "" },
+    eyes_1:{ frontCheck: false, backCheck: false, textfield: "" }, eyes_2:{ frontCheck: false, backCheck: false, textfield: "" }, eyes_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    enmt_1:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_2:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_3:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_4:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_5:{ frontCheck: false, backCheck: false, textfield: "" }, enmt_6:{ frontCheck: false, backCheck: false, textfield: "" },
+    neck_1:{ frontCheck: false, backCheck: false, textfield: "" }, neck_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    respiratory_1:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_2:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_3:{ frontCheck: false, backCheck: false, textfield: "" }, respiratory_4:{ frontCheck: false, backCheck: false, textfield: "" },
+    cardiovascular_1:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_2:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_3:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_4:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_5:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_6:{ frontCheck: false, backCheck: false, textfield: "" }, cardiovascular_7:{ frontCheck: false, backCheck: false, textfield: "" },
+    breasts_1:{ frontCheck: false, backCheck: false, textfield: "" }, breasts_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    gastrointestinal_1:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_2:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_3:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_4:{ frontCheck: false, backCheck: false, textfield: "" }, gastrointestinal_5:{ frontCheck: false, backCheck: false, textfield: "" },
+    genitourinaryFemale_1:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_2:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_3:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_4:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_5:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryFemale_6:{ frontCheck: false, backCheck: false, textfield: "" },
+    genitourinaryMale_1:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryMale_2:{ frontCheck: false, backCheck: false, textfield: "" }, genitourinaryMale_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    lymphatic_1:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_2:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_3:{ frontCheck: false, backCheck: false, textfield: "" }, lymphatic_4:{ frontCheck: false, backCheck: false, textfield: "" },
+    musculoskeletal_1:{ frontCheck: false, backCheck: false, textfield: "" }, musculoskeletal_2:{ frontCheck: false, backCheck: false, textfield: "" }, musculoskeletal_3:{ frontCheck: false, backCheck: false, textfield: "" },
+    skin_1:{ frontCheck: false, backCheck: false, textfield: "" }, skin_2:{ frontCheck: false, backCheck: false, textfield: "" },
+    neurologic_1:{ frontCheck: false, backCheck: false, textfield: "" }, neurologic_2:{ frontCheck: false, backCheck: false, textfield: "" }, neurologic_3:{ frontCheck: false, backCheck: false, textfield: "" }, 
+    psychiatric_1:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_2:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_3:{ frontCheck: false, backCheck: false, textfield: "" }, psychiatric_4:{ frontCheck: false, backCheck: false, textfield: "" },});
+    const [open, setOpen] = useState<Record<string, boolean>>({});  
+    const [presentIllness, setPresentIllness] = useState<string>("");
+    
+    const [medications, setMedications] = useState<{ id: number; unit: string; qty: string; refills:string; sig: string; rx: string }[]>([
+      { id: 1, unit: '', qty: '', refills: '', sig: '', rx: '' },
+    ]);
+    const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
+      { id: 1, order: '', requisition: '' },
+    ]);
+    const [assessments, setAssessments] = useState<{id: number; code: string; onset: string; nature:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', nature: '', desc: '', note: ''}
+    ]);
+    const [procedures, setProcedures] = useState<{ id: number; code: string; description: string; note: string }[]>([
+      { id: 1, code: '', description: '', note: '' },
+    ]);
+    const [ongoings, setOngoings] = useState<{id: number; code: string; onset: string; status:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', status: '', desc: '', note: ''}
+    ]);
+    const [meeting, setMeeting] = useState<Meeting>({emcode:"", emcodeEdit:"", codeBasis:"", codeBasisEdit:"", calculation:"", period:"", time:"",})
+    const cleanString = (str:string) => {
+      return str.replace(/\\{1,}/g, '').replace(/^"|"$/g, '');  // Removes all escape characters
+    };
+
+
     useEffect(()=>{
         const fetchData = () => {
             
