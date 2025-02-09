@@ -12,12 +12,27 @@ import {
   Paper,
   Grid,
   TextField,
+  Dialog,
 } from "@mui/material";
 
 import PrintIcon from "@mui/icons-material/Print";
 import CloseIcon from "@mui/icons-material/Close";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import Draggable from 'react-draggable';
+
+function PaperComponent(props:any) {
+    const nodeRef = React.useRef(null);
+    return (
+      <Draggable
+        nodeRef={nodeRef}
+        handle="#draggable-dialog-title"
+        cancel={'[class*="MuiDialogContent-root"]'}
+      >
+        <Paper {...props} ref={nodeRef} />
+      </Draggable>
+    );
+  }
 
 
 interface Head {
@@ -277,7 +292,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
   
   return (
 
-      <Modal open={props.open} onClose={()=>{}}>
+      <Dialog open={props.open} onClose={()=>{}} PaperComponent={PaperComponent}>
         <Box
           sx={{
             position: "absolute",
@@ -292,28 +307,28 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
             padding: "0px",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              backgroundColor: "green",
-              color: "white",
-              padding: "8px",
-              borderTopLeftRadius: "8px",
-              borderTopRightRadius: "8px",
+            <Box sx={{display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: "green",
+            color: "white",
+            padding: "8px 8px",
+            borderTopLeftRadius: "4px",
+            borderTopRightRadius: "4px",
+            cursor:"move"
             }}
-          >
-            <Typography variant="h6">Print / Fax Encounter Related Document</Typography>
-            <Box>
-              <IconButton aria-label="close" color="inherit" onClick={handlePrint}>
-                <PrintIcon />
-              </IconButton>
-              <IconButton aria-label="close" color="inherit" onClick={props.handleClose}>
-                <CloseIcon />
-              </IconButton>
+            id="draggable-dialog-title"
+            >
+                <Typography variant="h6">Print / Fax Encounter Related Document</Typography>
+                <Box>
+                    <IconButton aria-label="close" color="inherit" onClick={handlePrint}>
+                        <PrintIcon />
+                    </IconButton>
+                    <IconButton aria-label="close" color="inherit" onClick={props.handleClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </Box>
             </Box>
-          </Box>
           <Box
             ref={printRef}
             component="main"
@@ -379,7 +394,7 @@ const [head, setHead] = useState<Head>({date:"", type:"", attendBy:""});
             </Container>
           </Box>
         </Box>
-      </Modal>
+      </Dialog>
   );
 };
 
