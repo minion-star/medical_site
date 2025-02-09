@@ -20,14 +20,11 @@ import PrintIcon from "@mui/icons-material/Print";
 import CloseIcon from "@mui/icons-material/Close";
 
 const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
-  const [openPrint, setOpenPrint] = useState(false);
   const [requisition, setRequisition] = useState("");
   const [tel, setTel] = useState("");
   const [fax, setFax] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
 
-  const handleOpenPrint = () => setOpenPrint(true);
-  const handleClosePrint = () => setOpenPrint(false);
 
   const handlePrint = () => {
     if (printRef.current) {
@@ -76,32 +73,8 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   };
   
   return (
-    <Box
-      sx={{
-        position: "sticky",
-        bottom: "16px",
-        right: "16px",
-        zIndex: 10,
-      }}
-    >
-      <SpeedDial
-        ariaLabel="encounter-tool"
-        icon={<SpeedDialIcon />}
-        sx={{ position: "absolute", bottom: 4, right: 4 }}
-        FabProps={{ color: "success" }}
-      >
-        {/* <SpeedDialAction key="Delete" icon={<DeleteIcon />} tooltipTitle="Delete" /> */}
-        <SpeedDialAction
-          key="Print"
-          icon={<PrintIcon />}
-          tooltipTitle="Print"
-          onClick={handleOpenPrint}
-        />
-        {/* <SpeedDialAction key="Lock" icon={<LockIcon />} tooltipTitle="Lock" /> */}
-        {/* <SpeedDialAction key="Add" icon={<AddIcon />} tooltipTitle="Add" /> */}
-      </SpeedDial>
 
-      <Modal open={openPrint} onClose={handleClosePrint}>
+      <Modal open={props.open} onClose={props.handleClose}>
         <Box
           sx={{
             position: "absolute",
@@ -133,7 +106,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
               <IconButton aria-label="close" color="inherit" onClick={handlePrint}>
                 <PrintIcon />
               </IconButton>
-              <IconButton aria-label="close" color="inherit" onClick={handleClosePrint}>
+              <IconButton aria-label="close" color="inherit" onClick={props.handleClose}>
                 <CloseIcon />
               </IconButton>
             </Box>
@@ -204,7 +177,6 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
           </Box>
         </Box>
       </Modal>
-    </Box>
   );
 };
 
