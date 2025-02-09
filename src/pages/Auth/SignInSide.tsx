@@ -1,4 +1,4 @@
-import * as React from "react";
+
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -16,29 +16,30 @@ import { Link, useNavigate } from "react-router-dom";
 import { Divider } from "@mui/material";
 import HeartRateLoader from "../../components/HeartRateLoader";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { Password } from "@mui/icons-material";
+import React, { useState } from "react";
 
-type FormValues = {
-  email: string;
-  password: string;
-};
+
 
 export default function SignInSide() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<FormValues>();
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
 
-  const onSubmit = (data: FormValues) => {
-    setLoading(true);
-    console.log(data);
-    setTimeout(() => {
-      setLoading(false);
-      navigate(`/dashboard`);
-    }, 3000);
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:5000/signin", { userId, password });
+      if (response.status === 200) {
+        alert("Sign-in successful!");
+        navigate("/dashboard"); // Redirect to dashboard or homepage
+      }
+    } catch (err) {
+      console.log("Invalid credentials. Please try again.");
+    }
   };
 
   return (
@@ -88,22 +89,18 @@ export default function SignInSide() {
                 Sign in
               </Typography>
               <Box sx={{ mt: 1 }}>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit}>
                   <TextField
                     margin="normal"
                     //required
                     fullWidth
-                    id="email"
-                    label="Email Address"
+                    id="id"
+                    label="ID"
                     //name="email"
                     //autoComplete="email"
                     //autoFocus
-                    value="test@test.com"
-                    {...register("email", {
-                      required: "Email is required"
-                    })}
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
                   />
                   <TextField
                     margin="normal"
@@ -113,13 +110,9 @@ export default function SignInSide() {
                     label="Password"
                     type={showPassword ? "text" : "password"}
                     id="password"
-                    value="1234"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     //autoComplete="current-password"
-                    {...register("password", {
-                      required: "Password is required"
-                    })}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
                     InputProps={{
                       endAdornment: (
                         <Button onClick={() => setShowPassword(!showPassword)}>
@@ -127,10 +120,6 @@ export default function SignInSide() {
                         </Button>
                       )
                     }}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox value="remember" color="primary" />}
-                    label="Remember me"
                   />
                   <Button
                     type="submit"
@@ -141,54 +130,7 @@ export default function SignInSide() {
                     Sign In
                   </Button>
                 </form>
-                <Grid container>
-                  <Grid item xs>
-                    <Link
-                      to={"/forgot"}
-                      style={{
-                        textDecoration: "none",
-                        color: "inherit"
-                      }}
-                    >
-                      Forgot password?
-                    </Link>
-                  </Grid>
-                  <Grid item>
-                    <Link
-                      to={"/signup"}
-                      style={{
-                        textDecoration: "none",
-                        color: "inherit"
-                      }}
-                    >
-                      {"Don't have an account? Sign Up"}
-                    </Link>
-                  </Grid>
-                </Grid>
-                <Divider sx={{ mt: 2 }} light variant="middle">
-                  OR
-                </Divider>
-                <Button
-                  fullWidth
-                  startIcon={<GoogleIcon />}
-                  variant="outlined"
-                  sx={{
-                    mt: 2
-                  }}
-                >
-                  Continue with google
-                </Button>
-
-                <Button
-                  fullWidth
-                  startIcon={<FacebookIcon />}
-                  variant="outlined"
-                  sx={{
-                    mt: 2
-                  }}
-                >
-                  Continue with facebook
-                </Button>
+                
 
                 <Typography align="center" variant="subtitle2" sx={{ mt: 2 }}>
                   By continuing, you agree to{" "}

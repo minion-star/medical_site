@@ -1,0 +1,29 @@
+250109 11:10:14  InnoDB: Started; log sequence number 0 146678746
+E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+250117 18:05:05 [Note] E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: Normal shutdown
+
+250117 18:05:08 [Warning] E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: Forcing close of thread 8  user: 'root'
+
+250117 18:05:10  InnoDB: Starting shutdown...
+250117 18:05:14  InnoDB: Shutdown completed; log sequence number 0 146884074
+250117 18:05:14 [Note] E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: Shutdown complete
+
+250119 23:56:50  InnoDB: Started; log sequence number 0 146884074
+E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+250122 18:12:40 [Note] E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: Normal shutdown
+
+250122 18:12:40  InnoDB: Starting shutdown...
+250122 18:12:42  InnoDB: Shutdown completed; log sequence number 0 146893994
+250122 18:12:42 [Note] E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: Shutdown complete
+
+250122 18:20:56  InnoDB: Started; log sequence number 0 146893994
+E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+250122 23:38:01 [Note] E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: Normal shutdown
+
+250122 23:38:01  InnoDB: Starting shutdown...
+250122 23:38:04  InnoDB: Shutdown completed; log sequence number 0 146899028
+250122 23:38:04 [Note] E:\project\UniCharts_old\UniCharts_old\mysql\bin\mysqld.exe: Shutdown complete
+

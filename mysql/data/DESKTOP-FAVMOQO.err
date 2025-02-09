@@ -1,0 +1,9 @@
+200705 12:36:31  InnoDB: Started; log sequence number 0 146626796
+C:\EMR\UniCharts\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+200705 12:57:10 [Note] C:\EMR\UniCharts\mysql\bin\mysqld.exe: Normal shutdown
+
+200705 12:57:10  InnoDB: Starting shutdown...
+200705 12:57:12  InnoDB: Shutdown completed; log sequence number 0 146678746
+200705 12:57:12 [Note] C:\EMR\UniCharts\mysql\bin\mysqld.exe: Shutdown complete
+

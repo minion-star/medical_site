@@ -24,16 +24,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 
 const primarynavList = [
-  {
-    link: "/dashboard",
-    label: "Dashboard",
-    icon: <DashboardIcon />,
-  },
-  {
-    link: "/profile",
-    label: "Doctor Profile",
-    icon: <AccountCircleIcon />,
-  },
+
   {
     link: "/administrator",
     label: "Administrator",
@@ -50,63 +41,16 @@ const primarynavList = [
     label: "Patient List",
     icon: <SickIcon />,
   },
-  {
-    link: "/appointments",
-    label: "Appointments",
-    icon: <BookOnlineIcon />,
-  },
-  {
-    link: "/calender",
-    label: "Calender",
-    icon: <CalendarMonthIcon />,
-  },
-  {
-    link: "/kanban",
-    label: "Kanban",
-    icon: <ViewKanbanIcon />,
-  },
-  {
-    link: "/account",
-    label: "Account",
-    icon: <ManageAccountsIcon />,
-  },
+
+
 ];
 
 const secondaryNavList = [
-  {
-    link: "/lab-results",
-    label: "Lab Results",
-    icon: <ReceiptLongIcon />,
-  },
-  {
-    link: "/medical-records",
-    label: "Medical Records",
-    icon: <DescriptionIcon />,
-  },
-  {
-    link: "/prescriptions",
-    label: "Prescriptions",
-    icon: <AssignmentTurnedInIcon />,
-  },
-  {
-    link: "/plans",
-    label: "Care Plans",
-    icon: <AssignmentIcon />,
-  },
-  {
-    link: "/forms",
-    label: "Forms",
-    icon: <DescriptionIcon />,
-  },
+
   {
     link: "/search",
     label: "Search",
     icon: <SearchSharpIcon />,
-  },
-  {
-    link: "/help",
-    label: "Get Help",
-    icon: <HelpIcon />,
   },
   {
     link: "/settings",

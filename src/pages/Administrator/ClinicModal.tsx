@@ -1,4 +1,5 @@
 import { useState, useEffect, createContext } from "react";
+import axios from "axios";
 import {
     ListItemIcon,
     ListItemButton,
@@ -34,7 +35,7 @@ import {
     ModalProps
   } from "@mui/material";
 import Appbar from "../../components/Appbar";
-import { GridOff } from "@mui/icons-material";
+import { GridOff, SettingsOutlined } from "@mui/icons-material";
 import { Form } from "react-router-dom";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from "@mui/icons-material/Add";
@@ -103,7 +104,9 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }:Clini
     
 
     const [clinic, setClinic] = useState<Clinic>(clinic1);
-
+    useEffect(() => {
+        setClinic(clinic1);
+      }, [clinic1]);
     
     const handleClinicChange = (e: React.ChangeEvent<HTMLInputElement |  HTMLTextAreaElement> | SelectChangeEvent) => {
         const { name, value } = e.target;
@@ -174,15 +177,26 @@ const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }:Clini
 
   };
 
-  const handleBookingEndTimeChange = (event: SelectChangeEvent<string>) => {
-    const updatedClinic = { ...clinic, bookingEndTime: event.target.value };
-    setClinic(updatedClinic);
-  };
-    const handleSaveChange = ():void => {
-        updateClinic(clinic);
-        setOpen(false);
-        console.log("Clinic Data", clinic);
-    }
+    const handleBookingEndTimeChange = (event: SelectChangeEvent<string>) => {
+        const updatedClinic = { ...clinic, bookingEndTime: event.target.value };
+        setClinic(updatedClinic);
+    };
+    const handleSaveChange = async () => {
+        console.log("Starting save process...");
+        try {
+            
+            setTimeout(()=>{
+                updateClinic(clinic);
+                setOpen(false);
+            },500)
+            await axios.post('http://localhost:5000/api/clinic', clinic);
+            
+        } catch (error) {
+            console.error("Error saving clinic:", error);
+        }
+        
+    };
+    
       
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);

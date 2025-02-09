@@ -1,0 +1,99 @@
+170913 16:14:54  InnoDB: Started; log sequence number 0 115293094
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 16:26:12 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 16:26:12  InnoDB: Starting shutdown...
+170913 16:26:15  InnoDB: Shutdown completed; log sequence number 0 118625112
+170913 16:26:15 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170913 16:30:30  InnoDB: Started; log sequence number 0 118625112
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 16:30:47 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 16:30:49  InnoDB: Starting shutdown...
+170913 16:30:52  InnoDB: Shutdown completed; log sequence number 0 119287357
+170913 16:30:52 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170913 16:31:56  InnoDB: Started; log sequence number 0 119287357
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 16:32:12 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 16:32:14  InnoDB: Starting shutdown...
+170913 16:32:18  InnoDB: Shutdown completed; log sequence number 0 119952848
+170913 16:32:18 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170913 16:33:46  InnoDB: Started; log sequence number 0 119952848
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 16:45:18 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 16:45:18  InnoDB: Starting shutdown...
+170913 16:45:21  InnoDB: Shutdown completed; log sequence number 0 123284498
+170913 16:45:21 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170913 18:56:16  InnoDB: Started; log sequence number 0 123284498
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 19:07:05 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 19:07:05  InnoDB: Starting shutdown...
+170913 19:07:09  InnoDB: Shutdown completed; log sequence number 0 126601884
+170913 19:07:09 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170913 19:49:00  InnoDB: Started; log sequence number 0 126601884
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 19:59:33 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 19:59:35  InnoDB: Starting shutdown...
+170913 19:59:37  InnoDB: Shutdown completed; log sequence number 0 129936356
+170913 19:59:37 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170913 20:09:38  InnoDB: Started; log sequence number 0 129936356
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 20:21:15 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 20:21:15  InnoDB: Starting shutdown...
+170913 20:21:22  InnoDB: Shutdown completed; log sequence number 0 133271192
+170913 20:21:22 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170913 20:31:55  InnoDB: Started; log sequence number 0 133271192
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170913 20:46:36 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170913 20:46:36  InnoDB: Starting shutdown...
+170913 20:46:40  InnoDB: Shutdown completed; log sequence number 0 136588897
+170913 20:46:40 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170914  7:51:37  InnoDB: Started; log sequence number 0 136588897
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170914  8:03:07 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170914  8:03:07  InnoDB: Starting shutdown...
+170914  8:03:10  InnoDB: Shutdown completed; log sequence number 0 139920801
+170914  8:03:10 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+170914  8:26:56  InnoDB: Started; log sequence number 0 139920801
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+170914  8:37:58 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+170914  8:37:58  InnoDB: Starting shutdown...
+170914  8:38:05  InnoDB: Shutdown completed; log sequence number 0 143259692
+170914  8:38:05 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+
+181030 17:31:49  InnoDB: Started; log sequence number 0 143259692
+D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: ready for connections.
+Version: '4.1.22-community'  socket: ''  port: 3306  MySQL Community Edition (GPL)
+181030 17:50:31 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Normal shutdown
+
+181030 17:50:31  InnoDB: Starting shutdown...
+181030 17:50:35  InnoDB: Shutdown completed; log sequence number 0 146626796
+181030 17:50:35 [Note] D:\Version1.0\Resources\Inno\BlankItems\mysql\bin\mysqld.exe: Shutdown complete
+

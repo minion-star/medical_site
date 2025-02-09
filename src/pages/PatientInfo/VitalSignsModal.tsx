@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Modal,
   Box,
@@ -32,8 +33,21 @@ import {
   ChartData,
 } from "chart.js";
 import { vitalSignsData } from "../../mockData";
+import { useParams } from "react-router-dom";
 
 
+interface VitalSigns {
+  systolic: string,
+  diastolic: string,
+  temperature: string,
+  weight: string,
+  height: string,
+  respiration: string,
+  pulse: string,
+  waist: string,
+  spO2: string,
+  date: string,
+}
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -96,7 +110,7 @@ const getDiastolicLineColor = (value: number) => {
   };
 
 
-function Past_5_Vital_Signs () {
+function Past_5_Vital_Signs ({ vitalSignsData }: { vitalSignsData: VitalSigns[] }) {
 
 
 
@@ -150,17 +164,38 @@ const TabPanel: React.FC<TabPanelProps> = ({ value, index, children }) => {
   return value === index ? <Box>{children}</Box> : null;
 };
 
+interface vitalSignsModalProps {
+  csn:string | undefined,
+  height:string,
+  weight:string ,
+  encounterid:string | undefined,
+}
 
-const VitalSignsModal: React.FC = () => {
+const VitalSignsModal = ({csn, encounterid, height, weight}:vitalSignsModalProps) => {
 
+    const {id} = useParams<{id: string}>();
 
-
-
+    const [vitalSigns, setVitalSigns] = useState<VitalSigns[]>([{systolic:"", diastolic:"", temperature:"", weight:"", height:"", respiration:"", pulse:"", spO2:"", waist:"", date:""}])
+  
+    useEffect(()=>{
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/vitalsigns/${id}`);
+          const data = response.data;
+          setVitalSigns(Array.isArray(data) ? data : []);
+          console.log("data", data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+      fetchData();
+    },[id]);
+          
     // Generate height for each weight based on BMI
     const generateHeightData = (bmi: number) => {
-        const weights = Array.from({ length: 41 }, (_, i) => 75 + i * 5); // 75 to 275 lbs
+        const weights = Array.from({ length: 19 }, (_, i) => 35 + i * 5); // 75 to 275 lbs
         const heights = weights.map((weight) =>
-        Number((Math.sqrt(weight*703) / Math.sqrt(bmi)).toFixed(2)) // Height formula
+        Number((Math.sqrt(weight*10000) / Math.sqrt(bmi)).toFixed(2)) // Height formula
         );
         return { weights, heights };
     };
@@ -174,29 +209,29 @@ const VitalSignsModal: React.FC = () => {
         labels: bmi18_5.weights.map((weight) => `${weight}`),
         datasets: [
         {
-            label: "BMI 18.5",
+            label: "Healthy Weight",
             data: bmi18_5.heights,
             borderColor: "green",
             backgroundColor: "green",
             fill: false,
         },
         {
-            label: "BMI 25",
+            label: "Overweight",
             data: bmi25.heights,
             borderColor: "yellow",
             backgroundColor: "yellow",
             fill: false,
         },
         {
-            label: "BMI 30",
+            label: "Obese",
             data: bmi30.heights,
             borderColor: "red",
             backgroundColor: "red",
             fill: false,
         },
         {
-            label: "BMI Data",
-            data: vitalSignsData.map((entry) => ({ x: entry.weight, y: entry.height })), // Scatter points
+            label: "Record",
+            data: [{x: parseFloat(weight), y: parseFloat(height)}], // Scatter points
             borderColor: "blue", // Color for the dots
             backgroundColor: "blue",
             pointRadius: 5, // Size of the dots
@@ -220,18 +255,18 @@ const VitalSignsModal: React.FC = () => {
             x: {
                 title: {
                     display: true,
-                    text: "Weight (lbs)",
+                    text: "Weight (kg)",
                 },
                 type: "linear", // Ensure proper scatter representation for weight
-                min: 75,
-                max: 275,
+                min: 35,
+                max: 125,
             },
             y: {
-                min: 58,
-                max: 78,
+                min: 150,
+                max: 200,
                 title: {
                     display: true,
-                    text: "Height (in)",
+                    text: "Height (cm)",
                 },
             },
         },
@@ -283,28 +318,28 @@ const VitalSignsModal: React.FC = () => {
     // Systolic and Diastolic diagram
 
     const systolicData = {
-        labels: vitalSignsData.map((entry) => entry.date),
+        labels: vitalSigns.map((entry) => entry.date),
         datasets: [
           {
             label: 'Systolic Blood Pressure',
-            data: vitalSignsData.map((entry) => entry.systolic),
-            borderColor: vitalSignsData.map((entry) => getSystolicLineColor(entry.systolic)),
+            data: vitalSigns.map((entry) => entry.systolic),
+            borderColor: vitalSigns.map((entry) => getSystolicLineColor(parseFloat(entry.systolic))),
             borderWidth: 2,
-            pointBackgroundColor: vitalSignsData.map((entry) => getSystolicLineColor(entry.systolic)),
+            pointBackgroundColor: vitalSigns.map((entry) => getSystolicLineColor(parseFloat(entry.systolic))),
             tension: 0.4, // Smoothing effect
           },
         ],
       };
 
       const diastolicData = {
-        labels: vitalSignsData.map((entry) => entry.date),
+        labels: vitalSigns.map((entry) => entry.date),
         datasets: [
           {
             label: 'Diastolic Blood Pressure',
-            data: vitalSignsData.map((entry) => entry.diastolic),
-            borderColor: vitalSignsData.map((entry) => getDiastolicLineColor(entry.diastolic)),
+            data: vitalSigns.map((entry) => entry.diastolic),
+            borderColor: vitalSigns.map((entry) => getDiastolicLineColor(parseFloat(entry.diastolic))),
             borderWidth: 2,
-            pointBackgroundColor: vitalSignsData.map((entry) => getDiastolicLineColor(entry.diastolic)),
+            pointBackgroundColor: vitalSigns.map((entry) => getDiastolicLineColor(parseFloat(entry.diastolic))),
             tension: 0.4, // Smoothing effect
           },
         ],
@@ -449,7 +484,7 @@ const VitalSignsModal: React.FC = () => {
                      </Box>
                 </TabPanel>
                 <TabPanel value={activeTab} index={2}>
-                    <Past_5_Vital_Signs/>
+                    <Past_5_Vital_Signs vitalSignsData={vitalSigns}/>
                 </TabPanel>
             </Paper>
         </Box>

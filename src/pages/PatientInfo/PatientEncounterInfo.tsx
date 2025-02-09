@@ -58,6 +58,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import LockIcon from '@mui/icons-material/Lock';
 import VitalSignsModal from "./VitalSignsModal";
 import StickySpeedDial from "./StickySpeedDial"
+import { useLocation } from 'react-router-dom';
 
 
 
@@ -373,7 +374,7 @@ function ChiefEncounter({
   const processedNames = normalizedNames.flat();
 
   return (
-    <Box sx={{ display: "flex",}}>
+    <Box sx={{ display: "flex",alignItems:"end"}}>
         {/* TextField */}
         <Grid item xs={11}>
           <TextField
@@ -611,56 +612,66 @@ function Select_Checkbox_Switch({
 
 // history of illness checkbox
 function Select_History_Checkbox({
-  names = [],
-  checked1 = true,
-  label = "",
-  selectedOptions = [],
+  names,
+  label,
+  value,
   onValueChange,
 }: {
   names: string[] | string[][];
-  checked1?: boolean;
-  label?: string;
-  selectedOptions: string[];
-  onValueChange: (newValues: string[]) => void;
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
 }) {
-  // Normalize names into a 2D array
-  const normalizedNames: string[][] =
-    Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+  const [dropdownValue, setDropdownValue] = useState<string[]>([]);
 
   const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
-    const { value } = event.target;
-    const newSelectedOptions = typeof value === "string" ? value.split(",") : value;
-    onValueChange(newSelectedOptions); // Notify parent of the change
+    const selectedValues = event.target.value as string[];
+    const latestSelection = selectedValues[selectedValues.length - 1];
+
+    if (latestSelection.trim() !== "") {
+      onValueChange(value.trim() === "" ? latestSelection : `${value} | ${latestSelection}`);
+    }
+    setDropdownValue([]); // Reset dropdown value to prevent display of selected items
   };
+
+  const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onValueChange(event.target.value);
+  };
+
+  const normalizedNames: string[][] = Array.isArray(names[0]) ? (names as string[][]) : [names as string[]];
+  const processedNames = normalizedNames.flat();
 
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
-      {/* Label */}
-      <Grid item xs={2}>
-        <label>{label}:</label>
-      </Grid>
-      {/* Select Component */}
-      <Grid item xs={10}>
-        <FormControl variant="standard" fullWidth>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="select-checkbox"
-            multiple
-            disabled={!checked1}
-            value={selectedOptions}
-            onChange={handleSelectChange}
-            renderValue={(selected) => selected.join(' | ')}
-          >
-            {normalizedNames.map((array, arrayIndex) =>
-              array.map((name) => (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={selectedOptions.includes(name)} />
-                  <ListItemText primary={name} />
-                </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+      <Grid container alignItems={"end"}>
+        {/* Label */}
+        <Grid item xs={2}>
+          <label>{label}</label>
+        </Grid>
+        {/* TextField */}
+        <Grid item xs={9}>
+          <TextField fullWidth variant="standard" multiline value={value} onChange={handleTextFieldChange} />
+        </Grid>
+        {/* Select Dropdown */}
+        <Grid item xs={1}>
+          <FormControl variant="standard">
+            <Select multiple value={dropdownValue} onChange={handleSelectChange} renderValue={() => null} displayEmpty>
+              {processedNames.map((name, index) =>
+                name === "" ? (
+                  <MenuItem key={`separator-${index}`} disabled>
+                    <Typography variant="body2" sx={{ color: "gray" }}>
+                      <>&nbsp;</>
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                )
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
     </Box>
   );
@@ -702,28 +713,43 @@ function Addable_Procedure_Service({
   };
 
   return (
-    <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold' }}>{place}</div>
-      <Grid container spacing={1} alignItems="center">
-        <Grid item xs={2}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-code-${id}`}
-              value={procedure.code}
-              onChange={handleCodeChange}
-              startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
-            />
-          </FormControl>
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container >
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
         </Grid>
-        <Grid item xs={9}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-desc-${id}`}
-              value={procedure.description}
-              onChange={handleDescriptionChange}
-              startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
-            />
-          </FormControl>
+        <Grid item xs={10} container spacing={1} alignItems="center">
+          <Grid item xs={2}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-code-${id}`}
+                value={procedure.code}
+                onChange={handleCodeChange}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={10}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-desc-${id}`}
+                value={procedure.description}
+                onChange={handleDescriptionChange}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-note-${id}`}
+                value={procedure.note}
+                onChange={handleNoteChange}
+                multiline
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
         </Grid>
         <Grid item xs={1}>
           <IconButton
@@ -734,19 +760,9 @@ function Addable_Procedure_Service({
             <DeleteIcon />
           </IconButton>
         </Grid>
-        <Grid item xs={12}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-note-${id}`}
-              value={procedure.note}
-              onChange={handleNoteChange}
-              multiline
-              startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
-            />
-          </FormControl>
-        </Grid>
       </Grid>
-    </Paper>
+      <Divider sx={{mt:4}}/>
+    </Box>
   );
 }
 
@@ -812,35 +828,39 @@ function Addable_Order_Requisition({
   };
 
   return (
-    <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold' }}>{place}</div>
-      <Grid container spacing={1} alignItems={'end'}>
-        <Grid item xs={2}>
-          <FormControl fullWidth variant="standard">
-            <InputLabel id={`orders-requisition-order-${id}`}>Order</InputLabel>
-            <Select
-              labelId={`orders-requisition-order-select-${id}`}
-              id={`orders-requisition-order-select-${id}`}
-              value={order.order}
-              onChange={handleOrderChange}
-              label="Order"
-            >
-              <MenuItem value={10}>Lab</MenuItem>
-              <MenuItem value={20}>Rad</MenuItem>
-              <MenuItem value={30}>Gen</MenuItem>
-            </Select>
-          </FormControl>
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container alignItems={"end"}>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
         </Grid>
-        <Grid item xs={9}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`procedures-services-desc-${id}`}
-              value={order.requisition}
-              onChange={handleRequisitionChange}
-              multiline
-              startAdornment={<InputAdornment position="start">Requisition:</InputAdornment>}
-            />
-          </FormControl>
+        <Grid item xs={10} container spacing={1} alignItems={'end'}>
+          <Grid item xs={2}>
+            <FormControl fullWidth variant="standard">
+              <InputLabel id={`orders-requisition-order-${id}`}>Order</InputLabel>
+              <Select
+                labelId={`orders-requisition-order-select-${id}`}
+                id={`orders-requisition-order-select-${id}`}
+                value={order.order}
+                onChange={handleOrderChange}
+                label="Order"
+              >
+                <MenuItem value="Lab">Lab</MenuItem>
+                <MenuItem value="Rad">Rad</MenuItem>
+                <MenuItem value="Gen">Gen</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={10}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`procedures-services-desc-${id}`}
+                value={order.requisition}
+                onChange={handleRequisitionChange}
+                multiline
+                startAdornment={<InputAdornment position="start">Requisition:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
         </Grid>
         <Grid item xs={1}>
           <IconButton
@@ -852,7 +872,8 @@ function Addable_Order_Requisition({
           </IconButton>
         </Grid>
       </Grid>
-    </Paper>
+      <Divider sx={{mt:4}}/>
+    </Box>
   );
 }
 
@@ -899,7 +920,7 @@ type Addable_Medication_RxProps = {
   disableDelete: boolean;
   place: number;
   medication: {
-    order: string;
+    unit: string;
     qty: string;
     refills: string;
     sig: string;
@@ -917,7 +938,7 @@ function Addable_Medication_Rx({
   onFieldChange,
 }: Addable_Medication_RxProps) {
   const handleChange = (event: SelectChangeEvent) => {
-    onFieldChange(id, 'order', event.target.value);
+    onFieldChange(id, 'unit', event.target.value);
   };
 
   const handleQtyChange = (event: SelectChangeEvent) => {
@@ -937,33 +958,54 @@ function Addable_Medication_Rx({
   };
 
   return (
-    <Paper elevation={1} style={{ padding: 16, margin: 8 }}>
-      <div style={{ fontWeight: 'bold' }}>{place}</div>
-      <Grid container spacing={1} alignItems={'end'}>
-        <Grid item xs={9}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`medication-rx-${id}`}
-              multiline
-              value={medication.rx}
-              onChange={handleRxChange}
-              startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
-            />
-          </FormControl>
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
         </Grid>
-        <Grid item xs={2}>
-          <FormControl fullWidth variant="standard">
-            <Select
-              labelId={`medication-rx-unit-select-${id}`}
-              id={`medication-rx-unit-select-${id}`}
-              value={medication.order}
-              onChange={handleChange}
-              label="unit"
-            >
-              <MenuItem value="GEQ">GEQ</MenuItem>
-              <MenuItem value="DAW">DAW</MenuItem>
-            </Select>
-          </FormControl>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={9}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`medication-rx-${id}`}
+                multiline
+                value={medication.rx||""}
+                onChange={handleRxChange}
+                startAdornment={<InputAdornment position="start">Rx:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth variant="standard">
+              <Select
+                labelId={`medication-rx-unit-select-${id}`}
+                id={`medication-rx-unit-select-${id}`}
+                value={medication.unit||""}
+                onChange={handleChange}
+                label="unit"
+              >
+                <MenuItem value="GEQ">GEQ</MenuItem>
+                <MenuItem value="DAW">DAW</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={8}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`medication-sig-${id}`}
+                multiline
+                value={medication.sig||""}
+                onChange={handleSigChange}
+                startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={2}>
+            <SelectQty qty={medication.qty} onChange={handleQtyChange} />
+          </Grid>
+          <Grid item xs={2}>
+            <SelectRefills refills={medication.refills} onChange={handleRefillsChange} />
+          </Grid>
         </Grid>
         <Grid item xs={1}>
           <IconButton
@@ -974,30 +1016,14 @@ function Addable_Medication_Rx({
             <DeleteIcon />
           </IconButton>
         </Grid>
-        <Grid item xs={8}>
-          <FormControl fullWidth variant="standard">
-            <Input
-              id={`medication-sig-${id}`}
-              multiline
-              value={medication.sig}
-              onChange={handleSigChange}
-              startAdornment={<InputAdornment position="start">Sig:</InputAdornment>}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={2}>
-          <SelectQty qty={medication.qty} onChange={handleQtyChange} />
-        </Grid>
-        <Grid item xs={2}>
-          <SelectRefills refills={medication.refills} onChange={handleRefillsChange} />
-        </Grid>
       </Grid>
-    </Paper>
+      <Divider sx={{mt:4}}/>
+    </Box>
   );
 }
 
 type Medications_RxProps = {
-  medications: { id: number; order: string; qty: string; refills: string; sig: string; rx: string }[];
+  medications: { id: number; unit: string; qty: string; refills: string; sig: string; rx: string }[];
   onAddMedication: () => void;
   onDeleteMedication: (id: number) => void;
   onFieldChange: (id: number, field: string, value: string | number) => void;
@@ -1281,12 +1307,309 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   );
 };
 
+// Add Assessment
+type Addable_AssessmentProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  assessment: {
+    code: string;
+    onset: string;
+    nature: string;
+    desc: string;
+    note: string;
+  };
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
 
+function Addable_Assessment({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  assessment,
+  onFieldChange,
+}: Addable_AssessmentProps) {
+  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'code', event.target.value);
+  };
+
+  const handleOnsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'onset', event.target.value);
+  };
+
+  const handleNatureChange = (event: SelectChangeEvent) => {
+    onFieldChange(id, 'nature', event.target.value);
+  };
+
+  const handleDescChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'desc', event.target.value);
+  };
+
+  const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onFieldChange(id, 'note', event.target.value);
+  };
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-code-${id}`}
+                multiline
+                value={assessment.code||""}
+                onChange={handleCodeChange}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-onset-${id}`}
+                multiline
+                value={assessment.onset||""}
+                onChange={handleOnsetChange}
+                startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`assessment-nature-select-${id}`}>Nature</InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={assessment.nature||""}
+                onChange={handleNatureChange}
+                label="Nature"
+                name="nature"
+              >
+                <MenuItem value="Minor">Minor</MenuItem>
+                <MenuItem value="Self Limited">Self Limited</MenuItem>
+                <MenuItem value="Time Limited">Time Limited</MenuItem>
+                <MenuItem value="Acute">Acute</MenuItem>
+                <MenuItem value="Chronic">Chronic</MenuItem>
+                <MenuItem value="Intermittent">Intermittent</MenuItem>
+                <MenuItem value="Recurrent">Recurrent</MenuItem>
+                <MenuItem value="Condition">Condition</MenuItem>
+                <MenuItem value="Symptom">Symptom</MenuItem>
+                <MenuItem value="Finding">Finding</MenuItem>
+                <MenuItem value="Limitation">Limitation</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-desc-${id}`}
+                multiline
+                value={assessment.desc||""}
+                onChange={handleDescChange}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`assessment-note-${id}`}
+                multiline
+                value={assessment.note||""}
+                onChange={handleNoteChange}
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+type AssessmentProps = {
+  assessments: { id: number; code: string; onset: string; nature: string; desc: string; note: string }[];
+  onAddAssessment: () => void;
+  onDeleteAssessment: (id: number) => void;
+  onFieldChange: (id: number, field: string, value: string | number) => void;
+};
+
+const Assessment: React.FC<AssessmentProps> = ({
+  assessments,
+  onAddAssessment,
+  onDeleteAssessment,
+  onFieldChange,
+}) => {
+  return (
+    <Grid>
+      {assessments.map((assessment, index) => (
+        <Addable_Assessment
+          key={assessment.id}
+          id={assessment.id}
+          onDelete={onDeleteAssessment}
+          place={index + 1}
+          disableDelete={assessments.length === 1} // Disable delete if only one item remains
+          assessment={assessment}
+          onFieldChange={onFieldChange}
+        />
+      ))}
+      <IconButton onClick={onAddAssessment} color="success">
+        <AddIcon />
+      </IconButton>
+    </Grid>
+  );
+};
+
+// Add Ongoing Problems
+type Addable_OngoingProps = {
+  id: number;
+  onDelete: (id: number) => void;
+  disableDelete: boolean;
+  place: number;
+  ongoing: {
+    code: string;
+    onset: string;
+    status: string;
+    desc: string;
+    note: string;
+  };
+};
+
+function Addable_Ongoing({
+  id,
+  onDelete,
+  disableDelete,
+  place,
+  ongoing,
+}: Addable_OngoingProps) {
+
+  return (
+    <Box style={{ padding: 4, margin: 8 }}>
+      <Grid container>
+        <Grid item xs={1}>
+          <div style={{ fontWeight: 'bold' }}>{place}</div>
+        </Grid>
+        <Grid container item xs={10} spacing={1} alignItems={'end'}>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-code-${id}`}
+                multiline
+                value={ongoing.code}
+                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-onset-${id}`}
+                multiline
+                value={ongoing.onset}
+                startAdornment={<InputAdornment position="start">Onset:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel id={`ongoin-status-select-${id}`}>Status</InputLabel>
+              <Select
+                labelId={`ongoing-status-${id}`}
+                id={`ongoing-status-${id}`}
+                value={ongoing.status}
+                label="Status"
+                name="status"
+              >
+                <MenuItem value="Improving">Improving</MenuItem>
+                <MenuItem value="Stable">Stable</MenuItem>
+                <MenuItem value="Controlled">Controlled</MenuItem>
+                <MenuItem value="Worsening">Worsening</MenuItem>
+                <MenuItem value="Uncontrolled">Uncontrolled</MenuItem>
+                <MenuItem value="Resolved">Resolved</MenuItem>
+                <MenuItem value="Ruled Out">Ruled Out</MenuItem>
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>                      
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-desc-${id}`}
+                multiline
+                value={ongoing.desc}
+                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="standard">
+              <Input
+                id={`ongoing-note-${id}`}
+                multiline
+                value={ongoing.note}
+                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            color="inherit"
+            onClick={() => onDelete(id)}
+            disabled={disableDelete}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Divider sx={{mt:4}}/>
+    </Box>
+  );
+}
+type OngoingProps = {
+  ongoings: { id: number; code: string; onset: string; status: string; desc: string; note: string }[];
+  onDeleteOngoing: (id: number) => void;
+};
+
+const Ongoing: React.FC<OngoingProps> = ({
+  ongoings,
+  onDeleteOngoing,
+}) => {
+  return (
+    <Grid>
+      {ongoings.map((ongoing, index) => (
+        <Addable_Ongoing
+          key={ongoing.id}
+          id={ongoing.id}
+          onDelete={onDeleteOngoing}
+          place={index + 1}
+          disableDelete={ongoings.length === 1} // Disable delete if only one item remains
+          ongoing={ongoing}
+        />
+      ))}
+    </Grid>
+  );
+};
 
 
 const PatientEncounterInfo:React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-
+  const { id, encounterID } = useParams<{ id: string; encounterID:string; }>();
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [age, setAge] = useState<string>("");
@@ -1333,14 +1656,20 @@ const PatientEncounterInfo:React.FC = () => {
     const [open, setOpen] = useState<Record<string, boolean>>({});  
     const [presentIllness, setPresentIllness] = useState<string>("");
     
-    const [medications, setMedications] = useState<{ id: number; order: string; qty: string; refills:string; sig: string; rx: string }[]>([
-      { id: 1, order: '', qty: '', refills: '', sig: '', rx: '' },
+    const [medications, setMedications] = useState<{ id: number; unit: string; qty: string; refills:string; sig: string; rx: string }[]>([
+      { id: 1, unit: '', qty: '', refills: '', sig: '', rx: '' },
     ]);
     const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
       { id: 1, order: '', requisition: '' },
     ]);
+    const [assessments, setAssessments] = useState<{id: number; code: string; onset: string; nature:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', nature: '', desc: '', note: ''}
+    ]);
     const [procedures, setProcedures] = useState<{ id: number; code: string; description: string; note: string }[]>([
       { id: 1, code: '', description: '', note: '' },
+    ]);
+    const [ongoings, setOngoings] = useState<{id: number; code: string; onset: string; status:string; desc:string; note:string}[]>([
+      { id: 1, code: '', onset: '', status: '', desc: '', note: ''}
     ]);
     const [meeting, setMeeting] = useState<Meeting>({emcode:"", emcodeEdit:"", codeBasis:"", codeBasisEdit:"", calculation:"", period:"", time:"",})
     const cleanString = (str:string) => {
@@ -1373,7 +1702,7 @@ const PatientEncounterInfo:React.FC = () => {
   useEffect(()=>{
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/encounter/${id}`);
+        const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
         const data = response.data;
 
         setHead(JSON.parse(data.head || '{}'));
@@ -1385,6 +1714,7 @@ const PatientEncounterInfo:React.FC = () => {
         setMeeting(JSON.parse(data.meeting || '{}'));
         setOpen(JSON.parse(data.open || '{}'));
         setPresentIllness(JSON.parse(data.presentIllness || ""));
+          // 
         if (data.medications && data.medications.length > 0) {
           // Update medications state with the fetched data
           setMedications(data.medications.map((med:any) => ({
@@ -1393,34 +1723,63 @@ const PatientEncounterInfo:React.FC = () => {
         }
 
         // Set orders data if available
-      if (data.orders && data.orders.length > 0) {
-        setOrders(data.orders.map((order:any) => ({
-          id: order.id, order: order.order_type, requisition: order.requisition
-        })));
-      }
+        if (data.orders && data.orders.length > 0) {
+          setOrders(data.orders.map((order:any) => ({
+            id: order.id, order: order.order_type, requisition: order.requisition
+          })));
+        }
 
-      // Set procedures data if available
-      if (data.procedures && data.procedures.length > 0) {
-        setProcedures(data.procedures.map((procedure:any) => ({
-          id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
-        })));
-      }
+        // Set procedures data if available
+        if (data.procedures && data.procedures.length > 0) {
+          setProcedures(data.procedures.map((procedure:any) => ({
+            id: procedure.id, code: procedure.code, description: procedure.description, note: procedure.note
+          })));
+        }
+
+        // Set assess,emts data of available
+        if (data.assessments && data.assessments.length > 0) {
+          setAssessments(data.assessments.map((assessment:any) => ({
+            id: assessment.id, code: assessment.mastercode, desc: assessment.description, note: assessment.note, onset:assessment.onset, nature:assessment.nature
+          })));
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
     fetchData();
-  },[id]);
+  },[id, encounterID]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/history/${id}`);
+        const data = response.data;
+        if (data.masterProblemLists && data.masterProblemLists.length > 0) {
+          setOngoings(data.masterProblemLists.map((med:any) => ({
+            id: med.id, status: med.masterstatus, code: med.mastercode, onset: med.onset, desc: med.description,
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [id]);
+
+
+
 
 const handleSubmit = async () => {
   try {
-    // Adding a delay of 2 seconds (2000ms) before sending the request
-    await new Promise(resolve => setTimeout(resolve, 2000)); 
+    // Adding a delay of 1 seconds (1000ms) before sending the request
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
 
     const response = await axios.post(
       'http://localhost:5000/api/encounter', 
       {
-        id,
+        CSN:id,
+        encounterID,
         head,
         reviewOfSystems,
         chief,
@@ -1433,6 +1792,7 @@ const handleSubmit = async () => {
         medications,
         orders,
         procedures,
+        assessments,
       },
       {
         headers: {
@@ -1442,7 +1802,6 @@ const handleSubmit = async () => {
     );
     
     alert(response.data.message);
-    console.log("physicalExamination state:", physicalExamination);
   } catch (error) {
     console.error('Error saving data:', error); // Log the error for debugging
     alert('Error saving data');
@@ -1470,10 +1829,10 @@ const handleChiefChange = (newValue: string) => {
 
 // History of present illness
 
-const handleHistoryOfIllnessChange = (field: keyof HistoryOfIllness, values: string[]) => {
+const handleHistoryOfIllnessChange = (field: keyof HistoryOfIllness, value: string) => {
   setHistoryOfIllness((prev) => ({
     ...prev,
-    [field]: values.join(", "), // Convert array to a comma-separated string
+    [field]: value,
   }));
 };
 
@@ -1560,25 +1919,26 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
   const bp2 = Array.from({ length: 131  }, (_, index) => index + 10);
 
   const tp: string[] = [];
-  for (let i = 94; i <= 107; i += 0.1) {
+  for (let i = 34.4; i <= 41.7; i += 0.1) {
     tp.push(i.toFixed(1)); // Convert to string with one decimal place
   }
+
   const pr = Array.from({ length: 161  }, (_, index) => index + 40);
   const rr = Array.from({ length: 64  }, (_, index) => index + 2);
   const sp02 = Array.from({ length: 91  }, (_, index) => index + 10);
 
   const ht: string[] = [];
-  for (let i = 15; i <= 82; i += 0.5) {
+  for (let i = 38; i <= 203; i += 1) {
     ht.push(i.toFixed(1)); // Convert to string with one decimal place
   }
 
   const wt: string[] = [];
-  for (let i = 1; i <= 400; i += 0.5) {
+  for (let i = 0.5; i <= 182; i += 0.5) {
     wt.push(i.toFixed(1)); // Convert to string with one decimal place
   }
 
   const waist: string[] = [];
-  for (let i = 15; i <= 80; i += 0.5) {
+  for (let i = 38; i <= 203; i += 0.5) {
     waist.push(i.toFixed(1)); // Convert to string with one decimal place
   }
 
@@ -1619,7 +1979,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
 
   const handleAddMedication = () => {
     const nextId = medications.length ? Math.max(...medications.map(m => m.id)) + 1 : 1;
-    setMedications([...medications, { id: nextId, order: '', qty: '', refills: '', sig: '', rx: '' }]);
+    setMedications([...medications, { id: nextId, unit: '', qty: '', refills: '', sig: '', rx: '' }]);
   };
 
   const handleDeleteMedication = (id: number) => {
@@ -1638,7 +1998,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
     ));
   };
 
-
+// Order
   const handleAddOrder = () => {
     const nextId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1;
     setOrders([...orders, { id: nextId, order: '', requisition: '' }]);
@@ -1659,7 +2019,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
       order.id === id ? { ...order, [field]: value } : order
     ));
   };
-
+// Procedure
   const handleAddProcedure = () => {
     const nextId = procedures.length ? Math.max(...procedures.map(p => p.id)) + 1 : 1;
     setProcedures([...procedures, { id: nextId, code: '', description: '', note: '' }]);
@@ -1680,6 +2040,37 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
       procedure.id === id ? { ...procedure, [field]: value } : procedure
     ));
   };
+// Assessment
+  const handleAddAssessment = () => {
+    const nextId = assessments.length ? Math.max(...assessments.map(m => m.id)) + 1 : 1;
+    setAssessments([...assessments, { id: nextId, code: '', onset: '', nature: '', desc: '', note: '' }]);
+  };
+
+  const handleDeleteAssessment = (id: number) => {
+    if (assessments.length > 1) {
+      setAssessments(assessments.filter((med) => med.id !== id));
+    }
+  };
+
+  const handleChangeAssessmentField = (
+    id: number,
+    field: string,
+    value: string | number
+  ) => {
+    setAssessments(assessments.map((med) =>
+      med.id === id ? { ...med, [field]: value } : med
+    ));
+  };
+
+  // ongoing
+  const handleDeleteOngoing = (id: number) => {
+    if (ongoings.length > 1) {
+      setOngoings(ongoings.filter((med) => med.id !== id));
+    }
+  };
+
+
+
 
   const handleInputChange = (field: string, value: string) => {
     setMeeting((prev) => ({
@@ -1693,7 +2084,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar_Patient appBarTitle="HISTORY" id={id}/>
+      <Appbar_Patient appBarTitle="ENCOUNTER" id={id}/>
       <Box
         component="main"
         sx={{
@@ -1799,7 +2190,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               <Grid item xs={1}>
                                 <TextField
                                   id="outlined-multiline-static"
-                                  label="1"
+                                  label={encounterID}
                                   multiline
                                   variant="standard"
                                   disabled
@@ -1867,50 +2258,54 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12} sx={{mt:3}}>
-                                <Select_History_Checkbox label="Location" names={location} 
-                                  selectedOptions={historyOfIllness.Location.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Location", values)}
+                                <Select_History_Checkbox
+                                  label="Location"
+                                  names={location}
+                                  value={historyOfIllness.Location}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Location", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
-                                <Select_History_Checkbox label='Quality' names={quality}
-                                  selectedOptions={historyOfIllness.Quality.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Quality", values)}
+                                <Select_History_Checkbox
+                                  label="Quality"
+                                  names={quality}
+                                  value={historyOfIllness.Quality}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Quality", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Severity" names={severity}
-                                  selectedOptions={historyOfIllness.Severity.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Severity", values)}
+                                  value={historyOfIllness.Severity}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Severity", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Duration" names={duration}
-                                  selectedOptions={historyOfIllness.Duration.split(", ")}
-                                  onValueChange={(values) => handleHistoryOfIllnessChange("Duration", values)}
+                                  value={historyOfIllness.Duration}
+                                  onValueChange={(value) => handleHistoryOfIllnessChange("Duration", value)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Onset - Timing" names={onset}
-                                  selectedOptions={historyOfIllness.OnsetTiming.split(", ")}
+                                  value={historyOfIllness.OnsetTiming}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("OnsetTiming", values)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Context" names={context}
-                                  selectedOptions={historyOfIllness.Context.split(", ")}
+                                  value={historyOfIllness.Context}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("Context", values)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Modifying Factors" names={modifying}
-                                  selectedOptions={historyOfIllness.ModifyingFactors.split(", ")}
+                                  value={historyOfIllness.ModifyingFactors}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("ModifyingFactors", values)}
                                 />
                               </Grid>
                               <Grid item xs={12} sm={12}>
                                 <Select_History_Checkbox label="Signs - Symptoms" names={signs}
-                                  selectedOptions={historyOfIllness.SignsSymptoms.split(", ")}
+                                  value={historyOfIllness.SignsSymptoms}
                                   onValueChange={(values) => handleHistoryOfIllnessChange("SignsSymptoms", values)}
                                 />
                               </Grid>
@@ -1922,7 +2317,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                                 <h2>Vital Signs</h2> 
                               </Grid>                
                               <Grid item xs={1} sx={{mb:2}}>
-                                <VitalSignsModal />
+                                <VitalSignsModal csn={id} height={vitalSigns.height} weight={vitalSigns.weight} encounterid={encounterID}/>
                               </Grid>           
                               <Grid item container  xs={3}  sx={{display:"flex", alignItems:'end'}}>
                                 <Grid item xs={5} >
@@ -2894,6 +3289,26 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                               <TextField fullWidth sx={{ m: 1 }} id="standard-basic"  variant="standard" />
                             </Grid>                   
                           </div> 
+                          <div className="Assessment / Diagnosis" style={styles.container}>
+                            <h2>Assessment / Diagnosis</h2>
+                            {/* Ongoing Problems */}
+                            <Grid container spacing={1}>
+                              <Ongoing 
+                                ongoings={ongoings}
+                                onDeleteOngoing={handleDeleteOngoing}
+                              />
+                            </Grid>
+                            <Divider sx={{mt:2}}/>
+                            {/* New Assessments */}
+                            <Grid container spacing={1}>
+                              <Assessment
+                                assessments={assessments}
+                                onAddAssessment={handleAddAssessment}
+                                onDeleteAssessment={handleDeleteAssessment}
+                                onFieldChange={handleChangeAssessmentField}
+                              />
+                            </Grid>
+                          </div>
                           <div className="order-requistion" style={styles.container}>
                             <h2>Order / Requistion</h2>
                             <Orders_Requisitions
@@ -2996,7 +3411,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                         </Grid>                      
                       </Grid>                     
                       <br />
-                      <Grid container justifyContent="flex-end">
+                      <Grid container justifyContent="flex-end" sx={{p: 5}}>
                         <Grid item xs={2} sm={1}>
                           <Button
                             component={Link}
@@ -3026,7 +3441,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
                 </Grid>
           </Paper>
         </Container>
-        <StickySpeedDial/>
+
         
       </Box>
       

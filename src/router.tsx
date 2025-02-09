@@ -105,6 +105,14 @@ export const router = createBrowserRouter([
     )
   },  
   {
+    path: "/patient-info-encounter/:id/:encounterID",
+    element: (
+      <AdminElement>
+        <PatientEncounterInfo />
+      </AdminElement>
+    )
+  },
+  {
     path: "/patient-list",
     element: (
       <AdminElement>

@@ -86,9 +86,9 @@ const PatientList: React.FC = () => {
                     <TableCell>AGE</TableCell>
                     <TableCell>GENDER</TableCell>
                     <TableCell>CREATED DATE</TableCell>
-                    <TableCell>CREATED BY</TableCell>
+                    {/*<TableCell>CREATED BY</TableCell>*/}
                     <TableCell>LAST SAVED DATE</TableCell>
-                    <TableCell>LAST SAVED BY</TableCell>
+                  {/* <TableCell>LAST SAVED BY</TableCell>*/}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -112,9 +112,9 @@ const PatientList: React.FC = () => {
                       <TableCell>{patient.AGE}</TableCell>
                       <TableCell>{patient.INFORMATION.personalInformation.gender}</TableCell>
                       <TableCell>{patient.CREATED_DATE}</TableCell>
-                      <TableCell>{patient.CREATED_BY}</TableCell>
+                      {/*<TableCell>{patient.CREATED_BY}</TableCell>*/}
                       <TableCell>{patient.LAST_SAVED_DATE}</TableCell>
-                      <TableCell>{patient.LAST_SAVED_BY}</TableCell>
+                      {/*<TableCell>{patient.LAST_SAVED_BY}</TableCell>*/}
                     </TableRow>
                   ))}
                   {emptyRows > 0 && (
