@@ -531,32 +531,25 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                     <div style={{ flex: 1 }}>
                         <input 
                         type="text" 
-                        placeholder="Last Name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)} 
+                        placeholder="Name"
+                        value={lastName+" "+firstName}
                         style={inputStyle} 
                         />
                     </div>
                     <div style={{ flex: 1 }}>
-                        <input 
-                        type="text" 
-                        placeholder="First Name"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)} 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <label>DOB:</label>
+                            <input 
+                                type="text" 
+                                value={personalInformation.dob}
+                                onChange={(e) => setPersonalInformation({ ...personalInformation, dob: e.target.value })} 
+                                style={inputStyle} 
+                            />
+                        </div>
                     </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label>DOB:</label>
-                    <input 
-                        type="text" 
-                        value={personalInformation.dob}
-                        onChange={(e) => setPersonalInformation({ ...personalInformation, dob: e.target.value })} 
-                        style={{ flex: 1, padding: '8px', marginBottom: '16px' }} 
-                    />
-                    </div>
+                    
 
                     <div>
                     {orders.map((order, index) => (
