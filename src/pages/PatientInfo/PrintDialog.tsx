@@ -534,7 +534,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                         placeholder="Last Name"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)} 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        style={inputStyle} 
                         />
                     </div>
                     <div style={{ flex: 1 }}>
