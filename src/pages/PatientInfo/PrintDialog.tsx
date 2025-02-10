@@ -512,15 +512,13 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             />
                         </div>
                         <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                            <div>
-                                <label style={labelStyle}>Fax</label>
-                                <input 
+                            <label style={labelStyle}>Fax</label>
+                            <input 
                                 type="text" 
                                 value={fax}
                                 onChange={(e:any) => setFax(e.target.value)} 
                                 style={inputStyle} 
-                                />
-                            </div>
+                            />
                             
                         </div>
                     </div>
