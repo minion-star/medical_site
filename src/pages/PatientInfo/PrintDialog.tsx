@@ -484,14 +484,14 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div>
-                    <label>REQUISITION</label>
-                    <input 
+                    <div style={{display:"inline"}}>
+                        <label>REQUISITION</label>
+                        <input 
                         type="text" 
                         value={requisition}
                         onChange={(e) => setRequisition(e.target.value)} 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
-                    />
+                        style={inputStyle} 
+                        />
                     </div>
 
                     <div>
@@ -638,5 +638,17 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
       </Dialog>
   );
 };
+
+
+const inputStyle = {
+    width: '100%',
+    padding: '8px',
+    border: 'none',
+    borderBottom: '2px solid #000', // border-bottom only
+    marginBottom: '16px',
+    outline: 'none', // remove the outline on focus
+  };
+
+
 
 export default PrintDialog;
