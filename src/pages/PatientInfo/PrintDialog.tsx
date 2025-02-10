@@ -543,7 +543,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             id="order"
                             multiline
                             fullWidth
-                            startAdornment={<InputAdornment position="start">{requisition}</InputAdornment>}
+                            value={requisition}
                             />
                     </Grid>
                   </Grid>
