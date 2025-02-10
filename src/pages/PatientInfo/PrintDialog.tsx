@@ -392,13 +392,12 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             <head>
               <title>Print</title>
               <style>
-                /* Global styles */
+                /* Add global styles for printing */
                 body { font-family: Arial, sans-serif; margin: 20px; font-size: 12pt; }
                 h2, h4 { margin: 0; }
                 .print-container { padding: 16px; border: 1px solid #ccc; }
   
-                /* Material-UI Styles */
-                /* You need to include these styles for proper rendering of MUI components */
+                /* Ensure Material-UI's styles are included for printing */
                 .MuiFormControl-root {
                   margin-bottom: 16px;
                 }
@@ -408,36 +407,31 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                   padding: 10px;
                 }
   
-                .MuiTypography-root {
-                  font-size: 14pt;
+                /* You can add additional styling as required */
+                label {
+                  font-size: 12pt;
+                  font-weight: bold;
                 }
   
                 .MuiInputAdornment-root {
                   font-size: 12pt;
                 }
   
-                /* Custom styles for print */
+                /* Make the page look good when printed */
                 @media print {
                   body {
                     margin: 0;
                     padding: 0;
                   }
-                  .MuiTypography-root {
-                    font-size: 12pt;
-                  }
-                  .MuiFormControl-root {
-                    margin-bottom: 8px;
-                  }
-                  .MuiTextField-root, .MuiInput-root {
-                    font-size: 12pt;
+                  .print-container {
+                    padding: 0;
+                    border: none;
                   }
                 }
               </style>
             </head>
             <body>
-              <div class="print-container">
-                ${printContent}
-              </div>
+              ${printContent}
             </body>
           </html>
         `);
@@ -456,7 +450,6 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
       };
     }
   };
-  
   
 
   
