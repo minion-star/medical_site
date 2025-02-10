@@ -300,13 +300,19 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
     
             // Set orders data if available
             if (data.orders && data.orders.length > 0) {
-                setOrders(data.orders.map((order:any) => ({
-                    id: order.id, orderType: order.orderType, requisition: order.requisition
+                // Update the orders state first
+                setOrders(data.orders.map((order: any) => ({
+                    id: order.id,
+                    orderType: order.orderType,
+                    requisition: order.requisition
                 })));
-
-                const labOrders = data.orders.filter((order: any) => order.orderType === "Lab");
+            
+                // Then filter the orders that match "Lab" after the state update
+                const labOrders = data.orders.filter((order: any) => order.orderType == "Lab");
+                // Set the lab orders state
+                setOrders(labOrders);
             }
-    
+            console.log(orders);
             // Set procedures data if available
             if (data.procedures && data.procedures.length > 0) {
               setProcedures(data.procedures.map((procedure:any) => ({
@@ -441,6 +447,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 </Box>
         </Box>
         <Box
+
             component="main"
             sx={{
               backgroundColor: (theme) =>
@@ -552,13 +559,16 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            
-                            <Input
-                                id="order"
-                                multiline
-                                fullWidth
-                                value={requisition}
-                            />
+                            {orders.map((order, index)=>(
+                                <TextField
+                                    key={index}
+                                    variant="standard"
+                                    fullWidth
+                                    multiline
+                                    value={order.requisition}
+                                    id={`print-order-requisition-${index}`}
+                                />
+                            ))}
                         </Grid>
                         <Grid item xs={12}>
                             <Input
