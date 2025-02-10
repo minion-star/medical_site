@@ -207,6 +207,15 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
     const [requisition, setRequisition] = useState("");
     const [tel, setTel] = useState("");
     const [fax, setFax] = useState("");
+    const [labOrders, setLabOrders] = useState<{ id: number; orderType: string; requisition: string }[]>([
+        { id: 1, orderType: '', requisition: '' },
+      ]);
+    const [radOrders, setRadOrders] = useState<{ id: number; orderType: string; requisition: string }[]>([
+        { id: 1, orderType: '', requisition: '' },
+      ]);
+    const [genOrders, setGenOrders] = useState<{ id: number; orderType: string; requisition: string }[]>([
+        { id: 1, orderType: '', requisition: '' },
+      ]);
     const printRef = useRef<HTMLDivElement>(null);
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
@@ -310,7 +319,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 // Then filter the orders that match "Lab" after the state update
                 const labOrders = data.orders.filter((order: any) => order.orderType == "Lab");
                 // Set the lab orders state
-                setOrders(labOrders);
+                setLabOrders(labOrders);
             }
             console.log(orders);
             // Set procedures data if available
@@ -552,24 +561,24 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                     
 
                     <div>
-                    {orders.map((order, index) => (
-                        <div key={index} style={{ marginBottom: '16px' }}>
-                        <input 
-                            type="text" 
-                            value={order.requisition} 
-                            readOnly
-                            style={{ width: '100%', padding: '8px' }} 
-                        />
-                        </div>
-                    ))}
+                        {labOrders.map((labOrder, index) => (
+                            <div key={index} style={{ marginBottom: '16px' }}>
+                            <input 
+                                type="text" 
+                                value={labOrder.requisition} 
+                                readOnly
+                                style={inputStyle} 
+                            />
+                            </div>
+                        ))}
                     </div>
 
-                    <div>
-                    <label>ICDs:</label>
-                    <input 
-                        type="text" 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label style={labelStyle}>ICDs:</label>
+                        <input 
+                            type="text" 
+                            style={inputStyle} 
+                        />
                     </div>
 
                     <div>
@@ -579,7 +588,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             type="text" 
                             value={`${ongoing.code} ${ongoing.desc}`} 
                             readOnly
-                            style={{ width: '100%', padding: '8px' }} 
+                            style={inputStyle} 
                         />
                         </div>
                     ))}
@@ -590,19 +599,19 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
-                    <div style={{ flex: 1 }}>
-                        <label>Signed</label>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                        <label style={labelStyle}>Signed</label>
                         <input 
                         type="text" 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        style={inputStyle} 
                         />
                     </div>
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                         <input 
                         type="text" 
                         value={head.date}
                         readOnly
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        style={inputStyle} 
                         />
                     </div>
                     </div>
@@ -620,7 +629,7 @@ const inputStyle = {
     padding: '8px',
     border: 'none',
     borderBottom: '2px solid #000', // border-bottom only
-    marginBottom: '16px',
+    marginBottom: '8px',
     outline: 'none', // remove the outline on focus
     display:"inline",
   };
