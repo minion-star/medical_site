@@ -376,15 +376,15 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   const handlePrint = () => {
     if (printRef.current) {
       const printContent = printRef.current.outerHTML;
-
-      // Create an iframe for printing
+  
+      // Create an iframe
       const printWindow = document.createElement("iframe");
       printWindow.style.position = "absolute";
       printWindow.style.top = "-10000px"; // Hide the iframe offscreen
       document.body.appendChild(printWindow);
-
+  
       const doc = printWindow.contentDocument || printWindow.contentWindow?.document;
-
+  
       if (doc) {
         doc.open();
         doc.write(`
@@ -392,16 +392,31 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             <head>
               <title>Print</title>
               <style>
-                /* Global print styles */
+                /* Global styles */
                 body { font-family: Arial, sans-serif; margin: 20px; font-size: 12pt; }
                 h2, h4 { margin: 0; }
+                .print-container { padding: 16px; border: 1px solid #ccc; }
+  
+                /* Material-UI Styles */
+                /* You need to include these styles for proper rendering of MUI components */
                 .MuiFormControl-root {
                   margin-bottom: 16px;
                 }
-                .MuiTextField-root {
-                  margin-bottom: 16px;
+  
+                .MuiInputBase-root {
+                  font-size: 12pt;
+                  padding: 10px;
                 }
-                /* Custom adjustments for print */
+  
+                .MuiTypography-root {
+                  font-size: 14pt;
+                }
+  
+                .MuiInputAdornment-root {
+                  font-size: 12pt;
+                }
+  
+                /* Custom styles for print */
                 @media print {
                   body {
                     margin: 0;
@@ -420,7 +435,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
               </style>
             </head>
             <body>
-              <div>
+              <div class="print-container">
                 ${printContent}
               </div>
             </body>
@@ -428,13 +443,13 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
         `);
         doc.close();
       }
-
-      // Wait for the iframe to load the content and trigger the print
+  
+      // Wait for the iframe to load the content
       printWindow.onload = () => {
         printWindow.contentWindow?.focus();
         printWindow.contentWindow?.print();
-
-        // Cleanup after printing
+  
+        // Cleanup: Remove the iframe after printing
         setTimeout(() => {
           document.body.removeChild(printWindow);
         }, 1000);
