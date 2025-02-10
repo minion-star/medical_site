@@ -353,6 +353,24 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
         fetchPatient();
   }, [id]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/history/${id}`);
+        const data = response.data;
+        if (data.masterProblemLists && data.masterProblemLists.length > 0) {
+          setOngoings(data.masterProblemLists.map((med:any) => ({
+            id: med.id, status: med.masterstatus, code: med.mastercode, onset: med.onset, desc: med.description,
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [id]);
+
   const handlePrint = () => {
     if (printRef.current) {
       const printContent = printRef.current.outerHTML;
@@ -547,12 +565,20 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             />
                         </Grid>
                         <Grid item xs={6}>
-                        <Input
-                            id="icds"
-                            multiline
-                            fullWidth
-                            startAdornment={<InputAdornment position="start">ICDs:</InputAdornment>}
-                        />
+                            <Input
+                                id="icds"
+                                multiline
+                                fullWidth
+                                startAdornment={<InputAdornment position="start">ICDs:</InputAdornment>}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Input
+                                id="codedesc"
+                                multiline
+                                fullWidth
+                                startAdornment={<InputAdornment position="start">{ongoings[0].code}{ongoings[0].desc}</InputAdornment>}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
