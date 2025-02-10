@@ -281,7 +281,6 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
           try {
             const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
             const data = response.data;
-            console.log("orders:", data.orders);
             setHead(JSON.parse(data.head || '{}'));
             setReviewOfSystems(JSON.parse(data.reviewOfSystems || '{}'));
             setChief(cleanString(data.chief || ''));
@@ -295,17 +294,17 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             if (data.medications && data.medications.length > 0) {
               // Update medications state with the fetched data
               setMedications(data.medications.map((med:any) => ({
-                id: med.id, order: med.order_type, qty: med.qty, refills: med.refills, sig: med.sig, rx: med.rx
+                id: med.id, order: med.unit, qty: med.qty, refills: med.refills, sig: med.sig, rx: med.rx
               })));
             }
     
             // Set orders data if available
             if (data.orders && data.orders.length > 0) {
                 setOrders(data.orders.map((order:any) => ({
-                    id: order.id, orderType: order.order_type, requisition: order.requisition
+                    id: order.id, orderType: order.orderType, requisition: order.requisition
                 })));
 
-                const labOrder = data.orders.find((order: any) => order.order_type == "Lab");
+                const labOrder = data.orders.find((order: any) => order.orderType == "Lab");
                 if (labOrder) {
                 setRequisition(labOrder.requisition);
                 

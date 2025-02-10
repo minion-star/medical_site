@@ -183,7 +183,6 @@ const VitalSignsModal = ({csn, encounterid, height, weight}:vitalSignsModalProps
           const response = await axios.get(`http://localhost:5000/api/vitalsigns/${id}`);
           const data = response.data;
           setVitalSigns(Array.isArray(data) ? data : []);
-          console.log("data", data);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
