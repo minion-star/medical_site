@@ -893,14 +893,14 @@ const Orders_Requisitions: React.FC<Orders_RequisitionsProps> = ({
 }) => {
   return (
     <Grid>
-      {orders.map((order, index) => (
+      {orders.map((orderType, index) => (
         <Addable_Order_Requisition
-          key={order.id}
-          id={order.id}
+          key={orderType.id}
+          id={orderType.id}
           onDelete={onDeleteOrder}
           place={index + 1}
           disableDelete={orders.length === 1} // Disable delete if only one item remains
-          order={order}
+          order={orderType}
           onFieldChange={onFieldChange}
         />
       ))}
@@ -1725,7 +1725,7 @@ const PatientEncounterInfo:React.FC = () => {
         // Set orders data if available
         if (data.orders && data.orders.length > 0) {
           setOrders(data.orders.map((order:any) => ({
-            id: order.id, order: order.order_type, requisition: order.requisition
+            id: order.id, order: order.orderType, requisition: order.requisition
           })));
         }
 
