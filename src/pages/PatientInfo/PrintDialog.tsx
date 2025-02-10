@@ -477,131 +477,161 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             </Tabs>
             <Container sx={{ mt: 4, mb: 10 }} className="print-container" >
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600, }} id="print-content" ref={printRef}>
-                <Grid>
-                  <h2>Clinique Sante Pour Tous</h2>
-                  <h4>1000, Fairwaywoods Dr. Chester ST 223344</h4>
-                  <h4>Tel: (804)123-4567 Fax: (804)123-4569</h4>
-                </Grid>
-                <Grid container sx={{ gap: 1, display: "flex" , alignItems:"end"}}>
-                    <Grid item xs={12}>
-                        <Box sx={{ display: "flex", alignItems: "flex-end", mb: 4 }}>
-                        <label>REQUISITION</label>
-                        <TextField variant="standard" fullWidth value=""/>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField variant="standard" fullWidth />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField  variant="standard" fullWidth />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                        id="general-order"
-                        variant="standard"
-                        fullWidth
-                        multiline
+                <div style={{ textAlign: 'center' }}>
+                    <h2>Clinique Sante Pour Tous</h2>
+                    <h4>1000, Fairwaywoods Dr. Chester ST 223344</h4>
+                    <h4>Tel: (804)123-4567 Fax: (804)123-4569</h4>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div>
+                    <label>REQUISITION</label>
+                    <input 
+                        type="text" 
+                        value={requisition}
+                        onChange={(e) => setRequisition(e.target.value)} 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                    />
+                    </div>
+
+                    <div>
+                    <input 
+                        type="text" 
+                        value={requisition}
+                        onChange={(e) => setRequisition(e.target.value)} 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                    />
+                    </div>
+
+                    <div>
+                    <input 
+                        type="text" 
+                        value={requisition}
+                        onChange={(e) => setRequisition(e.target.value)} 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                    />
+                    </div>
+
+                    <div>
+                    <textarea
                         value={requisition}
                         onChange={(e) => setRequisition(e.target.value)}
+                        style={{ width: '100%', padding: '8px', height: '100px', marginBottom: '16px' }}
+                    />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                    <div style={{ flex: 1 }}>
+                        <label>Tel</label>
+                        <input 
+                        type="text" 
+                        value={tel}
+                        onChange={(e) => setTel(e.target.value)} 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
                         />
-                    </Grid>
-                    <Grid item container xs={12} spacing={1}>
-                        <Grid item xs={6}>
-                            <TextField
-                                id="tel"
-                                label="Tel"
-                                multiline
-                                variant="standard"
-                                fullWidth
-                                value={tel}
-                                onChange={(e) => setTel(e.target.value)}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                id="fax"
-                                label="Fax"
-                                multiline
-                                variant="standard"
-                                fullWidth
-                                value={fax}
-                                onChange={(e) => setFax(e.target.value)}
-                            />
-                        </Grid>
-                        <Grid item xs={12}><h4>This is a request for laboratory services for:</h4></Grid>
-                        <Grid item xs={3}>
-                            <TextField
-                                id="lastname"
-                                label=""
-                                multiline
-                                variant="standard"
-                                fullWidth
-                                value={lastName}
-                            />
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField
-                                id="firstname"
-                                label=""
-                                multiline
-                                variant="standard"
-                                fullWidth
-                                value={firstName}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Input
-                                id="dob"
-                                multiline
-                                fullWidth
-                                value={personalInformation.dob}
-                                startAdornment={<InputAdornment position="start">DOB:</InputAdornment>}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            {orders.map((order, index)=>(
-                                <TextField
-                                    key={index}
-                                    variant="standard"
-                                    fullWidth
-                                    multiline
-                                    value={order.requisition}
-                                    id={`print-order-requisition-${index}`}
-                                />
-                            ))}
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Input
-                                id="icds"
-                                multiline
-                                fullWidth
-                                startAdornment={<InputAdornment position="start">ICDs:</InputAdornment>}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            {ongoings.map((ongoing, index)=>(
-                                <Input
-                                id="codedesc"
-                                multiline
-                                fullWidth
-                                startAdornment={<InputAdornment key={index} position="start">{ongoing.code}{ongoing.desc}</InputAdornment>}
-                            />))}
-                            
-                        </Grid>
-                        <Grid item xs={12} textAlign={"left"}>
-                            <h4>Thank you,</h4>
-                        </Grid>
-                        <Grid item xs={6} sx={{mt:1}}>
-                            <Box sx={{ display: "flex", alignItems: "flex-end", mt: 2 }}>
-                            <label>Signed </label>
-                            <TextField variant="standard" fullWidth/>
-                            </Box>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField variant="standard" fullWidth value={head.date} sx={{mt:3}}/>
-                        </Grid>
-                    </Grid>
-                </Grid>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <label>Fax</label>
+                        <input 
+                        type="text" 
+                        value={fax}
+                        onChange={(e) => setFax(e.target.value)} 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        />
+                    </div>
+                    </div>
+
+                    <div>
+                    <h4>This is a request for laboratory services for:</h4>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                    <div style={{ flex: 1 }}>
+                        <input 
+                        type="text" 
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)} 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <input 
+                        type="text" 
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)} 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        />
+                    </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label>DOB:</label>
+                    <input 
+                        type="text" 
+                        value={personalInformation.dob}
+                        onChange={(e) => setPersonalInformation({ ...personalInformation, dob: e.target.value })} 
+                        style={{ flex: 1, padding: '8px', marginBottom: '16px' }} 
+                    />
+                    </div>
+
+                    <div>
+                    {orders.map((order, index) => (
+                        <div key={index} style={{ marginBottom: '16px' }}>
+                        <input 
+                            type="text" 
+                            value={order.requisition} 
+                            readOnly
+                            style={{ width: '100%', padding: '8px' }} 
+                        />
+                        </div>
+                    ))}
+                    </div>
+
+                    <div>
+                    <label>ICDs:</label>
+                    <input 
+                        type="text" 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                    />
+                    </div>
+
+                    <div>
+                    {ongoings.map((ongoing, index) => (
+                        <div key={index} style={{ marginBottom: '16px' }}>
+                        <input 
+                            type="text" 
+                            value={`${ongoing.code} ${ongoing.desc}`} 
+                            readOnly
+                            style={{ width: '100%', padding: '8px' }} 
+                        />
+                        </div>
+                    ))}
+                    </div>
+
+                    <div>
+                    <h4>Thank you,</h4>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                    <div style={{ flex: 1 }}>
+                        <label>Signed</label>
+                        <input 
+                        type="text" 
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <input 
+                        type="text" 
+                        value={head.date}
+                        readOnly
+                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
+                        />
+                    </div>
+                    </div>
+                </div>
               </Paper>
             </Container>
           </Box>
