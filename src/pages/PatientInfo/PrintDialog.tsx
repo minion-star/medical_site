@@ -376,15 +376,15 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   const handlePrint = () => {
     if (printRef.current) {
       const printContent = printRef.current.outerHTML;
-  
-      // Create an iframe
+
+      // Create an iframe for printing
       const printWindow = document.createElement("iframe");
       printWindow.style.position = "absolute";
       printWindow.style.top = "-10000px"; // Hide the iframe offscreen
       document.body.appendChild(printWindow);
-  
+
       const doc = printWindow.contentDocument || printWindow.contentWindow?.document;
-  
+
       if (doc) {
         doc.open();
         doc.write(`
@@ -392,32 +392,56 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             <head>
               <title>Print</title>
               <style>
-                /* Add any styles you want to apply to the printed content */
-                body { font-family: Arial, sans-serif; margin: 20px; }
+                /* Global print styles */
+                body { font-family: Arial, sans-serif; margin: 20px; font-size: 12pt; }
                 h2, h4 { margin: 0; }
-                .print-container { padding: 16px; border: 1px solid #ccc; }
+                .MuiFormControl-root {
+                  margin-bottom: 16px;
+                }
+                .MuiTextField-root {
+                  margin-bottom: 16px;
+                }
+                /* Custom adjustments for print */
+                @media print {
+                  body {
+                    margin: 0;
+                    padding: 0;
+                  }
+                  .MuiTypography-root {
+                    font-size: 12pt;
+                  }
+                  .MuiFormControl-root {
+                    margin-bottom: 8px;
+                  }
+                  .MuiTextField-root, .MuiInput-root {
+                    font-size: 12pt;
+                  }
+                }
               </style>
             </head>
             <body>
-              ${printContent}
+              <div>
+                ${printContent}
+              </div>
             </body>
           </html>
         `);
         doc.close();
       }
-  
-      // Wait for the iframe to load the content
+
+      // Wait for the iframe to load the content and trigger the print
       printWindow.onload = () => {
         printWindow.contentWindow?.focus();
         printWindow.contentWindow?.print();
-  
-        // Cleanup: Remove the iframe after printing
+
+        // Cleanup after printing
         setTimeout(() => {
           document.body.removeChild(printWindow);
         }, 1000);
       };
     }
   };
+  
   
 
   
