@@ -484,39 +484,27 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{display:"inline"}}>
+                    <div>
                         <label>REQUISITION</label>
+                    </div>
+
+                    <div>
                         <input 
-                        type="text" 
-                        value={requisition}
-                        onChange={(e) => setRequisition(e.target.value)} 
-                        style={inputStyle} 
+                            type="text" 
+                            style={inputStyle} 
                         />
                     </div>
 
                     <div>
-                    <input 
-                        type="text" 
-                        value={requisition}
-                        onChange={(e) => setRequisition(e.target.value)} 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
-                    />
-                    </div>
-
-                    <div>
-                    <input 
-                        type="text" 
-                        value={requisition}
-                        onChange={(e) => setRequisition(e.target.value)} 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
-                    />
+                        <input 
+                            type="text" 
+                            style={inputStyle} 
+                        />
                     </div>
 
                     <div>
                     <textarea
-                        value={requisition}
-                        onChange={(e) => setRequisition(e.target.value)}
-                        style={{ width: '100%', padding: '8px', height: '100px', marginBottom: '16px' }}
+                        style={{ width: '100%', padding: '8px', height: '100px', marginBottom: '16px', border:"none", outline:"none", borderBottom: '2px solid #000', }}
                     />
                     </div>
 
