@@ -205,6 +205,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
   const {id, encounterID} = useParams<{id:string; encounterID:string}>();
 
     const [requisition, setRequisition] = useState("");
+    const [selectedTab, setSelectedTab] = useState(0);
     const [tel, setTel] = useState("");
     const [fax, setFax] = useState("");
     const [labOrders, setLabOrders] = useState<{ id: number; orderType: string; requisition: string }[]>([
