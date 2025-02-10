@@ -588,14 +588,17 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             />))}
                             
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} textAlign={"left"}>
                             <h4>Thank you,</h4>
                         </Grid>
-                        <Grid container item xs={6} sx={{mt:1}}>
+                        <Grid item xs={6} sx={{mt:1}}>
                             <Box sx={{ display: "flex", alignItems: "flex-end", mt: 2 }}>
-                            <label>Signed</label>
+                            <label>Signed </label>
                             <TextField variant="standard" fullWidth/>
                             </Box>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <TextField variant="standard" fullWidth value={head.date} sx={{mt:3}}/>
                         </Grid>
                     </Grid>
                 </Grid>
