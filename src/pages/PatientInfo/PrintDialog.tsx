@@ -511,7 +511,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             style={inputStyle} 
                             />
                         </div>
-                        <div style={{ flex: 1 }}>
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                             <div>
                                 <label style={labelStyle}>Fax</label>
                                 <input 
