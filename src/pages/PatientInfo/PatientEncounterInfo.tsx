@@ -739,6 +739,7 @@ function Addable_Procedure_Service({
               onChange={handleDescriptionChange}
               label="Desc"
               name="desc"
+              fullWidth
             />
           </Grid>
           <Grid item xs={12}>
@@ -749,6 +750,7 @@ function Addable_Procedure_Service({
                 onChange={handleNoteChange}
                 multiline
                 startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
+                fullWidth
               />
             </FormControl>
           </Grid>
