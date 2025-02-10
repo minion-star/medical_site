@@ -641,7 +641,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             {/* <Tab label={<FormControlLabel control={<Checkbox/>} label="Signature Stamp" />} /> */}
             </Tabs>
             <Container sx={{ mt: 4, mb: 10 }} className="print-container" >
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600, }} id="print-content" ref={printRef}>
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600, minWidth:300 }} id="print-content" ref={printRef}>
                 <div style={{ textAlign: 'center' }}>
                     <h2>Clinique Sante Pour Tous</h2>
                     <h4>1000, Fairwaywoods Dr. Chester ST 223344</h4>
