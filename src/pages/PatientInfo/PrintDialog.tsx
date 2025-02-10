@@ -473,8 +473,8 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 <Tab label="Face Label" sx={{borderBottom:1, borderColor:"divider"}} />
             {/* <Tab label={<FormControlLabel control={<Checkbox/>} label="Signature Stamp" />} /> */}
             </Tabs>
-            <Container sx={{ mt: 4, mb: 4 }} className="print-container" >
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600 }}>
+            <Container sx={{ mt: 4, mb: 10 }} className="print-container" >
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600, }}>
                 <Grid>
                   <h2>Clinique Sante Pour Tous</h2>
                   <h4>1000, Fairwaywoods Dr. Chester ST 223344</h4>
@@ -564,7 +564,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                                 value={requisition}
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12}>
                             <Input
                                 id="icds"
                                 multiline
@@ -572,13 +572,15 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                                 startAdornment={<InputAdornment position="start">ICDs:</InputAdornment>}
                             />
                         </Grid>
-                        <Grid item xs={6}>
-                            <Input
+                        <Grid item xs={12}>
+                            {ongoings.map((ongoing, index)=>(
+                                <Input
                                 id="codedesc"
                                 multiline
                                 fullWidth
-                                startAdornment={<InputAdornment position="start">{ongoings[0].code}{ongoings[0].desc}</InputAdornment>}
-                            />
+                                startAdornment={<InputAdornment key={index} position="start">{ongoing.code}{ongoing.desc}</InputAdornment>}
+                            />))}
+                            
                         </Grid>
                     </Grid>
                 </Grid>
