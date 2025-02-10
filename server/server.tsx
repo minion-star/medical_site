@@ -512,7 +512,7 @@ app.post('/api/encounter', async (req, res) => {
     procedures,
     assessments,
   } = req.body;
-
+  console.log(orders);
   try {
     // Adding a delay of 2 seconds before processing the request
     setTimeout(async () => {
@@ -551,12 +551,12 @@ app.post('/api/encounter', async (req, res) => {
         // Insert the medications into the database
         if (medications && medications.length > 0) {
           const insertMedicationQuery = `
-            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN, encounterID)
+            INSERT INTO medications (unit, qty, refills, sig, rx, CSN, encounterID)
             VALUES (?, ?, ?, ?, ?, ?, ?)
           `;
           for (let medication of medications) {
-            const { order, qty, refills, sig, rx } = medication;
-            const insertMedicationParams = [order, qty, refills, sig, rx, CSN, encounterID];
+            const { unit, qty, refills, sig, rx } = medication;
+            const insertMedicationParams = [unit, qty, refills, sig, rx, CSN, encounterID];
             await db.query(insertMedicationQuery, insertMedicationParams);
           }
         }
@@ -568,7 +568,7 @@ app.post('/api/encounter', async (req, res) => {
         // Insert the orders into the database
         if (orders && orders.length > 0) {
           const insertOrderQuery = `
-            INSERT INTO orders (order_type, requisition, CSN, encounterID)
+            INSERT INTO orders (orderType, requisition, CSN, encounterID)
             VALUES (?, ?, ?, ?)
           `;
           for (let order of orders) {
@@ -627,12 +627,12 @@ app.post('/api/encounter', async (req, res) => {
         // Insert medications into the database
         if (medications && medications.length > 0) {
           const insertMedicationQuery = `
-            INSERT INTO medications (order_type, qty, refills, sig, rx, CSN, encounterID)
+            INSERT INTO medications (unit, qty, refills, sig, rx, CSN, encounterID)
             VALUES (?, ?, ?, ?, ?, ?, ?)
           `;
           for (let medication of medications) {
-            const { order, qty, refills, sig, rx } = medication;
-            const insertMedicationParams = [order, qty, refills, sig, rx, newCSN, encounterID];
+            const { unit, qty, refills, sig, rx } = medication;
+            const insertMedicationParams = [unit, qty, refills, sig, rx, newCSN, encounterID];
             await db.query(insertMedicationQuery, insertMedicationParams);
           }
         }
@@ -640,7 +640,7 @@ app.post('/api/encounter', async (req, res) => {
         // Insert orders into the database
         if (orders && orders.length > 0) {
           const insertOrderQuery = `
-            INSERT INTO orders (order_type, requisition, CSN, encounterID)
+            INSERT INTO orders (orderType, requisition, CSN, encounterID)
             VALUES (?, ?, ?, ?)
           `;
           for (let order of orders) {

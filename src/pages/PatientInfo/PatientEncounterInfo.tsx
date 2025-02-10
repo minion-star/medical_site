@@ -807,7 +807,7 @@ type Addable_Order_RequisitionProps = {
   onDelete: (id: number) => void;
   disableDelete: boolean;
   place: number;
-  order: { order: string; requisition: string };
+  order: { orderType: string; requisition: string };
   onFieldChange: (id: number, field: string, value: string) => void;
 };
 
@@ -840,7 +840,7 @@ function Addable_Order_Requisition({
               <Select
                 labelId={`orders-requisition-order-select-${id}`}
                 id={`orders-requisition-order-select-${id}`}
-                value={order.order}
+                value={order.orderType}
                 onChange={handleOrderChange}
                 label="Order"
               >
@@ -879,7 +879,7 @@ function Addable_Order_Requisition({
 
 
 type Orders_RequisitionsProps = {
-  orders: { id: number; order: string; requisition: string }[];
+  orders: { id: number; orderType: string; requisition: string }[];
   onAddOrder: () => void;
   onDeleteOrder: (id: number) => void;
   onFieldChange: (id: number, field: string, value: string) => void;
@@ -1659,8 +1659,8 @@ const PatientEncounterInfo:React.FC = () => {
     const [medications, setMedications] = useState<{ id: number; unit: string; qty: string; refills:string; sig: string; rx: string }[]>([
       { id: 1, unit: '', qty: '', refills: '', sig: '', rx: '' },
     ]);
-    const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
-      { id: 1, order: '', requisition: '' },
+    const [orders, setOrders] = useState<{ id: number; orderType: string; requisition: string }[]>([
+      { id: 1, orderType: '', requisition: '' },
     ]);
     const [assessments, setAssessments] = useState<{id: number; code: string; onset: string; nature:string; desc:string; note:string}[]>([
       { id: 1, code: '', onset: '', nature: '', desc: '', note: ''}
@@ -1704,7 +1704,7 @@ const PatientEncounterInfo:React.FC = () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
         const data = response.data;
-
+        console.log(data.medications);
         setHead(JSON.parse(data.head || '{}'));
         setReviewOfSystems(JSON.parse(data.reviewOfSystems || '{}'));
         setChief(cleanString(data.chief || ''));
@@ -1718,7 +1718,7 @@ const PatientEncounterInfo:React.FC = () => {
         if (data.medications && data.medications.length > 0) {
           // Update medications state with the fetched data
           setMedications(data.medications.map((med:any) => ({
-            id: med.id, order: med.order_type, qty: med.qty, refills: med.refills, sig: med.sig, rx: med.rx
+            id: med.id, unit: med.unit, qty: med.qty, refills: med.refills, sig: med.sig, rx: med.rx
           })));
         }
 
@@ -2001,7 +2001,7 @@ const handleChildChange = <T extends keyof ReviewOfSystems>(
 // Order
   const handleAddOrder = () => {
     const nextId = orders.length ? Math.max(...orders.map(o => o.id)) + 1 : 1;
-    setOrders([...orders, { id: nextId, order: '', requisition: '' }]);
+    setOrders([...orders, { id: nextId, orderType: '', requisition: '' }]);
   };
 
   const handleDeleteOrder = (id: number) => {

@@ -281,7 +281,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
           try {
             const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
             const data = response.data;
-    
+            console.log("orders:", data.orders);
             setHead(JSON.parse(data.head || '{}'));
             setReviewOfSystems(JSON.parse(data.reviewOfSystems || '{}'));
             setChief(cleanString(data.chief || ''));
@@ -301,9 +301,15 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
     
             // Set orders data if available
             if (data.orders && data.orders.length > 0) {
-              setOrders(data.orders.map((order:any) => ({
-                id: order.id, order: order.order_type, requisition: order.requisition
-              })));
+                setOrders(data.orders.map((order:any) => ({
+                    id: order.id, order: order.order_type, requisition: order.requisition
+                })));
+
+                const labOrder = data.orders.find((order: any) => order.order_type == "Lab");
+                if (labOrder) {
+                setRequisition(labOrder.requisition);
+                
+                }
             }
     
             // Set procedures data if available
@@ -319,6 +325,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 id: assessment.id, code: assessment.mastercode, desc: assessment.description, note: assessment.note, onset:assessment.onset, nature:assessment.nature
               })));
             }
+
           } catch (error) {
             console.error("Error fetching data:", error);
           }
@@ -392,6 +399,8 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
       };
     }
   };
+  
+
   
   return (
 
@@ -529,6 +538,14 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                         value={personalInformation.dob}
                         startAdornment={<InputAdornment position="start">DOB:</InputAdornment>}
                       />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Input
+                            id="order"
+                            multiline
+                            fullWidth
+                            startAdornment={<InputAdornment position="start">{requisition}</InputAdornment>}
+                            />
                     </Grid>
                   </Grid>
                 </Grid>
