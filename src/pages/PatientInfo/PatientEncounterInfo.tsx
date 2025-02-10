@@ -743,16 +743,16 @@ function Addable_Procedure_Service({
             />
           </Grid>
           <Grid item xs={12}>
-            <FormControl fullWidth variant="standard">
-              <Input
-                id={`procedures-services-note-${id}`}
-                value={procedure.note}
-                onChange={handleNoteChange}
-                multiline
-                startAdornment={<InputAdornment position="start">Note:</InputAdornment>}
-                fullWidth
-              />
-            </FormControl>
+            <TextField
+              multiline
+              variant="standard"
+              id={`procedures-services-note-${id}`}
+              value={procedure.note}
+              onChange={handleNoteChange}
+              label="Note"
+              name="note"
+              fullWidth
+            />
           </Grid>
         </Grid>
         <Grid item xs={1}>
