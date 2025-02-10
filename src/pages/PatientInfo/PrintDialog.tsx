@@ -304,11 +304,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                     id: order.id, orderType: order.orderType, requisition: order.requisition
                 })));
 
-                const labOrder = data.orders.find((order: any) => order.orderType == "Lab");
-                if (labOrder) {
-                setRequisition(labOrder.requisition);
-                
-                }
+                const labOrders = data.orders.filter((order: any) => order.orderType === "Lab");
             }
     
             // Set procedures data if available
@@ -445,7 +441,6 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 </Box>
         </Box>
         <Box
-            ref={printRef}
             component="main"
             sx={{
               backgroundColor: (theme) =>
@@ -474,7 +469,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             {/* <Tab label={<FormControlLabel control={<Checkbox/>} label="Signature Stamp" />} /> */}
             </Tabs>
             <Container sx={{ mt: 4, mb: 10 }} className="print-container" >
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600, }}>
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column", textAlign: "center", maxWidth:600, }} id="print-content" ref={printRef}>
                 <Grid>
                   <h2>Clinique Sante Pour Tous</h2>
                   <h4>1000, Fairwaywoods Dr. Chester ST 223344</h4>
@@ -526,7 +521,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                                 onChange={(e) => setFax(e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}><Typography><h4>This is a request for laboratory services for:</h4></Typography></Grid>
+                        <Grid item xs={12}><h4>This is a request for laboratory services for:</h4></Grid>
                         <Grid item xs={3}>
                             <TextField
                                 id="lastname"
@@ -557,6 +552,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             />
                         </Grid>
                         <Grid item xs={12}>
+                            
                             <Input
                                 id="order"
                                 multiline
