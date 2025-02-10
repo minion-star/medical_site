@@ -461,7 +461,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             }}
             
           > 
-            <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width: 210}} variant="scrollable">
+            <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width:210, height:"800px"}} variant="scrollable">
                 <Tab label="Laboratory Order"/>
                 <Tab label="Radiology Order "/>
                 <Tab label="General Order" sx={{borderBottom:1, borderColor:"divider"}}/>
@@ -587,6 +587,15 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                                 startAdornment={<InputAdornment key={index} position="start">{ongoing.code}{ongoing.desc}</InputAdornment>}
                             />))}
                             
+                        </Grid>
+                        <Grid item xs={12}>
+                            <h4>Thank you,</h4>
+                        </Grid>
+                        <Grid container item xs={6} sx={{mt:1}}>
+                            <Box sx={{ display: "flex", alignItems: "flex-end", mt: 2 }}>
+                            <label>Signed</label>
+                            <TextField variant="standard" fullWidth/>
+                            </Box>
                         </Grid>
                     </Grid>
                 </Grid>
