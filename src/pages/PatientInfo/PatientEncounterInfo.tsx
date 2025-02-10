@@ -820,7 +820,7 @@ function Addable_Order_Requisition({
   onFieldChange,
 }: Addable_Order_RequisitionProps) {
   const handleOrderChange = (event: SelectChangeEvent) => {
-    onFieldChange(id, 'order', event.target.value);
+    onFieldChange(id, 'orderType', event.target.value);
   };
 
   const handleRequisitionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1704,7 +1704,6 @@ const PatientEncounterInfo:React.FC = () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/encounter/${id}/${encounterID}`);
         const data = response.data;
-        console.log(data.medications);
         setHead(JSON.parse(data.head || '{}'));
         setReviewOfSystems(JSON.parse(data.reviewOfSystems || '{}'));
         setChief(cleanString(data.chief || ''));
@@ -1725,7 +1724,7 @@ const PatientEncounterInfo:React.FC = () => {
         // Set orders data if available
         if (data.orders && data.orders.length > 0) {
           setOrders(data.orders.map((order:any) => ({
-            id: order.id, order: order.orderType, requisition: order.requisition
+            id: order.id, orderType: order.orderType, requisition: order.requisition
           })));
         }
 

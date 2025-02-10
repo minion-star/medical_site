@@ -512,7 +512,7 @@ app.post('/api/encounter', async (req, res) => {
     procedures,
     assessments,
   } = req.body;
-  console.log(orders);
+
   try {
     // Adding a delay of 2 seconds before processing the request
     setTimeout(async () => {
@@ -759,7 +759,6 @@ app.post('/api/clinic', async(req, res) => {
 
   try {
     await db.query(query, values)
-    console.log("success")
   } catch (err){
     console.error(err);
     res.status(500).send("Server error");
