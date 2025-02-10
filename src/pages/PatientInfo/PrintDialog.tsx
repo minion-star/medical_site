@@ -321,6 +321,10 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                 const labOrders = data.orders.filter((order: any) => order.orderType == "Lab");
                 // Set the lab orders state
                 setLabOrders(labOrders);
+                const genOrders = data.orders.filter((order:any)=>order.orderType == "Gen")
+                setGenOrders(genOrders);
+                const radOrders = data.orders.filter((order:any)=>order.orderType == "Rad");
+                setRadOrders(radOrders);
             }
             console.log(orders);
             // Set procedures data if available
@@ -562,7 +566,132 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             </div>
         );
       case 1:
-        return <h4>Content for Radiology Order</h4>; // Replace with your content
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div>
+                <label>REQUISITION</label>
+            </div>
+
+            <div>
+                <input 
+                    type="text" 
+                    style={inputStyle} 
+                />
+            </div>
+
+            <div>
+                <input 
+                    type="text" 
+                    style={inputStyle} 
+                />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                    <label style={labelStyle}>Tel</label>
+                    <input 
+                    type="text" 
+                    value={tel}
+                    onChange={(e:any) => setTel(e.target.value)} 
+                    style={inputStyle} 
+                    />
+                </div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                    <label style={labelStyle}>Fax</label>
+                    <input 
+                        type="text" 
+                        value={fax}
+                        onChange={(e:any) => setFax(e.target.value)} 
+                        style={inputStyle} 
+                    />
+                    
+                </div>
+            </div>
+
+            <div>
+            <h4>This is a request for radiology services for:</h4>
+            </div>
+
+            <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+                <input 
+                type="text" 
+                placeholder="Name"
+                value={lastName+" "+firstName}
+                style={inputStyle} 
+                />
+            </div>
+            <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label>DOB:</label>
+                    <input 
+                        type="text" 
+                        value={personalInformation.dob}
+                        onChange={(e) => setPersonalInformation({ ...personalInformation, dob: e.target.value })} 
+                        style={inputStyle} 
+                    />
+                </div>
+            </div>
+            </div>
+
+            
+
+            <div>
+                {radOrders.map((radOrder, index) => (
+                    <div key={index} style={{ marginBottom: '16px' }}>
+                    <input 
+                        type="text" 
+                        value={radOrder.requisition} 
+                        readOnly
+                        style={inputStyle} 
+                    />
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <label style={labelStyle}>ICDs:</label>
+                <input 
+                    type="text" 
+                    style={inputStyle} 
+                />
+            </div>
+
+            <div>
+            {ongoings.map((ongoing, index) => (
+                <div key={index} style={{ marginBottom: '16px' }}>
+                <input 
+                    type="text" 
+                    value={`${ongoing.code} ${ongoing.desc}`} 
+                    readOnly
+                    style={inputStyle} 
+                />
+                </div>
+            ))}
+            </div>
+
+            <div>
+            <h4>Thank you,</h4>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                <label style={labelStyle}>Signed</label>
+                <input 
+                type="text" 
+                style={inputStyle} 
+                />
+            </div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                <input 
+                type="text" 
+                value={head.date}
+                readOnly
+                style={inputStyle} 
+                />
+            </div>
+            </div>
+            </div>
+        );
       case 2:
         return <h4>Content for General Order</h4>; // Replace with your content
       case 3:
