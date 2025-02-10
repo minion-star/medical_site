@@ -501,13 +501,6 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                             style={inputStyle} 
                         />
                     </div>
-
-                    <div>
-                    <textarea
-                        style={{ width: '100%', padding: '8px', height: '100px', marginBottom: '16px', border:"none", outline:"none", borderBottom: '2px solid #000', }}
-                    />
-                    </div>
-
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
                     <div style={{ flex: 1 }}>
                         <label>Tel</label>
