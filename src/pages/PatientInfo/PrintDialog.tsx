@@ -258,8 +258,8 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
     const [medications, setMedications] = useState<{ id: number; unit: string; qty: string; refills:string; sig: string; rx: string }[]>([
       { id: 1, unit: '', qty: '', refills: '', sig: '', rx: '' },
     ]);
-    const [orders, setOrders] = useState<{ id: number; order: string; requisition: string }[]>([
-      { id: 1, order: '', requisition: '' },
+    const [orders, setOrders] = useState<{ id: number; orderType: string; requisition: string }[]>([
+      { id: 1, orderType: '', requisition: '' },
     ]);
     const [assessments, setAssessments] = useState<{id: number; code: string; onset: string; nature:string; desc:string; note:string}[]>([
       { id: 1, code: '', onset: '', nature: '', desc: '', note: ''}
@@ -302,7 +302,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             // Set orders data if available
             if (data.orders && data.orders.length > 0) {
                 setOrders(data.orders.map((order:any) => ({
-                    id: order.id, order: order.order_type, requisition: order.requisition
+                    id: order.id, orderType: order.order_type, requisition: order.requisition
                 })));
 
                 const labOrder = data.orders.find((order: any) => order.order_type == "Lab");
