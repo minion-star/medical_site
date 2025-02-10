@@ -720,24 +720,26 @@ function Addable_Procedure_Service({
         </Grid>
         <Grid item xs={10} container spacing={1} alignItems="center">
           <Grid item xs={2}>
-            <FormControl fullWidth variant="standard">
-              <Input
-                id={`procedures-services-code-${id}`}
-                value={procedure.code}
-                onChange={handleCodeChange}
-                startAdornment={<InputAdornment position="start">Code:</InputAdornment>}
-              />
-            </FormControl>
+            <TextField
+              id={`procedures-services-code-${id}`}
+              value={procedure.code}
+              onChange={handleCodeChange}
+              fullWidth
+              variant="standard"
+              label="Code"
+              name="code"
+            />
           </Grid>
           <Grid item xs={10}>
-            <FormControl fullWidth variant="standard">
-              <Input
-                id={`procedures-services-desc-${id}`}
-                value={procedure.description}
-                onChange={handleDescriptionChange}
-                startAdornment={<InputAdornment position="start">Desc:</InputAdornment>}
-              />
-            </FormControl>
+            <TextField
+              multiline
+              variant="standard"
+              id={`procedures-services-desc-${id}`}
+              value={procedure.description}
+              onChange={handleDescriptionChange}
+              label="Desc"
+              name="desc"
+            />
           </Grid>
           <Grid item xs={12}>
             <FormControl fullWidth variant="standard">
@@ -851,15 +853,16 @@ function Addable_Order_Requisition({
             </FormControl>
           </Grid>
           <Grid item xs={10}>
-            <FormControl fullWidth variant="standard">
-              <Input
-                id={`procedures-services-desc-${id}`}
+            <TextField
+              id={`procedures-services-desc-${id}`}
                 value={order.requisition}
                 onChange={handleRequisitionChange}
                 multiline
-                startAdornment={<InputAdornment position="start">Requisition:</InputAdornment>}
+                label="Requisition"
+                fullWidth
+                variant="standard"
+                name="requisition"
               />
-            </FormControl>
           </Grid>
         </Grid>
         <Grid item xs={1}>
