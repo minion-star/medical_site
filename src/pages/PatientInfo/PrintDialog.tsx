@@ -461,7 +461,7 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             }}
             
           > 
-            <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width:210, height:"800px"}} variant="scrollable">
+            <Tabs orientation="vertical" sx={{borderRight: 1, borderColor: "divider", width:210, height:"1000px"}} variant="scrollable">
                 <Tab label="Laboratory Order"/>
                 <Tab label="Radiology Order "/>
                 <Tab label="General Order" sx={{borderBottom:1, borderColor:"divider"}}/>
