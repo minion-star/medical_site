@@ -502,24 +502,27 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                         />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
-                    <div style={{ flex: 1 }}>
-                        <label>Tel</label>
-                        <input 
-                        type="text" 
-                        value={tel}
-                        onChange={(e) => setTel(e.target.value)} 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
-                        />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                        <label>Fax</label>
-                        <input 
-                        type="text" 
-                        value={fax}
-                        onChange={(e) => setFax(e.target.value)} 
-                        style={{ width: '100%', padding: '8px', marginBottom: '16px' }} 
-                        />
-                    </div>
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                            <label style={labelStyle}>Tel</label>
+                            <input 
+                            type="text" 
+                            value={tel}
+                            onChange={(e:any) => setTel(e.target.value)} 
+                            style={inputStyle} 
+                            />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <div>
+                                <label style={labelStyle}>Fax</label>
+                                <input 
+                                type="text" 
+                                value={fax}
+                                onChange={(e:any) => setFax(e.target.value)} 
+                                style={inputStyle} 
+                                />
+                            </div>
+                            
+                        </div>
                     </div>
 
                     <div>
@@ -628,8 +631,14 @@ const inputStyle = {
     borderBottom: '2px solid #000', // border-bottom only
     marginBottom: '16px',
     outline: 'none', // remove the outline on focus
+    display:"inline",
   };
-
+const labelStyle = {
+    marginRight: '8px',
+    fontWeight: 'bold',
+    display: 'inline-block',
+    width: '60px', // Give enough space for the label to sit next to the input
+  };
 
 
 export default PrintDialog;
