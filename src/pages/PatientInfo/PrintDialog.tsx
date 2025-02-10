@@ -463,90 +463,98 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
                   <h4>Tel: (804)123-4567 Fax: (804)123-4569</h4>
                 </Grid>
                 <Grid container sx={{ gap: 1, display: "flex" , alignItems:"end"}}>
-                  <Grid item xs={12}>
-                    <Box sx={{ display: "flex", alignItems: "flex-end", mb: 4 }}>
-                      <label>REQUISITION</label>
-                      <TextField variant="standard" fullWidth value=""/>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField variant="standard" fullWidth />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField  variant="standard" fullWidth />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      id="general-order"
-                      variant="standard"
-                      fullWidth
-                      multiline
-                      value={requisition}
-                      onChange={(e) => setRequisition(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item container xs={12} spacing={1}>
-                    <Grid item xs={6}>
-                      <TextField
-                        id="tel"
-                        label="Tel"
-                        multiline
-                        variant="standard"
-                        fullWidth
-                        value={tel}
-                        onChange={(e) => setTel(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        id="fax"
-                        label="Fax"
-                        multiline
-                        variant="standard"
-                        fullWidth
-                        value={fax}
-                        onChange={(e) => setFax(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid item xs={12}><Typography><h4>This is a request for laboratory services for:</h4></Typography></Grid>
-                    <Grid item xs={3}>
-                      <TextField
-                        id="lastname"
-                        label=""
-                        multiline
-                        variant="standard"
-                        fullWidth
-                        value={lastName}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <TextField
-                        id="firstname"
-                        label=""
-                        multiline
-                        variant="standard"
-                        fullWidth
-                        value={firstName}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Input
-                        id="dob"
-                        multiline
-                        fullWidth
-                        value={personalInformation.dob}
-                        startAdornment={<InputAdornment position="start">DOB:</InputAdornment>}
-                      />
+                    <Grid item xs={12}>
+                        <Box sx={{ display: "flex", alignItems: "flex-end", mb: 4 }}>
+                        <label>REQUISITION</label>
+                        <TextField variant="standard" fullWidth value=""/>
+                        </Box>
                     </Grid>
                     <Grid item xs={12}>
+                        <TextField variant="standard" fullWidth />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField  variant="standard" fullWidth />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                        id="general-order"
+                        variant="standard"
+                        fullWidth
+                        multiline
+                        value={requisition}
+                        onChange={(e) => setRequisition(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item container xs={12} spacing={1}>
+                        <Grid item xs={6}>
+                            <TextField
+                                id="tel"
+                                label="Tel"
+                                multiline
+                                variant="standard"
+                                fullWidth
+                                value={tel}
+                                onChange={(e) => setTel(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <TextField
+                                id="fax"
+                                label="Fax"
+                                multiline
+                                variant="standard"
+                                fullWidth
+                                value={fax}
+                                onChange={(e) => setFax(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}><Typography><h4>This is a request for laboratory services for:</h4></Typography></Grid>
+                        <Grid item xs={3}>
+                            <TextField
+                                id="lastname"
+                                label=""
+                                multiline
+                                variant="standard"
+                                fullWidth
+                                value={lastName}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextField
+                                id="firstname"
+                                label=""
+                                multiline
+                                variant="standard"
+                                fullWidth
+                                value={firstName}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Input
+                                id="dob"
+                                multiline
+                                fullWidth
+                                value={personalInformation.dob}
+                                startAdornment={<InputAdornment position="start">DOB:</InputAdornment>}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Input
+                                id="order"
+                                multiline
+                                fullWidth
+                                value={requisition}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
                         <Input
-                            id="order"
+                            id="icds"
                             multiline
                             fullWidth
-                            value={requisition}
-                            />
+                            startAdornment={<InputAdornment position="start">ICDs:</InputAdornment>}
+                        />
+                        </Grid>
                     </Grid>
-                  </Grid>
                 </Grid>
               </Paper>
             </Container>
