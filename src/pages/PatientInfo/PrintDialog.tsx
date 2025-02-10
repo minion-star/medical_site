@@ -392,42 +392,10 @@ const PrintDialog = (props:{open:boolean; handleClose:any;}) => {
             <head>
               <title>Print</title>
               <style>
-                /* Add global styles for printing */
-                body { font-family: Arial, sans-serif; margin: 20px; font-size: 12pt; }
+                /* Add any styles you want to apply to the printed content */
+                body { font-family: Arial, sans-serif; margin: 20px; }
                 h2, h4 { margin: 0; }
                 .print-container { padding: 16px; border: 1px solid #ccc; }
-  
-                /* Ensure Material-UI's styles are included for printing */
-                .MuiFormControl-root {
-                  margin-bottom: 16px;
-                }
-  
-                .MuiInputBase-root {
-                  font-size: 12pt;
-                  padding: 10px;
-                }
-  
-                /* You can add additional styling as required */
-                label {
-                  font-size: 12pt;
-                  font-weight: bold;
-                }
-  
-                .MuiInputAdornment-root {
-                  font-size: 12pt;
-                }
-  
-                /* Make the page look good when printed */
-                @media print {
-                  body {
-                    margin: 0;
-                    padding: 0;
-                  }
-                  .print-container {
-                    padding: 0;
-                    border: none;
-                  }
-                }
               </style>
             </head>
             <body>
