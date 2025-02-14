@@ -104,7 +104,7 @@ const PatientListProvider: React.FC<PatientListProviderProps> = ({ children }) =
         fetchPatients();
     },[patientList] );
 
-    if (loading) return <Box sx={{ display: 'flex' }}><CircularProgress color="success" /></Box>;
+    if (loading) return <Box sx={{ display: 'flex',position:"absolute", left:"50%", top:"50%" }}><CircularProgress color="success" /></Box>;
 
     return (
         <PatientListContext.Provider value={patientList}>
