@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Appbar from '../../components/Appbar';
+import axios from "axios";
 import {
   Box,
   Button,
@@ -27,33 +28,140 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { searchData } from "../../mockData";
 
+interface Patient {
+  CSN: string;
+  FIRST_NAME: string;
+  LAST_NAME: string;
+  PHOTO: string;
+  AGE: string;
+  INFORMATION: {
+    personalInformation: PersonalInformation;
+    contactInformation: ContactInformation;
+    workInformation: WorkInformation;
+    insurance: Insurance;
+  };
+  CREATED_DATE: string;
+  LAST_SAVED_DATE: string;
+}
+
+interface PersonalInformation {
+  id: string,
+  mrn: string,
+  dob: string,
+  gender: string,
+  marriage: string,
+  siblings: string,
+  race: string,
+  pharamacy: string,
+  other: string
+}
+
+interface ContactInformation {
+  address: string,
+  city: string,
+  postcode: string,
+  country: string,
+  state: string,
+  homeph: string,
+  cellph: string,
+  email: string,
+  emergency: string
+}
+
+interface WorkInformation {
+  status: string,
+  workph: string,
+  employer: string
+}
+
+interface Insurance {
+  carrier: string,
+  address: string,
+  city: string,
+  postcode: string,
+  country: string,
+  state: string,
+  phone: string,
+  facsimile: string,
+  plan: string,
+  expiry: string,
+  idno: string,
+  groupno: string,
+  copay: string,
+  authno: string,
+  remarks: string,
+  relation: string,
+  homeph: string,
+  lastname: string,
+  firstname: string,
+  mi: string,
+  dob: string,
+  gender: string
+}
+
+interface TransformedPatient {
+  chartId: string;
+  lastName: string;
+  firstName: string;
+  gender: string;
+  dob: string;
+  age: number;
+  phone: string;
+}
+
 const SearchPage: React.FC = () => {
 
   
   const [searchBy, setSearchBy] = useState<string>('Chart ID');
   const [searchCondition, setSearchCondition] = useState<string>('starts with');
   const [searchText, setSearchText] = useState<string>('');
-  const [filteredData, setFilteredData] = useState(searchData);
+  const [filteredData, setFilteredData] = useState<TransformedPatient[]>([]);
+  const [patientList, setPatientList] = useState<Patient[]>([]);
 
-  const handleSearch = () => {
-    const filtered = searchData.filter((doctor) => {
-      const value = getSearchFieldValue(doctor);
-      if (!value) return false;
+  useEffect(() => {
+    const fetchPatients = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/api/general");
+            setPatientList(response.data); // Assuming the response contains an array of patient data
+        } catch (error) {
+            console.error("Error fetching patients:", error);
+        }
+    };
 
-      switch (searchCondition) {
-        case 'starts with':
-          return value.toLowerCase().startsWith(searchText.toLowerCase());
-        case 'contains':
-          return value.toLowerCase().includes(searchText.toLowerCase());
-        case 'equals':
-          return value.toLowerCase() === searchText.toLowerCase();
-        default:
-          return false;
-      }
-    });
+    fetchPatients();
+},[] );
 
-    setFilteredData(filtered);
-  };
+
+const handleSearch = () => {
+  const filtered = patientList.filter((patient) => {
+    const value = getSearchFieldValue(patient);
+    if (!value) return false;
+
+    switch (searchCondition) {
+      case "starts with":
+        return value.toLowerCase().startsWith(searchText.toLowerCase());
+      case "contains":
+        return value.toLowerCase().includes(searchText.toLowerCase());
+      case "equals":
+        return value.toLowerCase() === searchText.toLowerCase();
+      default:
+        return false;
+    }
+  });
+
+  // Transform to match TransformedPatient interface
+  const transformedData: TransformedPatient[] = filtered.map((patient) => ({
+    chartId: patient.CSN, // Assuming CSN is the Chart ID
+    lastName: patient.LAST_NAME,
+    firstName: patient.FIRST_NAME,
+    gender: patient.INFORMATION.personalInformation.gender,
+    dob: patient.INFORMATION.personalInformation.dob,
+    age: Number(patient.AGE), // Convert to number
+    phone: patient.INFORMATION.contactInformation.cellph,
+  }));
+  console.log("transformedData", transformedData);
+  setFilteredData(transformedData);
+};
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
@@ -61,32 +169,29 @@ const SearchPage: React.FC = () => {
     }
   };
 
-  const getSearchFieldValue = (doctor: any): string | undefined => {
+  const getSearchFieldValue = (patient: Patient): string | undefined => {
     switch (searchBy) {
-        case 'Chart ID':
-            return doctor.chartId;
-        case 'MRN':
-            return doctor.diagnosis;
-        case 'MRN':
-            return doctor.medication;
-        case 'Phone':
-            return doctor.phone;
-        case 'Last Name':
-            return doctor.lastName;
-        case 'First Name':
-            return doctor.firstName;
-        case 'Birth Date':
-            return doctor.dob;
-        case 'Visit Date':
-            return doctor.visitDate;
-        case 'Age/Gender':
-            return `${doctor.age} ${doctor.gender}`;
-        case 'Other':
-            return doctor.other;
-        default:
-            return undefined;
+      case "Chart ID":
+        return patient.CSN;
+      case "Phone":
+        return patient.INFORMATION.contactInformation.cellph;
+      case "Last Name":
+        return patient.LAST_NAME;
+      case "First Name":
+        return patient.FIRST_NAME;
+      case "Birth Date":
+        return patient.INFORMATION.personalInformation.dob;
+      case "Gender":
+        return patient.INFORMATION.personalInformation.gender;
+      case "Age":
+        return patient.AGE;
+      case "Other":
+        return patient.INFORMATION.personalInformation.other;
+      default:
+        return undefined;
     }
   };
+
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -126,9 +231,6 @@ const SearchPage: React.FC = () => {
                             <FormControlLabel value="Chart ID" control={<Radio />} label="Chart ID" />
                           </Grid>
                           <Grid item xs={4}>
-                            <FormControlLabel value="MRN" control={<Radio />} label="MRN" />
-                          </Grid>
-                          <Grid item xs={4}>
                             <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
                           </Grid>
                           <Grid item xs={4}>
@@ -141,10 +243,10 @@ const SearchPage: React.FC = () => {
                             <FormControlLabel value="Birth Date" control={<Radio />} label="Birth Date" />
                           </Grid>
                           <Grid item xs={4}>
-                            <FormControlLabel value="Visit Date" control={<Radio />} label="Visit Date" />
+                            <FormControlLabel value="Gender" control={<Radio />} label="Gender" />
                           </Grid>
                           <Grid item xs={4}>
-                            <FormControlLabel value="Age/Gender" control={<Radio />} label="Age/Gender" />
+                            <FormControlLabel value="Age" control={<Radio />} label="Age" />
                           </Grid>
                           <Grid item xs={4}>
                             <FormControlLabel value="Other" control={<Radio />} label="Other" />
@@ -199,30 +301,28 @@ const SearchPage: React.FC = () => {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell>CHART ID</TableCell>
-                        <TableCell>DIAGNOSIS</TableCell>
-                        <TableCell>MEDICATION</TableCell>
                         <TableCell>LAST NAME</TableCell>
                         <TableCell>FIRST NAME</TableCell>
-                        <TableCell>MI</TableCell>
+                        <TableCell>GENDER</TableCell>
                         <TableCell>DOB</TableCell>
                         <TableCell>AGE</TableCell>
                         <TableCell>PHONE</TableCell>
+                        {/* Diagnosis&Medication */}
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {filteredData.length > 0 ? (
-                        filteredData.map((doctor: any, index: number) => (
+                        filteredData.map((patient:any, index:number) => (
                           <TableRow key={index}>
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell>{doctor.chartId}</TableCell>
-                            <TableCell>{doctor.diagnosis}</TableCell>
-                            <TableCell>{doctor.medication}</TableCell>
-                            <TableCell>{doctor.lastName}</TableCell>
-                            <TableCell>{doctor.firstName}</TableCell>
-                            <TableCell>{doctor.mi}</TableCell>
-                            <TableCell>{doctor.dob}</TableCell>
-                            <TableCell>{doctor.age}</TableCell>
-                            <TableCell>{doctor.phone}</TableCell>
+                            <TableCell>{patient.chartId}</TableCell>
+                            <TableCell>{patient.lastName}</TableCell>
+                            <TableCell>{patient.firstName}</TableCell>
+                            <TableCell>{patient.gender}</TableCell>
+                            <TableCell>{patient.dob}</TableCell>
+                            <TableCell>{patient.age}</TableCell>
+                            <TableCell>{patient.phone}</TableCell>
+                            {/* diagnosis&medication */}
                           </TableRow>
                         ))
                       ) : (
