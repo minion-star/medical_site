@@ -159,7 +159,6 @@ const handleSearch = () => {
     age: Number(patient.AGE), // Convert to number
     phone: patient.INFORMATION.contactInformation.cellph,
   }));
-  console.log("transformedData", transformedData);
   setFilteredData(transformedData);
 };
 
