@@ -38,7 +38,7 @@ export default function SignInSide() {
         navigate("/dashboard"); // Redirect to dashboard or homepage
       }
     } catch (err) {
-      console.log("Invalid credentials. Please try again.");
+        alert("Invalid credentials. Please try again.");
     }
   };
 

@@ -141,7 +141,6 @@ const Administrator = () => {
             if (response.data && response.data.length > 0) {
               setClinicData(response.data[0]);
             }
-            console.log("clinicData", response.data[0]);
           } catch (error) {
             console.error("Error fetching clinic data:", error);
           }
