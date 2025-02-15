@@ -123,6 +123,16 @@ const SearchPage: React.FC = () => {
         try {
             const response = await axios.get("http://localhost:5000/api/general");
             setPatientList(response.data); // Assuming the response contains an array of patient data
+            const initialValue:TransformedPatient[] = response.data.map((patient:Patient) => ({
+              chartId: patient.CSN, // Assuming CSN is the Chart ID
+              lastName: patient.LAST_NAME,
+              firstName: patient.FIRST_NAME,
+              gender: patient.INFORMATION.personalInformation.gender,
+              dob: patient.INFORMATION.personalInformation.dob,
+              age: Number(patient.AGE), // Convert to number
+              phone: patient.INFORMATION.contactInformation.cellph,
+            }));
+            setFilteredData(initialValue);
         } catch (error) {
             console.error("Error fetching patients:", error);
         }
